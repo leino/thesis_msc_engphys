@@ -1,0 +1,90 @@
+\subsection{Definitions}
+
+To define a \emph{positional game}, or \emph{strong game}, or simply \emph{game} from now on, we need a few things.
+
+First of all, we need a ``board'', $V$ and a collection of ``winning subsets'', $\mathcal F \subset \mathcal P(V)$.
+
+The tuple $(V,\mathcal F)$ constitutes a \emph{hypergraph}.
+The set $V$ is sometimes called the \emph{vertices} and the set $\mathcal F$ is sometimes called the \emph{hyperedges} of the hypergraph $(V,\mathcal F)$.
+
+\begin{remark}
+We often refer to $(V,\mathcal F)$ as the game.
+\end{remark}
+
+The idea is that two players, called $\emph{First}$ and $\emph{Second}$ take turns coloring uncolored vertices of the board.
+
+Initially, the entire board, $V$ starts out with all vertices uncolored.
+
+The object of the game is to be the first to color an entire winning set.
+The players are named as they are because player First has the benefit of getting the first move.
+
+Note that a vertex which has already been colored cannot be colored again.
+
+The word \emph{play} is meant to represent an instance of a correctly played game from start to finish.
+Roughly speaking, this means a sequence of partial colorings of $V$.
+(TODO: is partial and complete (see below) standard?)
+
+A given point of the play is called a \emph{position} of the board.
+More precisely, a position is a (partial or complete) two-coloring of $V$.
+
+\begin{remark}
+Note that a position may not necessarily be attainable when playing by the rules; for instance, I can color one vertex Second without any vertex colored First, which is obviously not a position that can arise in the course of a game played by the rules, but nevertheless a position by definition.
+\end{remark}
+
+A \emph{draw} happens when the board is fully occupied, yet neither player occupies completely a winning set.
+
+\subsubsection{Reverse games}
+
+The \emph{reverse} of a given game is obtained if the desired outcome is to avoid occupying completely the winning sets from $\mathcal F$.
+
+(TODO: is $reverse(game)$ an operation? i.e. is it possible to define a game from a reverse game? i.e. is it possible to define winning sets for $reverse(game)$, in terms of the winning sets of game? If not, then give counter-example!)
+
+
+
+\subsubsection{Weak games}
+
+In the above definition of a a game, both players (First and Second), strive to occupy the same winning sets, given by $\mathcal F$. A player might be interested in settling for a draw. (For instance, if Second knows that he cannot win.) 
+
+Thus, we have two players: one player is the \emph{Maker}, and one is the \emph{Breaker}.
+
+We say that Maker wins if he manages to occupy completely one of the winning sets in $\mathcal F$, and Breaker wins if he manages to prevent maker.
+
+Note that the notion of who is ``first to win'' is moot: a player either wins or doesn't win.
+Note further that a draw is impossible in a Maker-Breaker game.
+
+This ``game'' is called a the \emph{weak version} of the original game, or the corresponding \emph{Maker-Breaker} game.
+Note however, that technically this isn't a game at all, according to the above definition: Maker and Breaker have different winning sets! Nevertheless, this is obviously a useful notion.
+
+\subsubsection{Reverse weak games}
+
+The notion of a \emph{reverse weak game} should now be intuitively clear.
+The idea is to start with a game, get the corresponding weak game and then reverse that.
+However, since a weak game is technically a not a game, we should give an explicit definition of what reverse means in reference to a weak game.
+
+Suppose we have a game with the hypergraph $(V,\mathcal F)$.
+The corresponding weak game as a Maker and a Breaker.
+The reverse weak game has a player trying to avoid making, and a player trying to avoid breaking.
+That is: we have an \emph{Avoider} and an \emph{Enforcer}.
+
+Avoider tries to avoid occupying completely a winnig set from $\mathcal F$, and Enforcer tries to prevent Avoider from doing so, that is, tries to enforce Avoider into occupying completely a winning set.
+
+(TODO: Is a reverse weak game a weak game? if not, then give a counter-example)
+
+\subsection{Library interface}
+
+(TODO: This section)
+
+
+\subsection{The game tree}
+
+A good conceptual tool when reasoning about positional games is the so-called game tree, corresponding to a given game.
+
+The root node of the game tree is the starting position of the game.
+That is to say, the empty board.
+
+The children of the root node is all possible positions of the board after First has made his move.
+The children of \emph{those} nodes are the position after Second has made his move, and so on.
+
+The game tree clearly finite, but can be very large.
+
+TODO: Insert example of game tree here

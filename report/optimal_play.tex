@@ -1,0 +1,98 @@
+\subsection{Introduction}
+
+In this section, we will introduce an algorithm called the minimax algorithm which can play any positional game (and more genral games) in an optimal manner.
+
+Quite clearly, any such claim is bound to be about an algorithm with performance issues.
+There are common optimizations, such as alpha-beta pruning, which we also talk about.
+
+The natural structure on which algorithmic play takes place is the game tree, as introduced in section \ref{subsec:gametree}.
+A playing algorithm can then be seen as a search algorithm on the game tree.
+
+
+\subsection{Optimal play}
+
+What do we mean by ``optimal play''?
+
+In this section, we will give some pretty intuitive neccesary conditions.
+
+Clearly, a player cannot play optimally if he squanders an oppurtinity to win.
+More precisely; if current position is a win for the moving player, then he must make a choice which is also a win for him.
+
+Furthermore, if the moving player does not have any opportunity to win in the given position (i.e. none of the leaf-nodes in the tree attached to the current node contains a winning node for the moving player), but if he does have an opportinity to tie, he must still have an opportunity to tie after he makes his move.
+
+Thus, if a player can play as above, then since the game can't go on forever, he will win if he can win, and if he can't win but he can tie, he will do that.
+
+
+TODO: Standard definition of optimal play?
+
+
+\subsection{The minimax algorithm}
+
+In this section, we will see how the considerations in the previous sections guide us to a pretty intuitive algorithm which leads to optimal play.
+
+It is intuitively clear that it is always possible to play as described in the previous section.
+
+The key in order to find an explicit algorithm is to extend the notion of First playwe win.
+The notion of a winning position is connected to the definition of a game, but not to how the player will play i.e. his strategy.
+Thus, the idea of a winning node is restricted to the leaf nodes.
+We will use the notion of optimal play in order to extend this definition to non-leaf nodes.
+
+In terms of the game tree, what does it mean for a given position to be a First player win?
+The definition is inductive.
+
+In the base case, i.e. we have a leaf node, the definition of winning node is clear from the rules of the game.
+If we are not on a leaf node, we break the definition up into two cases:
+
+\begin{itemize}
+  \item Case 1: It is Firsts turn to move.
+    In this case, the position is a First win it has a child which is a first win.
+  \item Case 2: It is Seconds turn to move.
+    In this case, the position is a First win if, for all of it's children, they have children which is a First win.
+\end{itemize}
+
+The notion of a position being a Second win is defined similarly.
+
+It is easy to see that if a position is a First win, it cannot be a Second win, and vice-versa.
+This does not mean that a position must be either a First win or a Second win; and we call such positions Neither win positions.
+
+We have now defined a coloring of any game tree, with three different colors: First win, Second win and Neither win.
+
+The following results follow directly from the definition of optimal play:
+
+If the game is in a First win position, then the play won't change color if First plays optimally.
+(And similarly for Second.)
+
+If the game is in a Neither win position and First plays optimally, then the game will never be in a Second win color, but it might turn into a First win color unless Second also plays optimally.
+(And similarly for Second.)
+
+Finally: if both players play optimally, then the color of the game won't change.
+
+From the above results, the central theorem, which corresponds to the so-called minimax algorithm follows easily:
+The color of a node is the same as the color of the leaf node which results when both players play optimally.
+(This is well defined because of the above corollary.)
+
+To get something a bit more operational, we define an ordering on the set of colors:
+
+\[
+  \text{Second win} < \text{Neither win} < \text{First win}
+\]
+
+It is clear that First plays optimally if he at all times makes choices with maximum color.
+Similarly, Second plays optimally if he at all times makes choices with minimum color.
+
+Thus, to find the color of a position in which it's Firsts time to move, we look at each of it's children in order.
+If any child is a First win, we know that our node is a First win, and can stop searching.
+
+To find the color of a position in which it's Seconds time to move, we look at each of it's children in order.
+If any child is a Second win, we know that the our node is a Second win, and can stop searching.
+
+This leads to the following mutually recursive definition of color for a node, which can me used to play optimally:
+
+\begin{code}
+  winner play@(Play First _) = 
+    max $ map winner $ options play
+  winner play@(Play Second _) = 
+    min $ map winner $ options play
+\end{code}
+
+Because Haskell is a lazy language, it might \emph{not} need to calculate the winner function for all of it's children, as desribed above. In fact, it might not even have to evaluate all options in order to know who is the winner.

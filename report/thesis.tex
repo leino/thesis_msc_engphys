@@ -1,0 +1,70 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{verbatim}
+\usepackage{enumerate}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small}
+
+
+\begin{document}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+% we want our definitions numbered!
+%\newenvironment{definition}[1][Definition]{\begin{trivlist}
+%\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newenvironment{notation}[1][Notation]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% some custom commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else      % qed sign used to mark end of proofs
+      \ifdim\lastskip<1.5em \hskip-\lastskip         
+      \hskip1.5em plus0em minus0.5em \fi \nobreak     
+      \vrule height0.75em width0.5em depth0.25em\fi}  
+\newcommand{\fg}{\mathfrak M}                         % set of fin. gen. modules
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Positional games}
+\label{sec:positional_games}
+\input{positional_games.tex}
+
+\section{Optimal play}
+\label{sec:optimal_play}
+\input{optimal_play.tex}
+
+\section{Hypergraphs}
+\label{sec:hypergraphs}
+\input{hypergraphs.tex}
+
+% bibliography
+% \bibliographystyle{abbrv}
+\bibliographystyle{plainnat}
+\bibliography{simple}
+\input{bibliography.tex}
+
+\end{document}
+

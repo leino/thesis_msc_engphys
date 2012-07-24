@@ -1,0 +1,35 @@
+\begin{thebibliography}{9}
+
+
+\bibitem[Serre, 1955]{serre55}
+Serre, Jean-Pierre (March 1955), "Faisceaux algébriques cohérents",
+\emph{Annals of Mathematics. Second Series. 61 (2): 197–278}
+
+\bibitem[Serre, 1958]{serre58}
+ Serre, Jean-Pierre (1958), "Modules projectifs et espaces fibrés à fibre vectorielle" (in French),
+ \emph{Séminaire P. Dubreil, M.-L. Dubreil-Jacotin et C. Pisot, 1957/58, Fasc. 2, Exposé 23}
+
+\bibitem[Kunz, 1985]{kunz85}
+  Ernst Kunz,
+  \emph{Introduction to Commutative Algebra and Algebraic Geometry}.
+  Birkhäuser Boston,
+  1985.
+
+\bibitem[Yengui-Lombardi, 2005]{yenguilombardi05}
+  Ihsen Yengui, Henri Lombardi,
+  \emph{Suslin's algorithms for reduction of unimodular rows}.
+  2005.
+
+\bibitem[Lam, 2006]{lam06}
+  Tsit Yuen Lam,
+  \emph{Serre's Problem on Projective Modules}.
+  Springer Monographs in Mathematics,
+  2006.
+
+\bibitem[Fabianska-Quadrat, 2007]{fabianskaquadrat07}
+  Anna Fabia\'{n}ska, Alban Quadrat
+  \emph{Applications of the Quillen-Suslin theorem to multidimensional systems theory}.
+  INRIA,
+  2007.
+
+\end{thebibliography}
