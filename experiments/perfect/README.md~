@@ -1,0 +1,1 @@
+This program takes a database of games (hypergraphs) and computes the winner of that game when two perfect players play against each other. (I.e. it runs minimaxi against maximini.)
