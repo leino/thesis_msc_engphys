@@ -1,1 +1,0 @@
-This program takes a database of games (hypergraphs) and computes the winner of that game when two perfect players play against each other, and stores the result as a string ("First" for first player win, "Second" for second player win and "Neither" if neither wins). (I.e. it runs minimaxi against maximini.)
