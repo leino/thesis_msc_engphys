@@ -12,9 +12,7 @@ module GameTheory.PoGa.Game
 data Player = First | Second
   deriving (Eq, Show)
            
-opponent :: Player -> Player
-opponent First = Second
-opponent Second = First
+type Strategy m p = p -> m p
 
 data Winner = Neither | Both | Only Player
   deriving (Eq, Show)
@@ -30,8 +28,10 @@ class Position p where
   winner :: p -> Winner   -- Nothing on non-leaf nodes
   terminal :: p -> Bool   -- Can a move be made? (For instance if the board is full, the position is terminal)
 
+opponent :: Player -> Player
+opponent First = Second
+opponent Second = First
 
-type Strategy m p = p -> m p
 
 playGame :: (Position p, Monad m) => Game p -> Strategy m p -> Strategy m p -> m Winner
 playGame (Game pos) firstStrategy secondStrategy
