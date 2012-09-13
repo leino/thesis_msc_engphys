@@ -19,10 +19,10 @@ type Strategy m p = p -> m p
 
 -- ~~~~~~~~~~ Exports ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-perfectStrategyFirst :: Position p => p -> p
-perfectStrategyFirst = perfectStrategy First
-perfectStrategySecond :: Position p => p -> p
-perfectStrategySecond = perfectStrategy Second
+perfectStrategyFirst :: (Monad m, Position p) => p -> m p
+perfectStrategyFirst pos = return $ perfectStrategy First pos
+perfectStrategySecond :: (Monad m, Position p) => p -> m p
+perfectStrategySecond pos = return $ perfectStrategy Second pos
 
 -- smaple uniformly from all choices
 randomStrategy :: (Random.MonadRandom m, Position p) => p -> m p
