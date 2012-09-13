@@ -1,9 +1,0 @@
-module GameTheory.PoGa
-       (module GameTheory.PoGa.SetGame,
-        module GameTheory.PoGa.Games,
-        module GameTheory.PoGa.Game)
-       where
-
-import GameTheory.PoGa.SetGame
-import GameTheory.PoGa.Games
-import GameTheory.PoGa.Game
