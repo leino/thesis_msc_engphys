@@ -2,10 +2,10 @@
 
 In this section, we will introduce an algorithm called the minimax algorithm which can play any positional game (and more genral games) in an optimal manner.
 
-Quite clearly, any such claim is bound to be about an algorithm with performance issues.
-There are common optimizations, such as alpha-beta pruning, which we also talk about.
+Naturally, any such algorithm will suffer from performance issues.
+Nevertheless, there is one common optimization called alpha-beta pruning, which we will also describe.
 
-The natural structure on which algorithmic play takes place is the game tree, as introduced in section \ref{subsec:gametree}.
+The natural structure on which algorithmic play takes place is the game tree, as described in section \ref{subsec:gametree}.
 A playing algorithm can then be seen as a search algorithm on the game tree.
 
 
@@ -32,12 +32,9 @@ In this section, we will see how the considerations in the previous sections gui
 
 It is intuitively clear that it is always possible to play as described in the previous section.
 
-The key in order to find an explicit algorithm is to extend the notion of First playwe win.
-The notion of a winning position is connected to the definition of a game, but not to how the player will play i.e. his strategy.
-Thus, the idea of a winning node is restricted to the leaf nodes.
-We will use the notion of optimal play in order to extend this definition to non-leaf nodes.
+The key in order to find an explicit algorithm is to extend the notion of First player win to be not just for leaf nodes.
 
-In terms of the game tree, what does it mean for a given position to be a First player win?
+In terms of the game tree, what might it mean for any given position, not just a leaf node, to be a First player win?
 The definition is inductive.
 
 In the base case, i.e. we have a leaf node, the definition of winning node is clear from the rules of the game.
@@ -95,4 +92,58 @@ This leads to the following mutually recursive definition of color for a node, w
     min $ map winner $ options play
 \end{code}
 
-Because Haskell is a lazy language, it might \emph{not} need to calculate the winner function for all of it's children, as desribed above. In fact, it might not even have to evaluate all options in order to know who is the winner.
+
+It is clear that, if we have this function, it is trivial to play optimally according to the above definition.
+
+The actual code used to run the experiments later on is not quite this simple: as mentioned we need to do some optimizations.
+
+\subsection {Alpha-Beta Pruning}
+
+The idea for this optimization is quite simple: suppose that, as we are evaluating max function playing as First, we run into a First win.
+We then know that we can stop searching because we cannot do any better than that.
+
+Similarly if Second is evaluating the min function, if he runs into Second win, he can stop looking since he cannot do any better than that in any case.
+
+In other words, we are ``pruning'' the game tree as we search it.
+
+
+This is a specific case of alpha-beta pruning, but for the case where the leaf node can have a bigger set of values than just First win, Second win and Neither win is completely analogous.
+
+The implementation is particularly easy in Haskell. We can even make it look exactly like the implementation above, but we need to take some special care when writing min and max so that they are lazy and that they know what the absolute minimum is (Second win) and what the absolute maximum is (First win) and can therefore prune.
+
+The lazyness means that Haskell can capture the semantics of the list of winners in a given position, without actually computing the entire list.
+The ``early out'' part is just a form of pruning on the list on which the min and max operate, so that for some lists we will get to the answer without inspecting the entire list (meaning, in Haskell, to compute all of the elements in the list).
+
+Here is prunedMin:
+
+\begin{code}
+  prunedMin ws = 
+    case find (Only Second) of
+      Nothing -> min ws
+      _ -> Only First
+\end{code}
+
+This is a lazy function since find is lazy: therefore, not all of ws might be computed - it depends on what find finds.
+If we have looked trough the entire list of winners and not found Only Second, we give up and use the regular min function.
+
+The implementation for prunedMax is similar:
+
+\begin{code}
+  prunedMax ws = 
+    case find (Only First) of
+      Nothing -> max ws
+      _ -> Only First
+\end{code}
+
+
+Now we can rewrite our pruned minimax algorithm so that it is very similar to the one in the previous section:
+
+\begin{code}
+  winner play@(Play First _) = 
+    prunedMax $ map winner $ options play
+  winner play@(Play Second _) = 
+    prunedMin $ map winner $ options play
+\end{code}
+
+
+Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.

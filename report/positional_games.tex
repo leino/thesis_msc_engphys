@@ -27,10 +27,6 @@ Roughly speaking, this means a sequence of partial colorings of $V$.
 A given point of the play is called a \emph{position} of the board.
 More precisely, a position is a (partial or complete) two-coloring of $V$.
 
-\begin{remark}
-Note that a position may not necessarily be attainable when playing by the rules; for instance, I can color one vertex Second without any vertex colored First, which is obviously not a position that can arise in the course of a game played by the rules, but nevertheless a position by definition.
-\end{remark}
-
 A \emph{draw} happens when the board is fully occupied, yet neither player occupies completely a winning set.
 
 \subsubsection{Reverse games}
@@ -70,10 +66,6 @@ Avoider tries to avoid occupying completely a winnig set from $\mathcal F$, and 
 
 (TODO: Is a reverse weak game a weak game? if not, then give a counter-example)
 
-\subsection{Library interface}
-
-(TODO: This section)
-
 
 \subsection{The game tree}
 
@@ -82,9 +74,7 @@ A good conceptual tool when reasoning about positional games is the so-called ga
 The root node of the game tree is the starting position of the game.
 That is to say, the empty board.
 
-The children of the root node is all possible positions of the board after First has made his move.
+The children of the root node are all possible positions of the board after First has made his move.
 The children of \emph{those} nodes are the position after Second has made his move, and so on.
 
-The game tree clearly finite, but can be very large.
-
-TODO: Insert example of game tree here
+The game tree clearly finite, but can be extremely large.
