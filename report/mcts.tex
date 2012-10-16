@@ -1,0 +1,57 @@
+\subsection {Introduction}
+
+
+Monte-Carlo tree search (MCTS) has become an umbrella term for a class of related algorithm for searching trees probabilistically.
+This applies directly to games if we decide to search the game tree.
+
+In this section, we will introduce an MCTS algorithm known as UCT.
+We will mostly follow the exposition in \citep{mcts_survey12}.
+
+\subsection {MCTS in general}
+
+MCTS studies the game tree as follows.
+
+It keeps a record of a subtree of the gametree containing the nodes that the algorithm has visited so far.
+It also keeps some extra information about each node, which is supposed to represent an approximation of the value of that node, for the player executing the tree search.
+The idea is to somehow find a good \emph{expandable node} (meaning that it has unvisited children) in the visited part of the game tree, and then to make an excursion from that node, which means doing a quicker kind of search from that node, in order to estimate the value of the node. The information gleaned from this excursion will then contribute to our knowledge of the game tree.
+
+It is assumed that we have a (reasonably efficient) function that lets us determine the value of a leaf node.
+
+Here is a sketch of the steps that will make up our algorithm:
+
+\begin{itemize}
+\item \emph{Selection}: find a suitable expandable explored node, and select one of it's child nodes
+\item \emph{Exploration}: run a simulation from the newly found child node and return a \emph{score}
+\item \emph{Expansion}: the child node can now be added to the explored game tree
+\item \emph{Backpropagation}: use the score found in the previous step to update the visited tree in an appropriate way
+\end{itemize}
+
+Note that there are variants of this algorithm that expands and explores multiple nodes instead of just one, but the principle is the same, otherwise.
+
+Note also that this algorithm is far from complete. There are valid ways of doing each of these steps, depending on the situation.
+The next section describes one of the possibilities: the UCT (Upper Confidence bounds for Trees) algorithm.
+
+
+\subsection{The UCT algorithm}
+
+In this section, we fill in each of the steps outlined in the previous section, for the special case of the UCT algorithm.
+
+
+Each node $v$ in the explored part of the game tree has an attached score, which is just a real-valued number, say $s(v)$.
+
+
+\subsubsection{The selection step}
+
+Selection takes place in the explored part of the game tree, and can therefore use the score, $s$.
+We simply repeatedly pick the ``best child'' of the current node, in the following sense.
+
+If a child of $v$ has not been explored, then pick any of them as the best child.
+If all children of $v$ have already been explored, then we pick a child wich maximizes 
+
+\[
+\frac{Q(v')}{N(v')} + c\sqrt{\frac{2\ln{N(v)}}{N(v')}}
+\] 
+
+
+where $v'$ is a child of $v$, $N$ is the visit count and $Q$ is the accumulated score for the node (we will see how to keep track of $Q$ and $N$ for a given node later).
+The parameter $c$ determines the amount of exploration. We will choose $c = 1 / \sqrt 2$ as per the comments in \citep[p. 9]{mcts_survey12}.
