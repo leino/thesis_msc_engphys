@@ -89,7 +89,10 @@ But for explored nodes, we need to store extra information in addition to positi
 Thus we define
 
 \begin{code}
-  data MCTSPosition = Explored {position :: Position, visitCount :: Integer, score :: Real, choices :: [MCTSPosition]} | Unexplored {position :: Position}
+  data MCTSPosition =
+    Explored {position :: Position, visitCount :: Integer,
+              score :: Real, choices :: [MCTSPosition]} |
+    Unexplored {position :: Position}
 \end{code}
 
 This reads as follows: an MCTSNode can either be explored or unexplored, and must have a position in both cases.
@@ -100,13 +103,16 @@ In the case of an explored node, we must also have a visit count and an accumula
 
 explore (Unexplored position) =
   let s = value . randomSearch $ position in
-  (-s, Explored position 1 s (map Unexplored $ choices position ) )
+  (-s, Explored position 1 s (map Unexplored $ choices position))
 explore (Explored position visitCount score choices) = 
   case terminal position of
-    True -> let s = value position in (-s, Explored position (visitCount+1) (score+s) [] )
-    False -> let (best, rest) = popBestChoice position
-                 (s, best') = explore best in
-                 (-s, Explored position (visitCount+1) (score+s) (best':rest) )
+    True ->
+      let s = value position in
+      (-s, Explored position (visitCount+1) (score+s) [])
+    False ->
+      let (best, rest) = popBestChoice position
+          (s, best') = explore best in
+          (-s, Explored position (visitCount+1) (score+s) (best':rest))
 
 \end{code}
 
@@ -118,8 +124,8 @@ If we apply this algorithm repeatedly, we will refine and expand our explored ga
 In this case, we want to stop after a fixed number of iterations (in other cases we might want to stop after a certain time has gone by), like so:
 
 \begin{code}
-  strategy 0 position = 
-    bestChoice position                              -- we are done, return the best child according to our knowledge so far
+  strategy 0 position =
+    bestChoice position
     where
     bestChoice = fst . popBestChoice
   strategy numIterations position  = 
