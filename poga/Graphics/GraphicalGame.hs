@@ -14,9 +14,9 @@ import Control.Monad.Random
 import Data.IORef
 
 
-data Position p => GraphicalGame p = GraphicalGame {name :: String,
-                                                    game :: Game p,
-                                                    renderBoard :: p -> IO ()}
+data GraphicalGame p = GraphicalGame {name :: String,
+                                      game :: Game p,
+                                      renderBoard :: p -> IO ()}
 
 
 liftRandomStrategy :: Position p => (p -> Rand StdGen p) -> p ->  ContT () IO p

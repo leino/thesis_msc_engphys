@@ -24,7 +24,7 @@ perfectStrategyFirst pos = return $ perfectStrategy First pos
 perfectStrategySecond :: (Monad m, Position p) => p -> m p
 perfectStrategySecond pos = return $ perfectStrategy Second pos
 
--- smaple uniformly from all choices
+-- sample uniformly from all choices
 randomStrategy :: (Random.MonadRandom m, Position p) => p -> m p
 randomStrategy pos = Random.fromList [(c,1) | c <- choices pos]
 
@@ -65,7 +65,7 @@ perfectStrategy player pos =
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 type Score = Double
-data Position p => MCTSNode p = Unexplored p | Explored p Int Score [MCTSNode p]
+data MCTSNode p = Unexplored p | Explored p Int Score [MCTSNode p]
 
 
 instance Position p => Position (MCTSNode p) where
@@ -154,9 +154,11 @@ valueSecond :: Position p =>  p -> Score
 valueSecond = negate . valueFirst
 
 
-mctsStrategyFirst :: (Position p, Random.MonadRandom m) => Int -> MCTSNode p ->  m (MCTSNode p) 
+mctsStrategyFirst :: (Position p, Random.MonadRandom m) =>
+  Int -> MCTSNode p ->  m (MCTSNode p) 
 mctsStrategyFirst = mctsStrategy valueFirst
-mctsStrategySecond :: (Position p, Random.MonadRandom m) => Int -> MCTSNode p ->  m (MCTSNode p)
+mctsStrategySecond :: (Position p, Random.MonadRandom m) =>
+  Int -> MCTSNode p ->  m (MCTSNode p)
 mctsStrategySecond = mctsStrategy valueSecond
 
 
