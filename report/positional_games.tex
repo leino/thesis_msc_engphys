@@ -21,8 +21,6 @@ The players are named as they are because player First has the benefit of gettin
 Note that a vertex which has already been colored cannot be colored again.
 
 The word \emph{play} is meant to represent an instance of a correctly played game from start to finish.
-Roughly speaking, this means a sequence of partial colorings of $V$.
-(TODO: is partial and complete (see below) standard?)
 
 A given point of the play is called a \emph{position} of the board.
 More precisely, a position is a (partial or complete) two-coloring of $V$.
@@ -32,10 +30,6 @@ A \emph{draw} happens when the board is fully occupied, yet neither player occup
 \subsubsection{Reverse games}
 
 The \emph{reverse} of a given game is obtained if the desired outcome is to avoid occupying completely the winning sets from $\mathcal F$.
-
-(TODO: is $reverse(game)$ an operation? i.e. is it possible to define a game from a reverse game? i.e. is it possible to define winning sets for $reverse(game)$, in terms of the winning sets of game? If not, then give counter-example!)
-
-
 
 \subsubsection{Weak games}
 
@@ -64,17 +58,15 @@ That is: we have an \emph{Avoider} and an \emph{Enforcer}.
 
 Avoider tries to avoid occupying completely a winnig set from $\mathcal F$, and Enforcer tries to prevent Avoider from doing so, that is, tries to enforce Avoider into occupying completely a winning set.
 
-(TODO: Is a reverse weak game a weak game? if not, then give a counter-example)
-
 
 \subsection{The game tree}
 
-A good conceptual tool when reasoning about positional games is the so-called game tree, corresponding to a given game.
+A good conceptual tool when reasoning about positional games is the so-called \emph{game tree}, corresponding to a given game.
 
 The root node of the game tree is the starting position of the game.
-That is to say, the empty board.
+That is to say, it corresponds to the empty board of the game.
 
-The children of the root node are all possible positions of the board after First has made his move.
+The children of the root node are all possible positions of the board after First has made his first move.
 The children of \emph{those} nodes are the position after Second has made his move, and so on.
 
-The game tree clearly finite, but can be extremely large.
+Since we are only considering games played on finite boards, the game tree finite as well, but can be extremely large.
