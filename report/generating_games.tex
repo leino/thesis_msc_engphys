@@ -1,10 +1,15 @@
 \subsection{Introduction and basic definitions}
 
+In the last section, we showed how to implement MCTS (or more specifically: UCT), which can be used directly to play games in a probabilistic manner.
+The plan is to try it out on many different games.
+In order to do that, we have to generate the games themselves.
+The goal of this chapter is to show how to do just that.
 
-The terminology of graphs and hypergraphs is slightly more natural in this section, and so we will adopt it here.
+This section talks about computationally generating positional games, given some parameters of said games, which we will cover later.
+Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is slightly more appropriate to talk about hypergraphs in place of positional games.
 
 \begin{definition}
-  A \emph{hypergraph} is a set of \emph{vertices},  $V$, together with a list of \emph{hyperedges} $E$, which are simply non-empty subsets of $V$.
+  A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a list of \emph{hyperedges} $E$, which are simply non-empty subsets of $V$.
 \end{definition}
 
 
@@ -19,10 +24,11 @@ Nauty is a tool to generate and work with graphs, and can be downloaded at http:
 
 We are interested, particularly, in the tools \texttt{genbg} and \texttt{showg}.
 
-\texttt{genbg} is used to generate (non-isomorphic) bipartite graphs in the so-called g6 format, and \texttt{showg} is used to turn these g6 graphs into more human-readable form.
+\texttt{genbg} is used to generate (non-isomorphic) bipartite graphs in the very compact g6 format, and \texttt{showg} is used to turn these g6-formatted graphs into more human-readable form.
 
 
 \subsection{Choosing the command line switches}
+\label{sec:nautycommandline}
 
 A bipartite graph corresponds to a hypergraph in the following manner.
 Let us say that the two colors are red and blue. Then we can decide that the red vertices correspond exactly with the set of vertices in our hypergraph.
@@ -199,7 +205,7 @@ Graph 6, order 5.
 
 There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyperedge three times. That is to say, we would end up with a hypergraph of only a single hyperedge. If we were interested in such a hypergraph, we would have just ran \texttt{./genbg 2 1 -d0:1} to begin with.
 
-This issue is resolve with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighbourhood.
+This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighbourhood.
 
 \begin{code}
 
@@ -218,7 +224,7 @@ Graph 1, order 5.
 
 So, in the end we have only a single hypergraph in this class. It has two vertices, each with it's own singleton hyperedge plus a hyperedge that contains both of the vertices.
 
-Our hypothesis at this point is now that a command such as \texttt{./genbg m n -z -d0:1} will generate all non-isomorphic hypergraphs of \texttt{m} vertices and \texttt{n} edges.
+Our hypothesis at this point is that a command such as \texttt{./genbg m n -z -d0:1} will generate all non-isomorphic hypergraphs of \texttt{m} vertices and \texttt{n} edges.
 
 In other words we need to prove the following result.
 
