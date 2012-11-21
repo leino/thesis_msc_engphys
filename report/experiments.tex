@@ -3,19 +3,19 @@
 
 We want to find out how ``good'' our MCTS strategy is for various numbers of iterations.
 Of course we expect that it becomes better at higher numbers of iterations, but how many are neccessary?
-We would also want to know at what number, or even if, it ever becomes virtually optimal.
+We would also want to know at what number, or even if, it becomes virtually perfect.
 
 
 One way to find out when our MCTS algorithm becomes virtually perfect is to match it against a perfect opponent, i.e. a minimaxi strategy.
 We can run perfect as first vs MCTS at $n$ iterations as second many times, and see how many times MCTS will win, loose and tie.
 
-In order for these numbers to be interesting, we of course need to classify the game being played as a first player win, second player win or neither player wins.
-As discussed in section ???, this means running perfect vs perfect for the game and recording the outcome.
+We also want to classify the game being played as a first player win, second player win or neither player wins.
+As discussed in section \ref{sec:minimaxi}, this means running perfect vs perfect for the game and recording the outcome.
 
 
 \subsection{Classes of games to study}
 
-The number of positional games grows explosively with the number of vertices.
+The number of positional games grows rapidly with the number of vertices (or positions).
 If we want to study interesting games of higher number of vertices, we are going to need to focus on particular classes.
 
 In the experiment outlined below, we will focus on games wich have hyperedges (winning sets) with either two or three vertices.
@@ -23,7 +23,7 @@ In the experiment outlined below, we will focus on games wich have hyperedges (w
 In order to limit the number of vertices in a hyperedge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
 
 The argument \texttt{-dm:n} gives a lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
-Recall that the first class of vertices correspond to the vertices of the hypergraph, and the second class referrs to the hyperedges, as described in ???.
+Recall that the first class of vertices correspond to the vertices of the hypergraph, and the second class referrs to the hyperedges, as described in \ref{sec:nautycommandline}.
 
 Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
 
@@ -93,7 +93,9 @@ We are dealing with the set of all hypergraphs with hyperedges of size either tw
 
 That ends up being about 4.3 million hypergraphs. 4320006, to be exact.
 
-For each of those hypergraphs, we run three tournaments: minimaxi as first versus mcts with 10, 20 and 30 iterations, as second.
+For each of those hypergraphs, we run three tournaments: minimaxi as first versus MCTS with 10, 20 and 30 iterations, as second.
 Each tournament consists of 100 games.
 
 Within a given tournament, we record the number of first wins, second wins and the number of ties.
+We also classify the games as first, second or neither player win, by playing two optimal players against each other and recording the result.
+This all ends up in a big database, which is discussed more in detail in chapter \ref{sec:database_queries}.
