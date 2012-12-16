@@ -34,7 +34,8 @@ makeMove sg vtx =
                  turn = First}
 
 -- construct a game given a board and winning sets
-fromWinningSets :: (Ord v) => Set.Set v -> Set.Set (Set.Set v) -> Set.Set (Set.Set v) -> SetGame v
+fromWinningSets :: (Ord v) =>
+  Set.Set v -> Set.Set (Set.Set v) -> Set.Set (Set.Set v) -> SetGame v
 fromWinningSets board wssFirst wssSecond = 
   SetGame {board = board,
            turn = First,

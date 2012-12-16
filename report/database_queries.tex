@@ -1,0 +1,163 @@
+In this section, we go trough, in a tutorial-like fashion, various interesting queries that one could make into the database.
+
+It is assumed that you have installed SQLite.
+
+\subsection{Overall database structure queries}
+
+This section presents various ways of querying the overall structure of the database.
+Feel free to experiment and combine these various queries, as long as you follow the rules of the SQL language implementation in SQLite.
+
+\subsubsection{Query: Vertices and edges}
+
+Suppose that we are interested in finding out, roughly, the structure of the table \texttt{mctsvsperfect} in our database.
+We might first be interested in knowing which ``classes'' of hypergraphs are in the table, where by ``class'' we mean how many vertices and edges.
+
+
+
+\begin{code}
+
+sqlite> SELECT DISTINCT numvertices,numedges
+        FROM mctsvsperfect NATURAL JOIN hypergraphs;
+
+...
+
+\end{code}
+
+The output is supressed here, since it is not ordered.
+If we want ordered results, we extend the previous query a little bit:
+
+
+\begin{code}
+
+sqlite> SELECT DISTINCT numvertices,numedges
+        FROM mctsvsperfect NATURAL JOIN hypergraphs
+        ORDER BY numvertices, numedges;
+
+2|1
+3|1
+3|2
+3|3
+3|4
+4|1
+4|2
+4|3
+4|4
+4|5
+4|6
+4|7
+4|8
+4|9
+4|10
+5|1
+5|2
+5|3
+5|4
+5|5
+5|6
+5|7
+5|8
+5|9
+5|10
+5|11
+5|12
+5|13
+5|14
+5|15
+5|16
+5|17
+5|18
+5|19
+5|20
+6|1
+6|2
+6|3
+6|4
+6|5
+6|6
+6|7
+6|8
+6|9
+6|10
+6|11
+6|12
+6|13
+
+
+\end{code}
+
+
+If we want to find out the number of vertices with 4 vertices and 7 edges, then we issue a command like
+
+\begin{code}
+sqlite> SELECT COUNT (*) FROM
+        mctsvsperfect NATURAL JOIN hypergraphs
+        WHERE numvertices = 4 AND numedges = 7;
+33
+\end{code}
+
+If we want to know this number for all combinations of \texttt{numvertices} and \texttt{numedges} stored in the database, we can issue the following command
+
+\begin{code}
+
+sqlite> SELECT numvertices, numedges, count(hypergraph)
+        FROM hypergraphs
+        GROUP BY numvertices, numedges;
+2|1|1
+3|1|2
+3|2|2
+3|3|2
+3|4|1
+4|1|2
+4|2|5
+4|3|11
+4|4|17
+4|5|18
+4|6|17
+4|7|11
+4|8|5
+4|9|2
+4|10|1
+5|1|2
+5|2|7
+5|3|24
+5|4|75
+5|5|192
+5|6|431
+5|7|806
+5|8|1259
+5|9|1644
+5|10|1806
+5|11|1644
+5|12|1259
+5|13|806
+5|14|431
+5|15|192
+5|16|75
+5|17|24
+5|18|7
+5|19|2
+5|20|1
+6|1|2
+6|2|8
+6|3|35
+6|4|163
+6|5|715
+6|6|2958
+6|7|11011
+6|8|36277
+6|9|105070
+6|10|267522
+6|11|600130
+6|12|1190410
+6|13|2094921
+
+
+\end{code}
+
+
+The attentive reader will note that this is the sum of the above number of hypergraphs is 4320006 - the number of hypergraphs in the database:
+
+\begin{code}
+sqlite> SELECT COUNT (*) FROM hypergraphs;
+4320006
+\end{code}

@@ -1,0 +1,238 @@
+\subsection{Introduction and basic definitions}
+
+In the last section, we showed how to implement MCTS (or more specifically: UCT), which can be used directly to play games in a probabilistic manner.
+The plan is to try it out on many different games.
+In order to do that, we have to generate the games themselves.
+The goal of this chapter is to show how to do just that.
+
+This section talks about computationally generating positional games, given some parameters of said games, which we will cover later.
+Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is slightly more appropriate to talk about hypergraphs in place of positional games.
+
+\begin{definition}
+  A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a list of \emph{hyperedges} $E$, which are simply non-empty subsets of $V$.
+\end{definition}
+
+
+A positional game is equivalent to a hypergraph, if we take the so-called winning sets to be the hyperedges.
+
+
+
+\subsection{Nauty and hypergraphs}
+
+
+Nauty is a tool to generate and work with graphs, and can be downloaded at http://cs.anu.edu.au/people/bdm/nauty/.
+
+We are interested, particularly, in the tools \texttt{genbg} and \texttt{showg}.
+
+\texttt{genbg} is used to generate (non-isomorphic) bipartite graphs in the very compact g6 format, and \texttt{showg} is used to turn these g6-formatted graphs into more human-readable form.
+
+
+\subsection{Choosing the command line switches}
+\label{sec:nautycommandline}
+
+A bipartite graph corresponds to a hypergraph in the following manner.
+Let us say that the two colors are red and blue. Then we can decide that the red vertices correspond exactly with the set of vertices in our hypergraph.
+We can make the blue vertices correspond to hyperedges by defining the hyperedge for a given blue vertex as those red vertices which are connected to it.
+
+
+In this section, we work out as an example all of the hypergraphs with 3 vertices and 2 hyperedges, using Nauty.
+I will assume that Nauty has been installed and your current directory is wherever you installed Nauty or have \texttt{genbg} and \texttt{showg} available.
+
+Here is some example output:
+
+\begin{code}
+   $ ./genbg 2 3 | ./showg
+
+
+Graph 1, order 5.
+  0 : ;
+  1 : ;
+  2 : ;
+  3 : ;
+  4 : ;
+
+Graph 2, order 5.
+  0 : 4;
+  1 : ;
+  2 : ;
+  3 : ;
+  4 : 0;
+
+Graph 3, order 5.
+  0 : 4;
+  1 : 4;
+  2 : ;
+  3 : ;
+  4 : 0 1;
+
+Graph 4, order 5.
+  0 : 3 4;
+  1 : ;
+  2 : ;
+  3 : 0;
+  4 : 0;
+
+Graph 5, order 5.
+  0 : 3;
+  1 : 4;
+  2 : ;
+  3 : 0;
+  4 : 1;
+
+Graph 6, order 5.
+  0 : 3 4;
+  1 : 4;
+  2 : ;
+  3 : 0;
+  4 : 0 1;
+
+Graph 7, order 5.
+  0 : 3 4;
+  1 : 3 4;
+  2 : ;
+  3 : 0 1;
+  4 : 0 1;
+
+Graph 8, order 5.
+  0 : 2 3 4;
+  1 : ;
+  2 : 0;
+  3 : 0;
+  4 : 0;
+
+Graph 9, order 5.
+  0 : 2 3 4;
+  1 : 4;
+  2 : 0;
+  3 : 0;
+  4 : 0 1;
+
+Graph 10, order 5.
+  0 : 2 4;
+  1 : 3;
+  2 : 0;
+  3 : 1;
+  4 : 0;
+
+Graph 11, order 5.
+  0 : 2 4;
+  1 : 3 4;
+  2 : 0;
+  3 : 1;
+  4 : 0 1;
+
+Graph 12, order 5.
+  0 : 2 3 4;
+  1 : 3 4;
+  2 : 0;
+  3 : 0 1;
+  4 : 0 1;
+
+Graph 13, order 5.
+  0 : 2 3 4;
+  1 : 2 3 4;
+  2 : 0 1;
+  3 : 0 1;
+  4 : 0 1;
+
+\end{code}
+
+
+
+The first three vertices are from the first color and correspond to the vertices of our would-be hypergraphs.
+The remaining two vertices are of the second color and correspond to the would-be hyperedges.
+
+Clearly, there are some issues to work out. Firstly, note that \texttt{Graph 1} does not give us an actual hypergraph: both hyperedges would be empty, under our interpretation, which we do not allow.
+
+The same criticism holds for \texttt{Graph 2} and \texttt{Graph 3}.
+
+
+To get around this, we use the command line switch $\texttt{-dm:n}$ where the \texttt{m} and \texttt{n} are the minimum degree of the first and second class of vertices, respectively.
+
+With something like \texttt{-d0:1} we are saying that the vertices of our hypergraph may be in no hyperedges, but each hyperedge must contain at least 1 vertex, i.e. must not be empty.
+
+
+\begin{code}
+
+  $ ./genbg 2 3 -d0:1 | ./showg
+
+
+
+Graph 1, order 5.
+  0 : 2 3 4;
+  1 : ;
+  2 : 0;
+  3 : 0;
+  4 : 0;
+
+Graph 2, order 5.
+  0 : 2 3 4;
+  1 : 4;
+  2 : 0;
+  3 : 0;
+  4 : 0 1;
+
+Graph 3, order 5.
+  0 : 2 4;
+  1 : 3;
+  2 : 0;
+  3 : 1;
+  4 : 0;
+
+Graph 4, order 5.
+  0 : 2 4;
+  1 : 3 4;
+  2 : 0;
+  3 : 1;
+  4 : 0 1;
+
+Graph 5, order 5.
+  0 : 2 3 4;
+  1 : 3 4;
+  2 : 0;
+  3 : 0 1;
+  4 : 0 1;
+
+Graph 6, order 5.
+  0 : 2 3 4;
+  1 : 2 3 4;
+  2 : 0 1;
+  3 : 0 1;
+  4 : 0 1;
+
+\end{code}
+
+
+There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyperedge three times. That is to say, we would end up with a hypergraph of only a single hyperedge. If we were interested in such a hypergraph, we would have just ran \texttt{./genbg 2 1 -d0:1} to begin with.
+
+This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighbourhood.
+
+\begin{code}
+
+  $ ./genbg 2 3 -z -d0:1 | ./showg
+
+Graph 1, order 5.
+  0 : 2 4;
+  1 : 3 4;
+  2 : 0;
+  3 : 1;
+  4 : 0 1;
+
+
+\end{code}
+
+
+So, in the end we have only a single hypergraph in this class. It has two vertices, each with it's own singleton hyperedge plus a hyperedge that contains both of the vertices.
+
+Our hypothesis at this point is that a command such as \texttt{./genbg m n -z -d0:1} will generate all non-isomorphic hypergraphs of \texttt{m} vertices and \texttt{n} edges.
+
+In other words we need to prove the following result.
+
+\begin{theorem}
+
+Let $B$ be the set of all bipartite graphs with $n$ vertices in the first class and $m$ vertices in the second class.
+Suppose further that $B$ is such that all vertices in the second class have non-zero neighbourhoods, and that no two vertices in the second class have the same neighbourhood.
+
+Then we get a one-to-one bijection to hypergraphs with $n$ vertices and $m$ hyperedges, by taking the vertices in the first class to be the vertices of the hypergraph, and the vertices in the second class to be hyperedges (defined by their neighbourhoods).
+
+\end{theorem}

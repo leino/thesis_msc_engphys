@@ -15,7 +15,7 @@ graphicalHex = GraphicalGame {name = "Hex",
 
 main = runGraphicalGame graphicalHex
                         (interactiveStrategy graphicalHex)
-                        (liftPureStrategy secondStrategyPerfect)
+                        ( perfectStrategySecond)
 
 
 
