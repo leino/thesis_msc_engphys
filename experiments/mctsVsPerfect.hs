@@ -3,7 +3,7 @@ import GameTheory.PoGa
 import System (getArgs)
 import Database.HDBC
 import Database.HDBC.Sqlite3
-import Data.List.Split (chunk)
+import Data.List.Split (chunksOf)
 import FromRepresentation (fromRepresentation)
 import HDBUtils (requireTable)
 import Control.Monad (unless)
@@ -72,10 +72,10 @@ runExperiment connection tableName numGames = do
   insertStatement <- do prepare connection $ concat ["REPLACE INTO ", tableName, 
                                                      " (hypergraph, numiterations, numfirstwins, numsecondwins, numneitherwins) VALUES (?,?,?,?,?)"]
 
-  results <- map convertResult <$> quickQuery' connection query []
+  results <- map convertResult <$> quickQuery connection query []
 
   -- Compute the results in chunks
-  let rcs = chunk 5 results
+  let rcs = chunksOf 1024  results
 
   sequence_ [do putStr $ "processing chunk " ++ show i ++ "... "
                 rs <- sequence [do r <- result numIterations sg
