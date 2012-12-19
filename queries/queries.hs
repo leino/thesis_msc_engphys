@@ -7,6 +7,7 @@ import Data.Convertible.Base
 import Data.List (transpose)
 import Control.Applicative
 import Text.Printf
+import System.Environment (getArgs)
 
 -- columWidths rows gives the widths of the columns in the matrix with the given rows
 columnWidths :: [[String]] -> [Int]
@@ -21,7 +22,7 @@ showTable rs =
   where
     showCell w s = (replicate (w - length s) ' ') ++ s
 
-cols_01 = ["vertices", "edges", "First wins", "Second wins", "Neither wins", "iterations"]
+cols_01 = ["#vertices", "#edges", "%First wins", "%Second wins", "%Neither wins", "#iterations"]
 query_01 = "SELECT numvertices, numedges, SUM(numfirstwins), SUM(numsecondwins), SUM(numneitherwins), numiterations \
            \FROM hypergraphs NATURAL JOIN perfect NATURAL JOIN mctsvsperfect \
            \WHERE winner = 'First' \
@@ -42,11 +43,13 @@ showRow_01 (v, e, f, s, n, i) =
     maybeShowFloat :: Maybe Float -> String
     maybeShowFloat = "" `maybe` (printf "%.2f")
 
-cols_02 = ["vertices", "edges", "First wins", "Second wins", "Neither wins", "iterations"]
+cols_02 = cols_01
 query_02 = "SELECT numvertices, numedges, SUM(numfirstwins), SUM(numsecondwins), SUM(numneitherwins), numiterations \
            \FROM hypergraphs NATURAL JOIN perfect NATURAL JOIN mctsvsperfect \
-           \WHERE winner = 'First' \
+           \WHERE winner = 'Neither' \
            \GROUP BY numvertices, numedges, numiterations"
+maybeProcess_02 = maybeProcess_01
+showRow_02 = showRow_01
 
 showSql :: SqlValue -> String
 showSql SqlNull = ""
@@ -62,10 +65,18 @@ maybeFromSql sqlVal =
     Right val -> val
 
 main = do
-  putEnv "TMPDIR=/usr/tmp"
-  connection <- connectSqlite3 "../data/twothree_accum-2012-12-07.db"
-  sqlResults <- quickQuery' connection query_01 []
-  let results = map (map maybeFromSql) sqlResults
-      maybeProcessedResults = map maybeProcess_01 results
-  putStrLn $ showTable $ map showRow_01 maybeProcessedResults
-  disconnect connection
+  args <- getArgs
+  case args of
+    [databaseFileName] -> do
+      putEnv "TMPDIR=/usr/tmp" -- put the temporary directory to some place with more storage than /tmp (at least useful on my system, uncomment if you don't have /usr/tmp)
+      connection <- connectSqlite3 databaseFileName
+      let queryAndPrint (query, colDescs, processRow, showRow) =  do
+            sqlResults <- quickQuery' connection query []
+            let results = map (map maybeFromSql) sqlResults
+                maybeProcessedResults = map processRow results
+            putStrLn $ showTable $ colDescs : (map showRow maybeProcessedResults)
+      queryAndPrint (query_01, cols_01, maybeProcess_01, showRow_01)
+      queryAndPrint (query_02, cols_02, maybeProcess_02, showRow_02)
+      disconnect connection
+    _ -> do
+      putStrLn "Invalid arguments. Expecting a database filename."
