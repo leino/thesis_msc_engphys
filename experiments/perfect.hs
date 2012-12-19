@@ -4,7 +4,7 @@ import System (getArgs)
 import Database.HDBC
 import Database.HDBC.Sqlite3
 import HDBUtils (requireTable)
-import Data.List.Split (chunk)
+import Data.List.Split (chunksOf)
 import FromRepresentation (fromRepresentation)
 
 requiredColumns = 
@@ -41,10 +41,10 @@ runExperiment connection tableName = do
   -- Insert results
   insertStatement <- do prepare connection $ concat ["REPLACE INTO ", tableName, 
                                                      " (hypergraph, winner) VALUES (?,?)"]
-  results <- map convertResult <$> quickQuery' connection query []
+  results <- map convertResult <$> quickQuery connection query []
 
   -- Compute the results in chunks
-  let rcs = chunk 5 results
+  let rcs = chunksOf 1024 results
 
   sequence_ [do putStr $ "processing chunk " ++ show i ++ "... "
                 rs <- sequence [do r <- result sg
