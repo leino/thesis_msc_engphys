@@ -6,7 +6,7 @@ In order to do that, we have to generate the games themselves.
 The goal of this chapter is to show how to do just that.
 
 This section talks about computationally generating positional games, given some parameters of said games, which we will cover later.
-Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is slightly more appropriate to talk about hypergraphs in place of positional games.
+Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is slightly more appropriate to talk about hyper-graphs in place of positional games.
 
 \begin{definition}
   A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a list of \emph{hyperedges} $E$, which are simply non-empty subsets of $V$.
@@ -32,7 +32,7 @@ We are interested, particularly, in the tools \texttt{genbg} and \texttt{showg}.
 
 A bipartite graph corresponds to a hypergraph in the following manner.
 Let us say that the two colors are red and blue. Then we can decide that the red vertices correspond exactly with the set of vertices in our hypergraph.
-We can make the blue vertices correspond to hyperedges by defining the hyperedge for a given blue vertex as those red vertices which are connected to it.
+We can make the blue vertices correspond to hyperedges by defining the hyper edge for a given blue vertex as those red vertices which are connected to it.
 
 
 In this section, we work out as an example all of the hypergraphs with 3 vertices and 2 hyperedges, using Nauty.
@@ -203,9 +203,9 @@ Graph 6, order 5.
 \end{code}
 
 
-There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyperedge three times. That is to say, we would end up with a hypergraph of only a single hyperedge. If we were interested in such a hypergraph, we would have just ran \texttt{./genbg 2 1 -d0:1} to begin with.
+There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyper edge three times. That is to say, we would end up with a hypergraph of only a single hyper edge. If we were interested in such a hypergraph, we would have just ran \texttt{./genbg 2 1 -d0:1} to begin with.
 
-This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighbourhood.
+This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighborhood.
 
 \begin{code}
 

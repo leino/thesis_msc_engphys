@@ -2,7 +2,7 @@
 
 
 We want to find out how ``good'' our MCTS strategy is for various numbers of iterations.
-Of course we expect that it becomes better at higher numbers of iterations, but how many are neccessary?
+Of course we expect that it becomes better at higher numbers of iterations, but how many are necessary?
 We would also want to know at what number, or even if, it becomes virtually perfect.
 
 
@@ -18,16 +18,16 @@ As discussed in section \ref{sec:minimaxi}, this means running perfect vs perfec
 The number of positional games grows rapidly with the number of vertices (or positions).
 If we want to study interesting games of higher number of vertices, we are going to need to focus on particular classes.
 
-In the experiment outlined below, we will focus on games wich have hyperedges (winning sets) with either two or three vertices.
+In the experiment outlined below, we will focus on games which have hyper-edges (winning sets) with either two or three vertices.
 
-In order to limit the number of vertices in a hyperedge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
+In order to limit the number of vertices in a hyper-edge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
 
 The argument \texttt{-dm:n} gives a lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
-Recall that the first class of vertices correspond to the vertices of the hypergraph, and the second class referrs to the hyperedges, as described in \ref{sec:nautycommandline}.
+Recall that the first class of vertices correspond to the vertices of the hyper-graph, and the second class refers to the hyper-edges, as described in \ref{sec:nautycommandline}.
 
 Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
 
-Therefore, if we wanted to generate the class of hypergraphs with 4 vertices and 2 hyperedges which either have 2 or 3 vertices in them, we would run:
+Therefore, if we wanted to generate the class of hyper-graphs with 4 vertices and 2 hyper-edges which either have 2 or 3 vertices in them, we would run:
 
 \begin{code}
   $ ./genbg -z 4 2 -d0:2 -D2:3 | ./showg

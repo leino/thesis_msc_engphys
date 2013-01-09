@@ -1,6 +1,6 @@
 \subsection{Introduction}
 
-In this section, we will introduce an algorithm called the minimax algorithm which can play any positional game (and more genral games) in an optimal manner.
+In this section, we will introduce an algorithm called the minimax algorithm which can play any positional game (and more general games) in an optimal manner.
 
 Naturally, any such algorithm will suffer from performance issues.
 Nevertheless, there is one common optimization called alpha-beta pruning, which we will also describe.
@@ -9,7 +9,7 @@ The natural structure on which algorithmic play takes place is the game tree, as
 A playing algorithm can then be seen as a search algorithm on the game tree.
 
 
-Most of this material is covered in \citep{aimodernapproach}, though with some of the propositions given as exercises and with more procedural psuedo code.
+Most of this material is covered in \citep{aimodernapproach}, though with some of the propositions given as exercises and with more procedural pseudo code.
 
 \subsection{Optimal play}
 
@@ -17,10 +17,10 @@ What do we mean by ``optimal play''?
 
 In this section, we will give some pretty intuitive neccesary conditions.
 
-Clearly, a player cannot play optimally if he squanders an oppurtinity to win.
+Clearly, a player cannot play optimally if he squanders an opportunity to win.
 More precisely; if current position is a win for the moving player, then he must make a choice which is also a win for him.
 
-Furthermore, if the moving player does not have any opportunity to win in the given position (i.e. none of the leaf-nodes in the tree below the current node contains a winning node for the moving player), but if he does have an opportinity to tie, he must still have an opportunity to tie after he makes his move.
+Furthermore, if the moving player does not have any opportunity to win in the given position (i.e. none of the leaf-nodes in the tree below the current node contains a winning node for the moving player), but if he does have an opportunity to tie, he must still have an opportunity to tie after he makes his move.
 
 If a player can play as above, he will win if he can win, and if he can't win but he can tie, he will do that.
 
@@ -59,7 +59,7 @@ It is easy to see that if a position is a First win, it cannot be a Second win, 
 This does not mean that a position must be either a First win or a Second win; and we call such positions Neither win positions.
 
 We have now defined a kind of coloring of any game tree, with three different colors: First win, Second win and Neither win.
-Instead saying ``the color of a node'', it is more naturall to speak of ``the \emph{winner} of a node'', which can be either First, Second or Neither.
+Instead saying ``the color of a node'', it is more natural to speak of ``the \emph{winner} of a node'', which can be either First, Second or Neither.
 
 The following two propositions follow directly from the definition of optimal play:
 
@@ -118,8 +118,8 @@ Since we know the rules of the game, the functions \texttt{turn}, \texttt{choice
 
 The code breaks the definition of \texttt{winner} up into three cases.
 In the first case, where the position is terminal, we trivially know the winner from the definition of the game, so \texttt{terminalWinner} is assumed to be given.
-In the second case, where the position is not terminal and it is First's turn to play, the winner is the maximum of \texttt{winner} mapped over the choices available from the given position.
-In the final case, where we know that the node is not terminal and it is not First's turn to move, the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
+In the second case, where the position is not terminal and it is Firsts turn to play, the winner is the maximum of \texttt{winner} mapped over the choices available from the given position.
+In the final case, where we know that the node is not terminal and it is not Firsts turn to move, the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
 
 With the above function in hand, it is easy to play optimally.
 The actual code used to run the experiments later on is not quite this simple: as mentioned we need to do some optimizations.
@@ -140,7 +140,7 @@ There is a common generalization where the leaf node can have a bigger set of va
 
 The implementation is particularly easy in Haskell. We can even make it look exactly like the implementation above, but we need to take some special care when writing min and max so that they know what the absolute minimum is (Second win) and what the absolute maximum is (First win) and can therefore prune.
 
-This means that we can find the maximum without actually computing the entire list of elements in the list (which would require searching the entire game tree), thanks to a feature of Haskell known as lazyness.
+This means that we can find the maximum without actually computing the entire list of elements in the list (which would require searching the entire game tree), thanks to a feature of Haskell known as laziness.
 
 Here is our version of \texttt{min} which is lazy and will consequently allow pruning:
 

@@ -1,3 +1,4 @@
-*.o
+*.*~
+\#*\#
 *.hi
-*.*~  # temporary files used by emacs
+*.o

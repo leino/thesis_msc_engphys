@@ -11,7 +11,7 @@ We will mostly follow the exposition in \citep{mcts_survey12}, chapter 3.
 
 MCTS studies the game tree as follows.
 
-It keeps a record of a subtree of the gametree containing the nodes that the algorithm has visited so far.
+It keeps a record of a subtree of the game-tree containing the nodes that the algorithm has visited so far.
 It also keeps some extra information about each node, which is supposed to represent an approximation of the value of that node, for the player executing the tree search.
 The idea is to somehow find a good \emph{expandable node} (meaning that it has unvisited children) in the visited part of the game tree, and then to make an excursion from that node, which means doing a quicker kind of search from that node, in order to estimate the value of the node. The information gleaned from this excursion will then contribute to the algorithms knowledge of the game tree.
 
@@ -46,7 +46,7 @@ Selection takes place in the explored part of the game tree, and can therefore u
 We repeatedly pick the ``best child'' of the current node, in the following sense.
 
 If a child of $v$ has not been explored, then pick any of them as the best child.
-If all children of $v$ have already been explored, then we pick a child wich maximizes
+If all children of $v$ have already been explored, then we pick a child which maximizes
 
 \begin{equation}
 \label{eq:uctnodevalue}
@@ -61,7 +61,7 @@ This selection process continues until we find either an unexplored node or run 
 
 \subsubsection{The exploration step}
 
-When we have found a node using the selection step, we will explore that node, which will yeild a score.
+When we have found a node using the selection step, we will explore that node, which will yield a score.
 
 If we are ``exploring'' a leaf node, the score will just be the value at the leaf node.
 
@@ -83,7 +83,7 @@ For our purposes, \texttt{value endPosition} is the value of \texttt{endPosition
 
 Here is the explore function, which will explore and refine our game tree.
 
-We will assume that we have a datatype \texttt{Position} which represents a completely pure state of the game.
+We will assume that we have a data-type \texttt{Position} which represents a completely pure state of the game.
 Of course, there is a function \texttt{choices :: Position -> [Position]} which given a position will give us a list of choices (also positions) of where we can go next (according to the structure of the game tree).
 
 For explored nodes, we need to store extra information in addition to position: we need a visit count and an accumulated score. 
@@ -142,7 +142,7 @@ The function \texttt{bestChoice} is just a helper, and is defined above simply t
 
 Thus \texttt{popBestChoice} is trivial to write if we have a notion of 'best'.
 
-This notion is gotten by defining an ordering on the datatype MCTSNode, as follows:
+This notion is gotten by defining an ordering on the data-type MCTSNode, as follows:
 
 \begin{code}
   compare node a@(Explored _ _ _ _) b@(Explored _ _ _ _) =

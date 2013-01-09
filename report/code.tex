@@ -3,7 +3,7 @@
 In this section, we give an overview of the overall structure of the code and the \texttt{PoGa} library.
 
 
-Some parts of the \texttt{PoGa} library, such as the implemetnations of the games Tic-Tac-Toe and Hex, are not relevant and are thus not brought up here.
+Some parts of the \texttt{PoGa} library, such as the implementations of the games Tic-Tac-Toe and Hex, are not relevant and are thus not brought up here.
 The same goes for the entire \texttt{Graphics} submodule, which implements support for a human player for the cases of Tic-Tac-Toe and Hex.
 (The reason that we cannot just implement support for a human player for all positional games is that we cannot implement attractive user interfaces for the class of all games.)
 
@@ -22,7 +22,7 @@ This module defines the \texttt{Position} type-class, which is the central inter
 It also defines the notion of a \texttt{Strategy} and how to play two strategies against each other in \texttt{playGame}.
 
 Note that a strategy is just a move function, but that the result of the move is a monadic position value.
-If we use the \texttt{IO} monad, we can represent a human player as a strategy. If we use a monad in the \texttt{MonadRandom} typeclass, we can represent a random strategy. (Though, typically not completely random, of course.)
+If we use the \texttt{IO} monad, we can represent a human player as a strategy. If we use a monad in the \texttt{MonadRandom} type-class, we can represent a random strategy. (Though, typically not completely random, of course.)
 
 \begin{code}
 module GameTheory.PoGa.Game
@@ -79,9 +79,9 @@ playTournament n game fststrat sndstrat = do
 
 \subsubsection{SetGame.hs}
 
-A typeclass works well as a general interface, but we need to have a concrete datatype to represent our games.
+A typeclass works well as a general interface, but we need to have a concrete data-type to represent our games.
 
-For many purposes, the following one works quite well. When it doesn't, a user of the library can always define his own datatype and use most of the functionality provided by the \texttt{PoGa} library, as long as the datatype is an instance of the \texttt{Position} typeclass, as described above.
+For many purposes, the following one works quite well. When it doesn't, a user of the library can always define his own data-type and use most of the functionality provided by the \texttt{PoGa} library, as long as the data-type is an instance of the \texttt{Position} typeclass, as described above.
 
 \begin{code}
 
