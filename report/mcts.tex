@@ -10,24 +10,20 @@ We will mostly follow the exposition in \citep{mcts_survey12}, chapter 3.
 \subsection {MCTS in general}
 
 MCTS studies the game tree as follows.
-
 It keeps a record of a subtree of the game-tree containing the nodes that the algorithm has visited so far.
-It also keeps some extra information about each node, which is supposed to represent an approximation of the value of that node, for the player executing the tree search.
+It also keeps some extra information about each node, which is supposed to represent an approximation of the value of that node.
 The idea is to somehow find a good \emph{expandable node} (meaning that it has unvisited children) in the visited part of the game tree, and then to make an excursion from that node, which means doing a quicker kind of search from that node, in order to estimate the value of the node. The information gleaned from this excursion will then contribute to the algorithms knowledge of the game tree.
 
 It is assumed that we have a (reasonably efficient) function that lets us determine the value of a leaf node.
-
 Here is a sketch of the steps that will make up our algorithm:
 
 \begin{itemize}
-\item \emph{Selection}: find a suitable expandable explored node, and select one of it's child nodes
-\item \emph{Exploration}: run a simulation from the newly found child node and return a \emph{score}
-\item \emph{Backpropagation}: use the score found in the previous step to update the visited tree in an appropriate way
+\item \emph{Selection}: find a suitable expandable explored node, and select one of it's child nodes.
+\item \emph{Exploration}: run a simulation from the newly found child node and return a \emph{score}.
+\item \emph{Backpropagation}: use the score found in the previous step to update the visited tree in an appropriate way.
 \end{itemize}
-
 Note that there are variants of this algorithm that expands and explores multiple nodes instead of just one, but the principle is the same, otherwise.
-
-Note also that this algorithm is far from complete. There are valid ways of doing each of these steps, depending on the situation.
+Note also that this algorithm is far from complete. There are various appropriate ways of performing each of these steps, depending on the situation.
 The next section describes one of the possibilities: the UCT (Upper Confidence bounds for Trees) algorithm.
 
 
@@ -36,7 +32,6 @@ The next section describes one of the possibilities: the UCT (Upper Confidence b
 
 In this section, we fill in each of the steps outlined in the previous section, for the special case of the UCT algorithm.
 
-
 Each node $v$ in the explored part of the game tree has an attached score, which is just a real-valued number, say $s(v)$.
 
 
@@ -44,7 +39,6 @@ Each node $v$ in the explored part of the game tree has an attached score, which
 
 Selection takes place in the explored part of the game tree, and can therefore use the score, $s$.
 We repeatedly pick the ``best child'' of the current node, in the following sense.
-
 If a child of $v$ has not been explored, then pick any of them as the best child.
 If all children of $v$ have already been explored, then we pick a child which maximizes
 
@@ -52,9 +46,7 @@ If all children of $v$ have already been explored, then we pick a child which ma
 \label{eq:uctnodevalue}
 \frac{Q(v')}{N(v')} + c\sqrt{\frac{2\ln{N(v)}}{N(v')}}
 \end{equation} 
-
-
-where $v'$ is a child of $v$, $N$ is the visit count and $Q$ is the accumulated score for the node (we will see how to keep track of $Q$ and $N$ for a given node later).
+where $v'$ is a child of $v$, $N$ is the visit count and $Q$ is the accumulated score for the node (we will see later how to keep track of $Q$ and $N$, for a given node).
 The parameter $c$ determines the amount of exploration. We will choose $c = 1 / \sqrt 2$ as per the comments in \citep[p. 9]{mcts_survey12}.
 
 This selection process continues until we find either an unexplored node or run into a node without children (i.e. a leaf node), in which case we return that leaf node.
@@ -62,47 +54,35 @@ This selection process continues until we find either an unexplored node or run 
 \subsubsection{The exploration step}
 
 When we have found a node using the selection step, we will explore that node, which will yield a score.
-
 If we are ``exploring'' a leaf node, the score will just be the value at the leaf node.
-
 Otherwise, we are exploring an unexplored node, in which case we add it as explored and then simply search randomly from that node until we run into a leaf node, which we know how to evaluate a score for.
 
 \subsubsection{The backup step}
 
-When the exploration is done, we go back up the way we came, all the way to the root node.
-As we go, we update visit count and accumulate score.
+When the exploration is done  we go back up the way we came, all the way to the root node.
+As we go, we update visit count, $N$, and accumulate the score, $Q$.
 We also make sure to alternate the sign of the score we use to accumulate as we go up the tree, since it represents the value for the player who's move it is at that node.
 
 
 \subsection{UCT implementation}
 
 
-We assume that we have a function \texttt{value} which gives a real number and which we can apply only to terminal positions.
+It is assumed that we have a function, \texttt{value}, which gives a real number and which we can apply only to terminal positions.
 For our purposes, \texttt{value endPosition} is the value of \texttt{endPosition} for First player.
-
-
-Here is the explore function, which will explore and refine our game tree.
 
 We will assume that we have a data-type \texttt{Position} which represents a completely pure state of the game.
 Of course, there is a function \texttt{choices :: Position -> [Position]} which given a position will give us a list of choices (also positions) of where we can go next (according to the structure of the game tree).
-
 For explored nodes, we need to store extra information in addition to position: we need a visit count and an accumulated score. 
-
 Thus we define
-
 \begin{code}
   data MCTSPosition =
     Explored {position :: Position, visitCount :: Integer,
               score :: Real, choices :: [MCTSPosition]} |
     Unexplored {position :: Position}
 \end{code}
-
 This reads as follows: an MCTSNode can either be explored or unexplored, and must have a position in both cases.
 In the case of an explored node, we must also have a visit count and an accumulated score, as well as a way to get at the explored children.
-
-
 \begin{code}
-
 explore (Unexplored position) =
   let s = value . randomSearch $ position in
   (-s, Explored position 1 s (map Unexplored $ choices position))
@@ -115,9 +95,7 @@ explore (Explored position visitCount score choices) =
       let (best, rest) = popBestChoice position
           (s, best') = explore best in
           (-s, Explored position (visitCount+1) (score+s) (best':rest))
-
 \end{code}
-
 The above function implicitly encodes all of the steps discussed in the previous section.
 If we apply \texttt{explore} repeatedly, we will refine and expand our explored game tree.
 
@@ -131,17 +109,13 @@ In this case, we want to stop after a fixed number of iterations (in other cases
   strategy numIterations position  = 
     strategy (numIterations-1) (explore position)
 \end{code}
-
 Note again that this strategy is for whoever the \texttt{value} function was written for.
 
 There are a few blanks left to fill in.
 The function \texttt{randomSearch} simply takes an unexplored position and searches randomly from it, and is trivial to implement.
-
 To define the function \texttt{popBestChoice}, we can say that if \texttt{(best, rest) = popBestSearch position} for some \texttt{position}, then \texttt{best} is the best choice from \texttt{position} and \texttt{rest} is a list of the remaining choices from \texttt{position}.
 The function \texttt{bestChoice} is just a helper, and is defined above simply to apply \texttt{popBestChoice} and throw away \texttt{rest} (since we aren't interested in that).
-
 Thus \texttt{popBestChoice} is trivial to write if we have a notion of 'best'.
-
 This notion is gotten by defining an ordering on the data-type MCTSNode, as follows:
 
 \begin{code}
@@ -158,13 +132,7 @@ This notion is gotten by defining an ordering on the data-type MCTSNode, as foll
   compare _ (Explored _ _ _ _) (Unexplored _) = LT
   compare _ (Unexplored _) (Explored _ _ _ _) = GT
 \end{code}
-
-
 This is a direct mapping of the rules described in the selection step: Unexplored nodes always win over explored nodes and tie against each other.
 When comparing two explored nodes to each other, we have to be a little more clever and use equation \ref{eq:uctnodevalue}, as written in the previous section.
-
-
-
-
 
 For complete code and therefore complete detail, see section \ref{sec:code}.

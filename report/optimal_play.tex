@@ -4,22 +4,19 @@ In this section, we will introduce an algorithm called the minimax algorithm whi
 
 Naturally, any such algorithm will suffer from performance issues.
 Nevertheless, there is one common optimization called alpha-beta pruning, which we will also describe.
-
 The natural structure on which algorithmic play takes place is the game tree, as described in section \ref{subsec:gametree}.
 A playing algorithm can then be seen as a search algorithm on the game tree.
 
 
-Most of this material is covered in \citep{aimodernapproach}, though with some of the propositions given as exercises and with more procedural pseudo code.
+Most of this material is covered in \citep{aimodernapproach}, though with some of the propositions given as exercises and with more imperative pseudo code.
 
 \subsection{Optimal play}
 
 What do we mean by ``optimal play''?
-
 In this section, we will give some pretty intuitive neccesary conditions.
 
 Clearly, a player cannot play optimally if he squanders an opportunity to win.
 More precisely; if current position is a win for the moving player, then he must make a choice which is also a win for him.
-
 Furthermore, if the moving player does not have any opportunity to win in the given position (i.e. none of the leaf-nodes in the tree below the current node contains a winning node for the moving player), but if he does have an opportunity to tie, he must still have an opportunity to tie after he makes his move.
 
 If a player can play as above, he will win if he can win, and if he can't win but he can tie, he will do that.
@@ -28,36 +25,28 @@ If a player can play as above, he will win if he can win, and if he can't win bu
 \label{sec:minimaxi}
 
 In this section, we will see how the considerations in the previous sections guide us to a pretty intuitive algorithm which leads to optimal play.
-
 It is intuitively clear that it is always possible to play as described in the previous section.
-
 The key in order to find an explicit algorithm is to extend the notion of First player win to be not just for leaf nodes.
 
-In terms of the game tree, what might it mean for any given position, not just a leaf node, to be a First player win?
-The definition is inductive.
-
-In the base case, i.e. we have a leaf node, the definition of winning node is clear from the rules of the game.
+In terms of the game tree, what might it mean for any given position, not just a leaf node, to be a First player win? The definition is inductive.
+In the base case, i.e. we have a leaf node, the definition of winning node is clear from the rules of the particular game.
 If we are not on a leaf node, we break the definition up into two cases:
 
 \begin{definition}
 \label{def:positionclasses}
 
 \begin{itemize}
+  \item Case 1: It is Firsts turn to move. In this case, the position is a First win it has a child which is a First win.
 
-  \item Case 1: It is Firsts turn to move.
-    In this case, the position is a First win it has a child which is a First win.
-  \item Case 2: It is Seconds turn to move.
-    In this case, the position is a First win if all of it's children have children which are First win.
+  \item Case 2: It is Seconds turn to move. In this case, the position is a First win if all of it's children have children which are First win.
 
 \end{itemize}
 
 \end{definition}
 
 The notion of a position being a Second win is defined similarly.
-
 It is easy to see that if a position is a First win, it cannot be a Second win, and vice-versa.
 This does not mean that a position must be either a First win or a Second win; and we call such positions Neither win positions.
-
 We have now defined a kind of coloring of any game tree, with three different colors: First win, Second win and Neither win.
 Instead saying ``the color of a node'', it is more natural to speak of ``the \emph{winner} of a node'', which can be either First, Second or Neither.
 
@@ -74,7 +63,6 @@ If the game is in a Neither win position and First plays optimally, then the pla
 \end{proposition}
 
 These two propositions are summed up in \citep{aimodernapproach} (page 197, exercise 5.7).
-
 Note that, in the second proposition, the play path might also end with a sequence of nodes of First win color unless Second also plays optimally.
 
 Finally, as a simple corollary of the above two propositions:
@@ -89,7 +77,6 @@ From the above results, we have the following nice re-characterization of defini
 The winner for a given node is the same as the winner of the leaf node (end position) which results when both players play optimally.
 \end{theorem}
 
-
 To get something a bit more operational, we define an ordering on the set of colors:
 
 \begin{equation}
@@ -97,10 +84,11 @@ To get something a bit more operational, we define an ordering on the set of col
   \text{Second win} < \text{Neither win} < \text{First win}
 \end{equation}
 
-It is clear that First plays optimally if he at all times makes choices with maximum color.
-Similarly, Second plays optimally if he at all times makes choices with minimum color.
+It is clear that First plays optimally if he at all times makes choices which are \emph{maximal} with respect to the above ordering.
+Similarly, Second plays optimally if he at all times makes choices which are \emph{minimal} with respect to the same ordering.
 
-Thus, to find the color of a position in which it's Firsts time to move, we take the maximum of it's children, according to the above ordering. (And similarly for Second.)
+Thus, to find the winner of a position in which it's Firsts time to move, we take the maximum of it's children, according to the above ordering.
+To find the winner of a position in which it's Seconts time to move, we take the minimum.
 This leads to the following recursive definition for the winner of a node, which can me used to play optimally:
 
 \begin{code}
@@ -119,10 +107,10 @@ Since we know the rules of the game, the functions \texttt{turn}, \texttt{choice
 The code breaks the definition of \texttt{winner} up into three cases.
 In the first case, where the position is terminal, we trivially know the winner from the definition of the game, so \texttt{terminalWinner} is assumed to be given.
 In the second case, where the position is not terminal and it is Firsts turn to play, the winner is the maximum of \texttt{winner} mapped over the choices available from the given position.
-In the final case, where we know that the node is not terminal and it is not Firsts turn to move, the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
+In the final case, we know that the node is not terminal and it is not Firsts turn to move. Thus it is Seconds turn to move, and so the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
 
-With the above function in hand, it is easy to play optimally.
-The actual code used to run the experiments later on is not quite this simple: as mentioned we need to do some optimizations.
+With the above function in hand, it is easy for either player to play optimally.
+The actual code used to run the experiments later on is not quite this simple: as mentioned there's a common optimization which we will take advantage of.
 Namely alpha-beta pruning.
 
 \subsection {Alpha-Beta Pruning}
@@ -137,38 +125,30 @@ This will allow us to disregard (or \emph{prune}) big parts of the game three as
 
 This is a specific case of alpha-beta pruning.
 There is a common generalization where the leaf node can have a bigger set of values than just First win, Second win or Neither win, but we don't need it here.
-
 The implementation is particularly easy in Haskell. We can even make it look exactly like the implementation above, but we need to take some special care when writing min and max so that they know what the absolute minimum is (Second win) and what the absolute maximum is (First win) and can therefore prune.
 
 This means that we can find the maximum without actually computing the entire list of elements in the list (which would require searching the entire game tree), thanks to a feature of Haskell known as laziness.
 
 Here is our version of \texttt{min} which is lazy and will consequently allow pruning:
-
 \begin{code}
   prunedMin ws = 
     case find ((==) Only Second) ws of
       Nothing -> min ws
       _ -> Only Second
 \end{code}
-
 The implementation for prunedMax is similar:
-
 \begin{code}
   prunedMax ws = 
     case find ((==) Only First) ws of
       Nothing -> max ws
       _ -> Only First
 \end{code}
-
-
 Now we can rewrite our pruned minimax algorithm so that it is very similar to the one in the previous section:
 
 \begin{code}
-  winner play@(Play First _) = 
-    prunedMax $ map winner $ choices play
-  winner play@(Play Second _) = 
-    prunedMin $ map winner $ choices play
+  winner position
+    | terminal position       = terminalWinner position
+    | turn position == First  = prunedMax $ map winner $ choices play
+    | otherwise               = prunedMin $ map winner $ choices play
 \end{code}
-
-
 Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.

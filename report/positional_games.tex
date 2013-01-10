@@ -1,9 +1,7 @@
 \subsection{Definitions}
 
 To define a \emph{positional game}, or \emph{strong game}, or simply \emph{game} from now on, we need a few things.
-
 First of all, we need a ``board'', $V$ and a collection of ``winning subsets'', $\mathcal F \subset \mathcal P(V)$.
-
 The tuple $(V,\mathcal F)$ constitutes a \emph{hypergraph}.
 The set $V$ is sometimes called the \emph{vertices} and the set $\mathcal F$ is sometimes called the \emph{hyperedges} of the hypergraph $(V,\mathcal F)$.
 
@@ -12,19 +10,13 @@ We often refer to $(V,\mathcal F)$ as the game.
 \end{remark}
 
 The idea is that two players, called $\emph{First}$ and $\emph{Second}$ take turns coloring uncolored vertices of the board.
-
 Initially, the entire board, $V$ starts out with all vertices uncolored.
-
-The object of the game is to be the first to color an entire winning set.
-The players are named as they are because player First has the benefit of getting the first move.
+The object of the game is to be the first to color an entire winning set. The players are named as they are because player First has the benefit of getting the first move.
 
 Note that a vertex which has already been colored cannot be colored again.
-
 The word \emph{play} is meant to represent an instance of a correctly played game from start to finish.
-
 A given point of the play is called a \emph{position} of the board.
 More precisely, a position is a (partial or complete) two-coloring of $V$.
-
 A \emph{draw} happens when the board is fully occupied, yet neither player occupies completely a winning set.
 
 \subsubsection{Reverse games}
@@ -33,29 +25,21 @@ The \emph{reverse} of a given game is obtained if the desired outcome is to avoi
 
 \subsubsection{Weak games}
 
-In the above definition of a a game, both players (First and Second), strive to occupy the same winning sets, given by $\mathcal F$. A player might be interested in settling for a draw. (For instance, if Second knows that he cannot win.) 
-
-Thus, we have two players: one player is the \emph{Maker}, and one is the \emph{Breaker}.
+In the above definition of a a game, both players (First and Second), strive to occupy the same winning sets, given by $\mathcal F$. A player might be interested in settling for a draw. (For instance, if Second knows that he cannot win.) Thus, we have two players: one player is the \emph{Maker}, and one is the \emph{Breaker}.
 
 We say that Maker wins if he manages to occupy completely one of the winning sets in $\mathcal F$, and Breaker wins if he manages to prevent maker.
-
 Note that the notion of who is ``first to win'' is moot: a player either wins or doesn't win.
 Note further that a draw is impossible in a Maker-Breaker game.
-
 This ``game'' is called a the \emph{weak version} of the original game, or the corresponding \emph{Maker-Breaker} game.
-Note however, that technically this isn't a game at all, according to the above definition: Maker and Breaker have different winning sets! Nevertheless, this is obviously a useful notion.
+Note however, that technically this isn't a game at all, according to the above definition: Maker and Breaker have different winning sets!
 
 \subsubsection{Reverse weak games}
 
 The notion of a \emph{reverse weak game} should now be intuitively clear.
 The idea is to start with a game, get the corresponding weak game and then reverse that.
 However, since a weak game is technically a not a game, we should give an explicit definition of what reverse means in reference to a weak game.
-
 Suppose we have a game with the hypergraph $(V,\mathcal F)$.
-The corresponding weak game as a Maker and a Breaker.
-The reverse weak game has a player trying to avoid making, and a player trying to avoid breaking.
-That is: we have an \emph{Avoider} and an \emph{Enforcer}.
-
+The corresponding weak game has a Maker and a Breaker. The reverse weak game has a player trying to avoid making, and a player trying to avoid breaking. That is: we have an \emph{Avoider} and an \emph{Enforcer}.
 Avoider tries to avoid occupying completely a wining set from $\mathcal F$, and Enforcer tries to prevent Avoider from doing so, that is, tries to enforce Avoider into occupying completely a winning set.
 
 
@@ -65,8 +49,6 @@ A good conceptual tool when reasoning about positional games is the so-called \e
 
 The root node of the game tree is the starting position of the game.
 That is to say, it corresponds to the empty board of the game.
-
 The children of the root node are all possible positions of the board after First has made his first move.
 The children of \emph{those} nodes are the position after Second has made his move, and so on.
-
 Since we are only considering games played on finite boards, the game tree finite as well, but can be extremely large.
