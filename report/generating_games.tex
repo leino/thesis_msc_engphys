@@ -136,16 +136,10 @@ Graph 13, order 5.
   4 : 0 1;
 
 \end{code}
-
-
-
 The first three vertices are from the first color and correspond to the vertices of our would-be hypergraphs.
 The remaining two vertices are of the second color and correspond to the would-be hyperedges.
 
-Clearly, there are some issues to work out. Firstly, note that \texttt{Graph 1} does not give us an actual hypergraph: both hyperedges would be empty, under our interpretation, which we do not allow.
-
-The same criticism holds for \texttt{Graph 2} and \texttt{Graph 3}.
-
+Clearly, there are some issues to work out. Firstly, note that \texttt{Graph 1} does not give us an actual hypergraph: both hyperedges would be empty, under our interpretation, which we do not allow. The same criticism holds for \texttt{Graph 2} and \texttt{Graph 3}.
 
 To get around this, we use the command line switch $\texttt{-dm:n}$ where the \texttt{m} and \texttt{n} are the minimum degree of the first and second class of vertices, respectively.
 
@@ -201,8 +195,6 @@ Graph 6, order 5.
   4 : 0 1;
 
 \end{code}
-
-
 There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyper edge three times. That is to say, we would end up with a hypergraph of only a single hyper edge. If we were interested in such a hypergraph, we would have just ran \texttt{./genbg 2 1 -d0:1} to begin with.
 
 This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighborhood.
@@ -220,8 +212,6 @@ Graph 1, order 5.
 
 
 \end{code}
-
-
 So, in the end we have only a single hypergraph in this class. It has two vertices, each with it's own singleton hyperedge plus a hyperedge that contains both of the vertices.
 
 Our hypothesis at this point is that a command such as \texttt{./genbg m n -z -d0:1} will generate all non-isomorphic hypergraphs of \texttt{m} vertices and \texttt{n} edges.
