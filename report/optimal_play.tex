@@ -43,7 +43,6 @@ If we are not on a leaf node, we break the definition up into two cases:
 \end{itemize}
 
 \end{definition}
-
 The notion of a position being a Second win is defined similarly.
 It is easy to see that if a position is a First win, it cannot be a Second win, and vice-versa.
 This does not mean that a position must be either a First win or a Second win; and we call such positions Neither win positions.
@@ -61,7 +60,6 @@ If the game is in a First win position and First plays optimally, then the path 
 If the game is in a Neither win position and First plays optimally, then the play path does not contain nodes where Second wins.
 (And similarly for Second.)
 \end{proposition}
-
 These two propositions are summed up in \citep{aimodernapproach} (page 197, exercise 5.7).
 Note that, in the second proposition, the play path might also end with a sequence of nodes of First win color unless Second also plays optimally.
 
@@ -70,20 +68,17 @@ Finally, as a simple corollary of the above two propositions:
 \begin{proposition}
 If both players play optimally, then the nodes in the play path will all have the same winner (First, Second or Neither).
 \end{proposition}
-
 From the above results, we have the following nice re-characterization of definition \ref{def:positionclasses}.
 
 \begin{theorem}
 The winner for a given node is the same as the winner of the leaf node (end position) which results when both players play optimally.
 \end{theorem}
-
 To get something a bit more operational, we define an ordering on the set of colors:
 
 \begin{equation}
 \label{eq:winnerordering}
   \text{Second win} < \text{Neither win} < \text{First win}
 \end{equation}
-
 It is clear that First plays optimally if he at all times makes choices which are \emph{maximal} with respect to the above ordering.
 Similarly, Second plays optimally if he at all times makes choices which are \emph{minimal} with respect to the same ordering.
 
@@ -97,8 +92,6 @@ This leads to the following recursive definition for the winner of a node, which
     | turn position == First  = max $ map winner $ choices position
     | otherwise               = min $ map winner $ choices position
 \end{code}
-
-
 The above is a taste of Haskell code.
 The \texttt{min} and \texttt{max} functions know about the ordering defined in equation \ref{eq:winnerordering}.
 Since we know the rules of the game, the functions \texttt{turn}, \texttt{choices} and \texttt{terminal} are assumed to be given.
@@ -120,11 +113,8 @@ Suppose that, as we are evaluating \texttt{max} function in the code segment fro
 We then know that we can stop searching because we cannot do any better than that.
 Similarly, whilst evaluating the \texttt{min} function, if we run into a Second win, then we can also stop prematurely.
 
-This will allow us to disregard (or \emph{prune}) big parts of the game three as we search it.
-
-
-This is a specific case of alpha-beta pruning.
-There is a common generalization where the leaf node can have a bigger set of values than just First win, Second win or Neither win, but we don't need it here.
+This is a specific case of alpha-beta pruning, and will allow us to disregard (or \emph{prune}) big parts of the game three as we search it.
+There is a generalization where the leaf node can have a bigger set of values than just First win, Second win or Neither win, but we don't need it here.
 The implementation is particularly easy in Haskell. We can even make it look exactly like the implementation above, but we need to take some special care when writing min and max so that they know what the absolute minimum is (Second win) and what the absolute maximum is (First win) and can therefore prune.
 
 This means that we can find the maximum without actually computing the entire list of elements in the list (which would require searching the entire game tree), thanks to a feature of Haskell known as laziness.
@@ -144,7 +134,6 @@ The implementation for prunedMax is similar:
       _ -> Only First
 \end{code}
 Now we can rewrite our pruned minimax algorithm so that it is very similar to the one in the previous section:
-
 \begin{code}
   winner position
     | terminal position       = terminalWinner position

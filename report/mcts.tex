@@ -1,7 +1,6 @@
 \subsection {Introduction}
 
-
-Monte-Carlo tree search (MCTS) has become an umbrella term for a class of related algorithm for searching trees probabilistically.
+Monte-Carlo tree search (MCTS) has become an umbrella term for a class of related algorithms for searching trees probabilistically.
 This applies directly to games if we decide to search the game tree.
 
 In this section, we will introduce an MCTS algorithm known as UCT.
@@ -71,7 +70,9 @@ It is assumed that we have a function, \texttt{value}, which gives a real number
 For our purposes, \texttt{value endPosition} is the value of \texttt{endPosition} for First player.
 
 We will assume that we have a data-type \texttt{Position} which represents a completely pure state of the game.
-Of course, there is a function \texttt{choices :: Position -> [Position]} which given a position will give us a list of choices (also positions) of where we can go next (according to the structure of the game tree).
+Of course, there is a function
+
+\texttt{choices :: Position -> [Position]}, which given a position will give us a list of choices (also positions) of where we can go next (according to the structure of the game tree).
 For explored nodes, we need to store extra information in addition to position: we need a visit count and an accumulated score. 
 Thus we define
 \begin{code}
@@ -109,7 +110,7 @@ In this case, we want to stop after a fixed number of iterations (in other cases
   strategy numIterations position  = 
     strategy (numIterations-1) (explore position)
 \end{code}
-Note again that this strategy is for whoever the \texttt{value} function was written for.
+Note again that this strategy is for whoever the \texttt{value} function was written for. In our case this is First.
 
 There are a few blanks left to fill in.
 The function \texttt{randomSearch} simply takes an unexplored position and searches randomly from it, and is trivial to implement.
