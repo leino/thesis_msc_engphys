@@ -7,7 +7,7 @@ We would also want to know at what number, or even if, it becomes virtually perf
 
 
 One way to find out when our MCTS algorithm becomes virtually perfect is to match it against a perfect opponent, i.e. a minimaxi strategy.
-We can run perfect as first vs MCTS at $n$ iterations as second many times, and see how many times MCTS will win, loose and tie.
+We can run perfect as First vs MCTS at $n$ iterations as Second many times, and see how many times MCTS will win, loose and tie.
 
 We also want to classify the game being played as a first player win, second player win or neither player wins.
 As discussed in section \ref{sec:minimaxi}, this means running perfect vs perfect for the game and recording the outcome.
@@ -19,14 +19,10 @@ The number of positional games grows rapidly with the number of vertices (or pos
 If we want to study interesting games of higher number of vertices, we are going to need to focus on particular classes.
 
 In the experiment outlined below, we will focus on games which have hyper-edges (winning sets) with either two or three vertices.
-
 In order to limit the number of vertices in a hyper-edge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
-
 The argument \texttt{-dm:n} gives a lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
 Recall that the first class of vertices correspond to the vertices of the hyper-graph, and the second class refers to the hyper-edges, as described in \ref{sec:nautycommandline}.
-
 Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
-
 Therefore, if we wanted to generate the class of hyper-graphs with 4 vertices and 2 hyper-edges which either have 2 or 3 vertices in them, we would run:
 
 \begin{code}
@@ -78,7 +74,6 @@ Graph 5, order 6.
 \label{sec:experiment1}
 
 This chapter describes experiment 1. Mainly the setup and contents - results are dealt with in the next chapter.
-
 We are dealing with the set of all hypergraphs with hyperedges of size either two or three, from the following classes:
 
 \begin{tabular}{ c | c }
@@ -90,12 +85,10 @@ We are dealing with the set of all hypergraphs with hyperedges of size either tw
 6&1-13 \\ \hline
 \end{tabular}
 
-
 That ends up being about 4.3 million hypergraphs. 4320006, to be exact.
 
 For each of those hypergraphs, we run three tournaments: minimaxi as first versus MCTS with 10, 20 and 30 iterations, as second.
-Each tournament consists of 100 games.
 
-Within a given tournament, we record the number of first wins, second wins and the number of ties.
+Each tournament consists of 100 games. Within a given tournament, we record the number of first wins, second wins and the number of ties.
 We also classify the games as first, second or neither player win, by playing two optimal players against each other and recording the result.
 This all ends up in a big database, which is discussed more in detail in chapter \ref{sec:database_queries}.
