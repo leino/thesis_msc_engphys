@@ -1,18 +1,14 @@
 This section covers a number of interesting queries that one could make into the database from one of the experiments described above.
 
 It is assumed that you have SQLite 3 installed.
-To begin making queries into the database \texttt{mydatabase.db} (in the current working directory), you issue the shell command:
-
+To begin making queries into the database \texttt{mydatabase.db} (in the current working directory), you would issue the shell command:
 \begin{code}
 $ sqlite3 mydatabase.db
 \end{code}
-
 You will then be greeted with a prompt like
-
 \begin{code}
 sqlite> 
 \end{code}
-
 where you can begin typing the queries and commands covered below.
 
 For the sake of completeness, we will run all the subsequent queries against the database \texttt{twothree.db}, which corresponds to experiment 1, described in section \ref{sec:experiment1}.
@@ -20,13 +16,11 @@ For the sake of completeness, we will run all the subsequent queries against the
 \subsection{Database overview}
 
 The following commands are not queries, but they are very important to know.
-
 \begin{code}
 sqlite> .tables
 hypergraphs    mctsvsperfect  perfect 
 \end{code}
-
-These are the tables in \texttt{twothree.db}. The \texttt{hypergraphs} table contains the games we want to play, along with some meta-info about the games. (See below.)
+These are the tables in \texttt{twothree.db}. The \texttt{hypergraphs} table contains the games we want to play, along with some meta-info about the games. (See next command.)
 The table \texttt{perfect} contains the outcome for a given game when perfect First plays against perfect Second. (The perfect strategies are implemented using minimaxi, as covered in section \ref{sec:minimaxi}.)
 The table \texttt{mctsvsperfect} contains a number of sample outcomes when MCTS, or more precisely UCT, (section \ref{sec:uct}) plays as First against a perfect opponent as Second.
 
@@ -49,7 +43,6 @@ CREATE TABLE perfect
 (hypergraph STRING PRIMARY KEY NOT NULL REFERENCES hypergraphs(hypergraph),
  winner STRING);
 \end{code}
-
 This command not only tells you the names, types and constraints of the collumns making up the table, but it does so by telling you the exact command that was issued to create the table.
 The important information here is the names and types.
 We can see that \texttt{hypergraphs} has a collumn named \texttt{hypergraph}, which stores the hypergraph as a non-null \footnote{\texttt{NULL} is used to denote 'nothing', and is not appropriate here, which is why it is explicitly disallowed.} string (in the graph6 format). 
@@ -68,19 +61,12 @@ Suppose that we are interested in finding out, roughly, the structure of the tab
 We might first be interested in knowing which ``classes'' of hypergraphs are in the table, in the sense that two hypergraphs are in the same class iff they have the same number of vertices and hyperedges.
 
 The following command will print out all such classes in the format \texttt{\#vertices | \#edges}.
-
-
-
 \begin{code}
-
 sqlite> SELECT DISTINCT numvertices,numedges
    ...> FROM mctsvsperfect NATURAL JOIN hypergraphs;
 \end{code}
-
 The output is supressed here, since it is not ordered.
 If we want ordered results, we extend the previous query a little bit:
-
-
 \begin{code}
 
 sqlite> SELECT DISTINCT numvertices,numedges
@@ -134,27 +120,20 @@ sqlite> SELECT DISTINCT numvertices,numedges
 6|11
 6|12
 6|13
-
-
 \end{code}
-
 Now we can see why the \texttt{hypergraphs} table exists, and contains redundant information: we simply need to do a \texttt{NATURAL JOIN} with it in order to get the number of vertices and edges for our hypergraphs in \texttt{mctsvsperfect}.
 
 As can be seen above, some hypergraphs from the class \texttt{4 | 7} are present in \texttt{mctsvsperfect}. How many?
-
 \begin{code}
 sqlite> SELECT COUNT (*) FROM
    ...> ((SELECT DISTINCT hypergraph FROM mctsvsperfect) NATURAL JOIN hypergraphs)
    ...> WHERE numvertices = 4 AND numedges = 7;
 11
 \end{code}
-
 Note that we add the qualifier \texttt{DISTINCT} when pulling hypergraphs from \texttt{mctsvsperfect}, since each hypergraph in this table ocurrs three times. (See the experiment structure in \ref{sec:experiment1}.)
 
 If we want to know this number for all combinations of \texttt{numvertices} and \texttt{numedges} stored in \texttt{mctsvsperfect}, we can issue the following command
-
 \begin{code}
-
 sqlite> SELECT numvertices, numedges, count(hypergraph)
    ...> FROM ((SELECT DISTINCT hypergraph FROM mctsvsperfect) NATURAL JOIN hypergraphs)
    ...> GROUP BY numvertices, numedges;
@@ -206,22 +185,17 @@ sqlite> SELECT numvertices, numedges, count(hypergraph)
 6|11|600130
 6|12|1190410
 6|13|2094921
-
 \end{code}
-
-
 The attentive reader will note that this is the sum of the above number of hypergraphs is 4320006 - the number of hypergraphs in the database:
-
 \begin{code}
 sqlite> SELECT COUNT (*) FROM hypergraphs;
 4320006
 \end{code}
-
-
 \subsection{Results}
 
 \subsection{Overview}
 
+The following query shows the percentage of First wins, Second wins and Neither wins, respectively, for the games classified as a first player win.
 \begin{code}
 sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
    ...>        SUM(numneitherwins), numiterations
@@ -232,14 +206,11 @@ sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
 40020796|37235073|2362831|20
 |||30
 \end{code}
-
 Or, approximately and in normalized form:
-
 \begin{code}
 0.75 | 0.24 | 0.02 | 10
 0.50 | 0.47 | 0.03 | 20
 \end{code}
-
 \subsubsection{Failure to win}
 
 Out of all the games in wich MCTS has a chance to win, i.e. the game is classified as a first player win, how many times does he actually manage to win?
