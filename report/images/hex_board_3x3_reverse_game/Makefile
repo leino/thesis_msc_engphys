@@ -1,8 +1,8 @@
-all:	*.svg
+hex_board_3x3_reverse_game:	*.svg
 	for svgfile in *.svg ; do \
 		filename=$$(basename $$svgfile) ; \
 		filename=$${filename%.*} ; \
-		inkscape -D -z --file=$$svgfile --export-pdf=$$filename.pdf --export-latex ; \
+		inkscape -D -z --file=$$svgfile --export-pdf=$@_$$filename.pdf --export-latex ; \
 	done ; 
 
 clean:
