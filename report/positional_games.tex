@@ -5,13 +5,6 @@ First of all, we need a ``board'', $V$ and a collection of ``winning subsets'', 
 The tuple $(V,\mathcal F)$ constitutes a \emph{hypergraph}.
 The elements of the set $V$ are sometimes called the \emph{vertices} and the elements of the set $\mathcal F$ are sometimes called the \emph{hyperedges} of the hypergraph $(V,\mathcal F)$.
 
-
-\begin{figure}
-  \centering
-  \def\svgwidth{\textwidth}
-  \input{hex_board_3x3.pdf_tex}
-\end{figure}
-
 \begin{remark}
 We often refer to $(V,\mathcal F)$ as the game.
 \end{remark}
@@ -26,9 +19,34 @@ A given point of the play is called a \emph{position} of the board.
 More precisely, a position is a (partial or complete) two-coloring of $V$.
 A \emph{draw} happens when the board is fully occupied, yet neither player occupies completely a winning set.
 
+\center
+\def\arraystretch{5.5}%  1 is the default, change whatever you need
+\begin{tabular}{l c r}
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_01.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_02.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth}\input{hex_board_3x3_positional_game_03.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth}\input{hex_board_3x3_positional_game_04.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_05.pdf_tex} &
+  \\
+\end{tabular}
+
 \subsubsection{Reverse games}
 
 The \emph{reverse} of a given game is obtained if the desired outcome is to avoid occupying completely the winning sets from $\mathcal F$.
+
+\center
+\def\arraystretch{5.5}%  1 is the default, change whatever you need
+\begin{tabular}{l c r}
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_01.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_02.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_03.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_04.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_05.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_06.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_07.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_08.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_09.pdf_tex} \\
+\end{tabular}
 
 \subsubsection{Weak games}
 
@@ -40,6 +58,17 @@ Note further that a draw is impossible in a Maker-Breaker game.
 This ``game'' is called a the \emph{weak version} of the original game, or the corresponding \emph{Maker-Breaker} game.
 Note however, that technically this isn't a game at all, according to the above definition: Maker and Breaker have different winning sets!
 
+\center
+\def\arraystretch{5.5}%  1 is the default, change whatever you need
+\begin{tabular}{l c r}
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_01.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_02.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_03.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_04.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_05.pdf_tex} &
+  \\
+\end{tabular}
+
 \subsubsection{Reverse weak games}
 
 The notion of a \emph{reverse weak game} should now be intuitively clear.
@@ -48,6 +77,20 @@ However, since a weak game is technically a not a game, we should give an explic
 Suppose we have a game with the hypergraph $(V,\mathcal F)$.
 The corresponding weak game has a Maker and a Breaker. The reverse weak game has a player trying to avoid making, and a player trying to avoid breaking. That is: we have an \emph{Avoider} and an \emph{Enforcer}.
 Avoider tries to avoid occupying completely a wining set from $\mathcal F$, and Enforcer tries to prevent Avoider from doing so, that is, tries to enforce Avoider into occupying completely a winning set.
+
+\center
+\def\arraystretch{5.5}%  1 is the default, change whatever you need
+\begin{tabular}{l c r}
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_01.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_02.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_03.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_04.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_05.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_06.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_07.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_08.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_09.pdf_tex} \\
+\end{tabular}
 
 
 \subsection{The game tree}
