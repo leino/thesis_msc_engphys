@@ -30,8 +30,11 @@ hex_board_3x3_reverse_weak_game: images/hex_board_3x3_reverse_weak_game/*.svg
 		mv $$image ../../$@$$image ; \
 	done ;
 
+.PHONY:
+images: hex_board_3x3_positional_game hex_board_3x3_reverse_game hex_board_3x3_weak_game hex_board_3x3_reverse_weak_game
+
 thesis: thesis.tex hex_board_3x3
 	pdflatex thesis.tex
 
 clean: 
-	rm -rf thesis.pdf thesis.aux thesis.log hex_board_3x3.pdf_tex hex_board_3x3.pdf *.log hex_board_3x3_positional_game*.pdf hex_board_3x3_positional_game*.pdf_tex
+	rm -rf *.pdf *.pdf_tex *.log thesis.aux
