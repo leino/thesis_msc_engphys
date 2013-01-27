@@ -19,8 +19,11 @@ A given point of the play is called a \emph{position} of the board.
 More precisely, a position is a (partial or complete) two-coloring of $V$.
 A \emph{draw} happens when the board is fully occupied, yet neither player occupies completely a winning set.
 
-\center
+As an example of a game, look at table \ref{tab:ex_positional}. It shows an entire play for the game Hex, played on a 3x3 board.
+The goal is to connect one horizontal edge with the other one. First wins because he connects the two edges before Second.
+\begin{center}
 \def\arraystretch{5.5}
+\begin{table}
 \begin{tabular}{l c r}
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_01.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_02.pdf_tex} &
@@ -29,13 +32,19 @@ A \emph{draw} happens when the board is fully occupied, yet neither player occup
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_05.pdf_tex} &
   \\
 \end{tabular}
+\caption{3x3 Hex, First wins}
+\label{tab:ex_positional}
+\end{table}
+\end{center}
 
 \subsubsection{Reverse games}
 
 The \emph{reverse} of a given game is obtained if the desired outcome is to avoid occupying completely the winning sets from $\mathcal F$.
+In table \ref{tab:ex_reverse}, we can see a play of reverse Hex 3x3. This time, Second wins. 
 
-\center
+\begin{center}
 \def\arraystretch{5.5}
+\begin{table}
 \begin{tabular}{l c r}
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_01.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_02.pdf_tex} &
@@ -47,6 +56,10 @@ The \emph{reverse} of a given game is obtained if the desired outcome is to avoi
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_08.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_game_09.pdf_tex} \\
 \end{tabular}
+\caption{Reverse 3x3 Hex, Second wins}
+\label{tab:ex_reverse}
+\end{table}
+\end{center}
 
 \subsubsection{Weak games}
 
@@ -58,8 +71,10 @@ Note further that a draw is impossible in a Maker-Breaker game.
 This ``game'' is called a the \emph{weak version} of the original game, or the corresponding \emph{Maker-Breaker} game.
 Note however, that technically this isn't a game at all, according to the above definition: Maker and Breaker have different winning sets!
 
-\center
+Table \ref{tab:ex_weak} shows an example of weak 3x3 Hex being played, with First as Maker and Second as Breaker. First (Maker) wins, since he manages to connect the two horizontal sides.
+\begin{center}
 \def\arraystretch{5.5}
+\begin{table}
 \begin{tabular}{l c r}
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_01.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_02.pdf_tex} &
@@ -68,6 +83,10 @@ Note however, that technically this isn't a game at all, according to the above 
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_weak_game_05.pdf_tex} &
   \\
 \end{tabular}
+\caption{Weak 3x3 Hex, First (Maker) wins}
+\label{tab:ex_weak}
+\end{table}
+\end{center}
 
 \subsubsection{Reverse weak games}
 
@@ -78,8 +97,10 @@ Suppose we have a game with the hypergraph $(V,\mathcal F)$.
 The corresponding weak game has a Maker and a Breaker. The reverse weak game has a player trying to avoid making, and a player trying to avoid breaking. That is: we have an \emph{Avoider} and an \emph{Enforcer}.
 Avoider tries to avoid occupying completely a wining set from $\mathcal F$, and Enforcer tries to prevent Avoider from doing so, that is, tries to enforce Avoider into occupying completely a winning set.
 
-\center
+In table \ref{tab:ex_reverse_weak}, we can see an example of reverse weak 3x3 Hex being played. Second (Enforcer) wins, since First has connected the two vertical edges.
+\begin{center}
 \def\arraystretch{5.5}
+\begin{table}
 \begin{tabular}{l c r}
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_01.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_02.pdf_tex} &
@@ -91,7 +112,10 @@ Avoider tries to avoid occupying completely a wining set from $\mathcal F$, and 
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_08.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_reverse_weak_game_09.pdf_tex} \\
 \end{tabular}
-
+\caption{Reverse weak 3x3 Hex, Second (Enforcer) wins}
+\label{tab:ex_reverse_weak}
+\end{table}
+\end{center}
 
 \subsection{The game tree}
 \label{subsec:gametree}
