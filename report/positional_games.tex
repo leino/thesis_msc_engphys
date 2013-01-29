@@ -27,8 +27,8 @@ The goal is to connect one horizontal edge with the other one. First wins becaus
 \begin{tabular}{l c r}
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_01.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_02.pdf_tex} &
-  \def\svgwidth{0.3\columnwidth}\input{hex_board_3x3_positional_game_03.pdf_tex} \\
-  \def\svgwidth{0.3\columnwidth}\input{hex_board_3x3_positional_game_04.pdf_tex} &
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_03.pdf_tex} \\
+  \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_04.pdf_tex} &
   \def\svgwidth{0.3\columnwidth} \input{hex_board_3x3_positional_game_05.pdf_tex} &
   \\
 \end{tabular}
@@ -126,3 +126,14 @@ That is to say, it corresponds to the empty board of the game.
 The children of the root node are all possible positions of the board after First has made his first move.
 The children of \emph{those} nodes are the position after Second has made his move, and so on.
 Since we are only considering games played on finite boards, the game tree finite as well, but can be extremely large.
+
+In table \ref{tab:ex_gametree} you can see an example of the game tree for 2x2 Tic-Tac-Toe.
+
+\begin{center}
+\def\arraystretch{5.5}
+\begin{table}
+\def\svgwidth{\columnwidth} \input{tic_tac_toe_2x2_gametree_tree.pdf_tex}
+\caption{2x2 Tic-Tac-Toe game tree}
+\label{tab:ex_gametree}
+\end{table}
+\end{center}
