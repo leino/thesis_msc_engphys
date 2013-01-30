@@ -12,7 +12,7 @@ The same goes for the entire \texttt{Graphics} submodule, which implements suppo
 
 In this section, we introduce the \texttt{PoGa} library.
 One part of \texttt{PoGa} is mainly an interfaced used for representing and playing positional games.
-However, \texttt{PoGa} also provides the two strategies discussed earlier: minimaxi with alpha-beta pruning, and the UCT variant of MCTS.
+However, \texttt{PoGa} also provides the two strategies discussed earlier: minimax with alpha-beta pruning, and the UCT variant of MCTS.
 
 \texttt{PoGa} also contains implementations of arbitrary sized ($m \times n$) Tic-Tac-Toe and Hex.
 
@@ -156,7 +156,7 @@ instance Ord v => Position (SetGame v) where
 \subsubsection {Strategies.hs}
 
 In this section, we list the strategy submodule of \texttt{PoGa}.
-It contains implementations of minimaxi with alpha-beta pruning as well as UCT.
+It contains implementations of minimax with alpha-beta pruning as well as UCT.
 The implementations of these were discussed in less detail in sections ??? and ???.
 
 

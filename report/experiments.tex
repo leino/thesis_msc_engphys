@@ -6,11 +6,11 @@ Of course we expect that it becomes better at higher numbers of iterations, but 
 We would also want to know at what number, or even if, it becomes virtually perfect.
 
 
-One way to find out when our MCTS algorithm becomes virtually perfect is to match it against a perfect opponent, i.e. a minimaxi strategy.
+One way to find out when our MCTS algorithm becomes virtually perfect is to match it against a perfect opponent, i.e. a minimax strategy.
 We can run perfect as First vs MCTS at $n$ iterations as Second many times, and see how many times MCTS will win, loose and tie.
 
 We also want to classify the game being played as a first player win, second player win or neither player wins.
-As discussed in section \ref{sec:minimaxi}, this means running perfect vs perfect for the game and recording the outcome.
+As discussed in section \ref{sec:minimax}, this means running perfect vs perfect for the game and recording the outcome.
 
 
 \subsection{Classes of games to study}
@@ -87,7 +87,7 @@ We are dealing with the set of all hypergraphs with hyperedges of size either tw
 
 That ends up being about 4.3 million hypergraphs. 4320006, to be exact.
 
-For each of those hypergraphs, we run three tournaments: minimaxi as first versus MCTS with 10, 20 and 30 iterations, as second.
+For each of those hypergraphs, we run three tournaments: minimax as first versus MCTS with 10, 20 and 30 iterations, as second.
 
 Each tournament consists of 100 games. Within a given tournament, we record the number of first wins, second wins and the number of ties.
 We also classify the games as first, second or neither player win, by playing two optimal players against each other and recording the result.
