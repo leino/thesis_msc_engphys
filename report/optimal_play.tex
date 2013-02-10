@@ -142,10 +142,9 @@ Now we can rewrite our pruned minimax algorithm so that it is very similar to th
 \end{code}
 Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.
 
-In table \ref{tab:ex_alphabeta}, there is an example of the part of a game tree seen by minimax with alpha-beta pruning.
-(Note that the root node is not an empty board, but instead a position in the middle of a play. This is because the tree would be very large if it started with an empty board.)
-The gray squares represent positions that do not need to be considered, thanks to alpha-beta pruning.
-The white squares represent positions which are not part of the game tree, but are included in the picture for visual balance.
+In table \ref{tab:ex_alphabeta}, we can recognize the game tree example from table \ref{tab:ex_gametree}, with some parts taken out; the gray squares represent positions that do not need to be considered by minimax, thanks to alpha-beta pruning.
+As in table \ref{tab:ex_gametree}, the white squares represent positions which are not part of the game tree, but are included in the picture for visual balance.
+
 \begin{center}
 \def\arraystretch{5.5}
 \begin{table}
