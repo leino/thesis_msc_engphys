@@ -127,7 +127,8 @@ The children of the root node are all possible positions of the board after Firs
 The children of \emph{those} nodes are the position after Second has made his move, and so on.
 Since we are only considering games played on finite boards, the game tree finite as well, but can be extremely large.
 
-In table \ref{tab:ex_gametree} you can see an example of a portion of the game tree for 3x3 Tic-Tac-Toe, below a certain position which has been chosen as the root node. The large white squares are not part of the tree; they are only in the picture to provide visual balance. 
+In table \ref{tab:ex_gametree} you can see an example of a portion of the game tree for 3x3 Tic-Tac-Toe, below a certain position which has been chosen as the root node. The large white squares are not part of the tree; they are only in the picture to provide visual balance.
+The considered positions for a move are considered from left to right, bottom to top, on the game board. The first free position encountered, when traversing the board in this manner, is chosen.
 
 \begin{center}
 \def\arraystretch{5.5}
