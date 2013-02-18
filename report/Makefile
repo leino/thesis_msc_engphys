@@ -2,7 +2,7 @@ thesis: thesis.tex
 	pdflatex thesis.tex
 
 .PHONY:
-images: hex_board_3x3_positional_game hex_board_3x3_reverse_game hex_board_3x3_weak_game hex_board_3x3_reverse_weak_game tic-tac-toe_3x3_gametree alpha-beta_example
+images: hex_board_3x3_positional_game hex_board_3x3_reverse_game hex_board_3x3_weak_game hex_board_3x3_reverse_weak_game tic-tac-toe_3x3_gametree alpha-beta_example mcts_example
 
 .PHONY:
 alpha-beta_example: images/alpha-beta_example/*.svg
@@ -10,6 +10,13 @@ alpha-beta_example: images/alpha-beta_example/*.svg
 	for image in *.pdf_tex *.pdf ; do \
 		mv $$image ../../$$image ; \
 	done ;
+.PHONY:
+mcts_example: images/mcts_example/*.svg
+	cd images/$@; make; \
+	for image in *.pdf_tex *.pdf ; do \
+		mv $$image ../../$$image ; \
+	done ;
+
 
 .PHONY:
 hex_board_3x3_positional_game: images/hex_board_3x3_positional_game/*.svg

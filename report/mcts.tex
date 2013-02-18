@@ -62,6 +62,19 @@ When the exploration is done  we go back up the way we came, all the way to the 
 As we go, we update visit count, $N$, and accumulate the score, $Q$.
 We also make sure to alternate the sign of the score we use to accumulate as we go up the tree, since it represents the value for the player who's move it is at that node.
 
+\subsection{An example}
+
+\begin{center}
+\def\arraystretch{5.5}
+\begin{table}
+\begin{tabular}{l}
+  \def\svgwidth{\columnwidth} \input{mcts_example_before.pdf_tex}
+  \\
+\end{tabular}
+\caption{Before the iteration}
+\label{tab:mcts_iteration_before}
+\end{table}
+\end{center}
 
 \subsection{UCT implementation}
 
@@ -136,4 +149,4 @@ This notion is gotten by defining an ordering on the data-type MCTSNode, as foll
 This is a direct mapping of the rules described in the selection step: Unexplored nodes always win over explored nodes and tie against each other.
 When comparing two explored nodes to each other, we have to be a little more clever and use equation \ref{eq:uctnodevalue}, as written in the previous section.
 
-For complete code and therefore complete detail, see section \ref{sec:code}.
+For complete code and more details, see section \ref{sec:code}.
