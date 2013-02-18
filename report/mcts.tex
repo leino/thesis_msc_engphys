@@ -63,16 +63,42 @@ As we go, we update visit count, $N$, and accumulate the score, $Q$.
 We also make sure to alternate the sign of the score we use to accumulate as we go up the tree, since it represents the value for the player who's move it is at that node.
 
 \subsection{An example}
-
+In this section, and example of the UCT algorithm described above.
+To keep things simple, we do only a single iteration.
+However, in order to get a non-trivial iteration, we assume that five iterations have already been done, and do iteration number six.
 \begin{center}
 \def\arraystretch{5.5}
 \begin{table}
 \begin{tabular}{l}
   \def\svgwidth{\columnwidth} \input{mcts_example_before.pdf_tex}
-  \\
 \end{tabular}
 \caption{Before the iteration}
 \label{tab:mcts_iteration_before}
+\end{table}
+\end{center}
+In table \ref{tab:mcts_iteration_before}, we have our starting point.
+We must first carry out the selection step. As can be seen from the figure, there are two cases: one with $N=1$ and $Q=-1$, and one with $N=1$ and $Q=1$.
+Thus, using equation \ref{eq:uctnodevalue}, we get $\sqrt{\ln{5}} - 1$ for the first choice, and $\sqrt{\ln{5}} + 1$ for the other three choices.
+Therefore, let us select the second node since it maximizes equation \ref{eq:uctnodevalue}.
+Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} - we simply select the first child, i.e. the fourth node from the left, on the third row.
+This node is the result of the selection step.
+
+Now it is time to perform the exploration step.
+This is just a random search from the selected node, until we hit a leaf node.
+As can be seen from table \ref{tab:mcts_iteration_before}, there are two possible outcomes: either the seventh node on the fourth row, or the eight node on the fifth row.
+Suppose that the outcome is the latter. (This is the most illustrative case, perhaps.)
+This node is a win for First.
+We should now perform the backup step. We start with the score $1$, and alternate signs until we come back up to the selected node. Which get's initialized with $N=1$ and $Q=(-1)^2 = 1$.
+The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go.
+The complete result after the backup step is shown in table \ref{fig:mcts_iteration_after}.
+\begin{center}
+\def\arraystretch{5.5}
+\begin{table}
+\begin{tabular}{l}
+  \def\svgwidth{\columnwidth} \input{mcts_example_after.pdf_tex}
+\end{tabular}
+\caption{After the iteration}
+\label{fig:mcts_iteration_after}
 \end{table}
 \end{center}
 
