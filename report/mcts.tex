@@ -39,11 +39,11 @@ Each node $v$ in the explored part of the game tree has an attached score, which
 Selection takes place in the explored part of the game tree, and can therefore use the score, $s$.
 We repeatedly pick the ``best child'' of the current node, in the following sense.
 If a child of $v$ has not been explored, then pick any of them as the best child.
-If all children of $v$ have already been explored, then we pick a child which maximizes
+If all children of $v$ have already been explored, then we pick a child, $v'$, which maximizes
 
 \begin{equation}
 \label{eq:uctnodevalue}
-\frac{Q(v')}{N(v')} + c\sqrt{\frac{2\ln{N(v)}}{N(v')}}
+S(v') = \frac{Q(v')}{N(v')} + c\sqrt{\frac{2\ln{N(v)}}{N(v')}}
 \end{equation} 
 where $v'$ is a child of $v$, $N$ is the visit count and $Q$ is the accumulated score for the node (we will see later how to keep track of $Q$ and $N$, for a given node).
 The parameter $c$ determines the amount of exploration. We will choose $c = 1 / \sqrt 2$ as per the comments in \citep[p. 9]{mcts_survey12}.
@@ -78,9 +78,10 @@ However, in order to get a non-trivial iteration, we assume that five iterations
 \end{center}
 In table \ref{tab:mcts_iteration_before}, we have our starting point.
 We must first carry out the selection step. As can be seen from the figure, there are two cases: one with $N=1$ and $Q=-1$, and one with $N=1$ and $Q=1$.
-Thus, using equation \ref{eq:uctnodevalue}, we get $\sqrt{\ln{5}} - 1$ for the first choice, and $\sqrt{\ln{5}} + 1$ for the other three choices.
-Therefore, let us select the second node since it maximizes equation \ref{eq:uctnodevalue}.
-Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} - we simply select the first child, i.e. the fourth node from the left, on the third row.
+Let the choices on the second row of table \ref{tab:mcts_iteration_before} be $v_1$, $v_2$, $v_3$ and $v_4$, from left to right.
+Using expression \ref{eq:uctnodevalue}, we get $S(v_1) = \sqrt{\ln{5}} - 1$ for the first choice, and $S(v_2) = S(v_3) = S(v_4) = \sqrt{\ln{5}} + 1$ for the other three choices.
+So $v2$, $v3$ and $v_4$ all maximize $S$.
+Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} -- we simply select the first child, i.e. the fourth node from the left, on the third row.
 This node is the result of the selection step.
 
 Now it is time to perform the exploration step.
