@@ -80,7 +80,7 @@ In table \ref{tab:mcts_iteration_before}, we have our starting point.
 We must first carry out the selection step. As can be seen from the figure, there are two cases: one with $N=1$ and $Q=-1$, and one with $N=1$ and $Q=1$.
 Let the choices on the second row of table \ref{tab:mcts_iteration_before} be $v_1$, $v_2$, $v_3$ and $v_4$, from left to right.
 Using expression \ref{eq:uctnodevalue}, we get $S(v_1) = \sqrt{\ln{5}} - 1$ for the first choice, and $S(v_2) = S(v_3) = S(v_4) = \sqrt{\ln{5}} + 1$ for the other three choices.
-So $v2$, $v3$ and $v_4$ all maximize $S$.
+So $v_2$, $v_3$ and $v_4$ all maximize $S$.
 Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} -- we simply select the first child, i.e. the fourth node from the left, on the third row.
 This node is the result of the selection step.
 
