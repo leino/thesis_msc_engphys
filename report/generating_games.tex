@@ -21,19 +21,18 @@ A positional game is equivalent to a hypergraph, if we take the so-called winnin
 
 
 Nauty is a tool to generate and work with graphs, and can be downloaded at http://cs.anu.edu.au/people/bdm/nauty/.
+We are particularly interested in the tools \texttt{genbg} and \texttt{showg}.
 
-We are interested, particularly, in the tools \texttt{genbg} and \texttt{showg}.
-
-\texttt{genbg} is used to generate (non-isomorphic) bipartite graphs in the very compact g6 format, and \texttt{showg} is used to turn these g6-formatted graphs into more human-readable form.
-
-
-\subsection{Choosing the command line switches}
-\label{sec:nautycommandline}
+\texttt{genbg} is used to generate (non-isomorphic) bipartite graphs. By default it will output the graphs in the very compact g6 format.
+\texttt{showg} is used to turn these g6-formatted graphs into more human-readable form.
 
 A bipartite graph corresponds to a hypergraph in the following manner.
 Let us say that the two colors are red and blue. Then we can decide that the red vertices correspond exactly with the set of vertices in our hypergraph.
 We can make the blue vertices correspond to hyperedges by defining the hyper edge for a given blue vertex as those red vertices which are connected to it.
 
+
+\subsection{Choosing the command line switches}
+\label{sec:nautycommandline}
 
 In this section, we work out as an example all of the hypergraphs with 3 vertices and 2 hyperedges, using Nauty.
 I will assume that Nauty has been installed and your current directory is wherever you installed Nauty or have \texttt{genbg} and \texttt{showg} available.
