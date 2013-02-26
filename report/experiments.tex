@@ -25,9 +25,15 @@ Recall that the first class of vertices correspond to the vertices of the hyper-
 Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
 Therefore, if we wanted to generate the class of hyper-graphs with 4 vertices and 2 hyper-edges which either have 2 or 3 vertices in them, we would run:
 
+
 \begin{code}
   $ ./genbg -z 4 2 -d0:2 -D2:3 | ./showg
+\end{code}
+The output is:
 
+\begin{tabular}{|p{1.5in} | p{1.5in} | p{1.5in} |}
+\begin{minipage}{1.5in}
+\begin{output}
 Graph 1, order 6.
   0 : 4 5;
   1 : 4;
@@ -36,22 +42,11 @@ Graph 1, order 6.
   4 : 0 1;
   5 : 0 2;
 
-Graph 2, order 6.
-  0 : 4;
-  1 : 4;
-  2 : 5;
-  3 : 5;
-  4 : 0 1;
-  5 : 2 3;
-
-Graph 3, order 6.
-  0 : 4 5;
-  1 : 4 5;
-  2 : 5;
-  3 : ;
-  4 : 0 1;
-  5 : 0 1 2;
-
+\end{output}
+\end{minipage}
+&
+\begin{minipage}{1.5in}
+\begin{output}
 Graph 4, order 6.
   0 : 4 5;
   1 : 4;
@@ -60,6 +55,24 @@ Graph 4, order 6.
   4 : 0 1;
   5 : 0 2 3;
 
+\end{output}
+\end{minipage}
+\\
+\begin{minipage}{1.5in}
+\begin{output}
+Graph 2, order 6.
+  0 : 4;
+  1 : 4;
+  2 : 5;
+  3 : 5;
+  4 : 0 1;
+  5 : 2 3;
+
+\end{output}
+\end{minipage}
+&
+\begin{minipage}{1.5in}
+\begin{output}
 Graph 5, order 6.
   0 : 4 5;
   1 : 4 5;
@@ -68,7 +81,24 @@ Graph 5, order 6.
   4 : 0 1 2;
   5 : 0 1 3;
 
-\end{code}
+\end{output}
+\end{minipage}
+\\
+\begin{minipage}{1.5in}
+\begin{output}
+Graph 3, order 6.
+  0 : 4 5;
+  1 : 4 5;
+  2 : 5;
+  3 : ;
+  4 : 0 1;
+  5 : 0 1 2;
+\end{output}
+\end{minipage}
+&
+\\
+\end{tabular}
+
 
 \subsection{Experiment 1}
 \label{sec:experiment1}
