@@ -92,15 +92,15 @@ sqlite> SELECT DISTINCT numvertices,numedges
 4|9
 4|10
 5|1
-5|2
-5|3
-5|4
-5|5
 \end{output}
 \end{minipage}
 &
 \begin{minipage}{0.5in}
 \begin{output}
+5|2
+5|3
+5|4
+5|5
 5|6
 5|7
 5|8
@@ -113,6 +113,11 @@ sqlite> SELECT DISTINCT numvertices,numedges
 5|15
 5|16
 5|17
+\end{output}
+\end{minipage}
+&
+\begin{minipage}{0.5in}
+\begin{output}
 5|18
 5|19
 5|20
@@ -121,11 +126,6 @@ sqlite> SELECT DISTINCT numvertices,numedges
 6|3
 6|4
 6|5
-\end{output}
-\end{minipage}
-&
-\begin{minipage}{0.5in}
-\begin{output}
 6|6
 6|7
 6|8
@@ -238,14 +238,13 @@ sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
    ...> FROM perfect NATURAL JOIN mctsvsperfect
    ...> WHERE winner = "First"
    ...> GROUP BY numiterations;
-323672106|101627304|6511290|10
-40020796|37235073|2362831|20
-|||30
+323672354|101627304|6511442|10
+253345343|172140755|6325002|20
+401797389|24320391|5693320|30
 \end{code}
 Or, approximately and in normalized form:
 \begin{code}
 0.75 | 0.24 | 0.02 | 10
-0.50 | 0.47 | 0.03 | 20
 \end{code}
 \subsubsection{Failure to win}
 
