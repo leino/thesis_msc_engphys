@@ -12,10 +12,7 @@ Since we will use a tool called Nauty to generate games, and since Nauty talks a
   A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a list of \emph{hyperedges} $E$, which are simply non-empty subsets of $V$.
 \end{definition}
 
-
 A positional game is equivalent to a hypergraph, if we take the so-called winning sets to be the hyperedges.
-
-
 
 \subsection{Nauty and hypergraphs}
 
@@ -343,13 +340,39 @@ Table \ref{tab:bipartite_hypergraph_correspondence} how this bipartite graph and
 
 Our hypothesis at this point is that a command such as \texttt{./genbg m n -z -d0:1} will generate all non-isomorphic hypergraphs of \texttt{m} vertices and \texttt{n} edges.
 
-In other words we need to prove the following result.
+In other words we need to prove the following two results.
 
-\begin{theorem}
+\begin{definition}
+The \emph{neighbourhood} $\mathcal{N}(v) \subset V(G)$ of a vertex $v \in V(G)$ is defined as the set of vertices which have edges connected directly to $v$.
+\end{definition}
 
-Let $B$ be the set of all bipartite graphs with $n$ vertices in the first class and $m$ vertices in the second class.
-Suppose further that $B$ is such that all vertices in the second class have non-zero neighbourhoods, and that no two vertices in the second class have the same neighbourhood.
+\begin{definition}
+A graph $G$ is said to be \emph{bipartite}, if there are $V_1, V_2 \subset{V(G)}$ such that $V(G) = V_1 \cup V_2$, such that $V_1 \cap V_2 = \emptyset$, and such that $\mathcal{N}(V_1) \subset V_2$ and $\mathcal{N}(V_2) \subset V_1$.
+We denote these subsets by $V_1(G)$ and $V_2(G)$, and call them the \emph{first and second classes} of $G$, respectively.
+\end{definition}
 
-Then we get a one-to-one bijection to hypergraphs with $n$ vertices and $m$ hyperedges, by taking the vertices in the first class to be the vertices of the hypergraph, and the vertices in the second class to be hyperedges (defined by their neighbourhoods).
+\begin{lemma}
+Let $\mathfrak{B}$ be the set of all bipartite graphs with $n$ vertices in the first class and $m$ vertices in the second class.
+Let $\mathfrak{H}$ be the set of all hypergraphs with $n$ vertices and $m$ hyperedges.
+Then there is a bijection, up to isomorphism, between $\mathfrak{B}$ and $\mathfrak{H}$.
+\end{lemma}
+\begin{proof}
+Let $G \in \mathfrak{B}$. Define $\varphi(G) \in \mathfrak{H}$ to be the hypergraph given by $(V_1(G), \mathcal{N}(V_2(G)))$.
+In this way we have constructed a mapping from $\mathfrak{B}$ to $\mathfrak{H}$, which we claim has the desired properties.
 
-\end{theorem}
+It now remains to be seen that $\varphi$ it injective and surjective up to isomorphism.
+To show \emph{injectivity up to isomorphism}, we should show $G \cong G' \Leftrightarrow \varphi(G) \cong \varphi(G')$.
+\textbf{TODO: show injectivity}
+
+To show \emph{surjectivity up to isomorphism}, we should show that, given any $H \in \mathfrak{H}$, there is a $G \in \mathfrak{B}$ such that $\varphi(G) \cong H$.
+\textbf{TODO: show surjectivity}
+\qed
+\end{proof}
+
+We shall need a bit more precision, as provided by the following result, which follows immediately from the definition of $\varphi$.
+
+\begin{corollary}
+Let $0 \leq d \leq D$. The set $\{ H : d \leq \left\| \mathcal{F}(H) \right\| \leq D \} \subset \mathfrak{H}$ corresponds up to isomorphism, via $\varphi$, to $ \{ G : d \leq \left\| \mathcal{N}(B) \right\| \leq D  \} \subset \mathfrak{B}$.
+\end{corollary}
+
+
