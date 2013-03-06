@@ -352,27 +352,51 @@ We denote these subsets by $V_1(G)$ and $V_2(G)$, and call them the \emph{first 
 \end{definition}
 
 \begin{lemma}
-Let $\mathfrak{B}$ be the set of all bipartite graphs with $n$ vertices in the first class and $m$ vertices in the second class.
-Let $\mathfrak{H}$ be the set of all hypergraphs with $n$ vertices and $m$ hyperedges.
+Let $\mathfrak{B}$ be the set of all bipartite graphs where all vertices in the second class have distinct neighbourhoods.
+Let $\mathfrak{H}$ be the set of all hypergraphs.
 Then there is a bijection, up to isomorphism, between $\mathfrak{B}$ and $\mathfrak{H}$.
 \end{lemma}
 \begin{proof}
-Let $G \in \mathfrak{B}$. Define $\varphi(G) \in \mathfrak{H}$ to be the hypergraph given by $(V_1(G), \mathcal{N}(V_2(G)))$.
+Let $G \in \mathfrak{B}$. Define $\varphi(G) = (V_1(G), \mathcal{N}(V_2(G))) \in \mathfrak{H}$.
 In this way we have constructed a mapping from $\mathfrak{B}$ to $\mathfrak{H}$, which we claim has the desired properties.
 
-It now remains to be seen that $\varphi$ it injective and surjective up to isomorphism.
-To show \emph{injectivity up to isomorphism}, we should show $G \cong G' \Leftrightarrow \varphi(G) \cong \varphi(G')$.
-\textbf{TODO: show injectivity}
+\textbf{Injectivity:}
+To show \emph{injectivity up to isomorphism}, we should show $G \cong G' \Leftrightarrow \varphi(G) \cong \varphi(G')$, for any two $G,G' \in \mathfrak{B}$.
+Suppose that there is a graph isomorphism $f: G \isomarrow G'$.
+Define $h: V_1(G) \rightarrow V_1(G')$ by $h(v) = f(v)$. In other words, $h$ is just $f$ restricted to $V_1(G)$.
+We must now show that $h$ yields a bijection between $\mathcal{N}(V_2(G))$ and $\mathcal{N}(V_2(G'))$.
+Since $\mathcal{N}(V_2(G)) \subset V_1(G)$ we get $h = f$ on $\mathcal{N}(V_2(G))$.
+Now, since $f$ is an isomorphism, $f$ indeed yields a bijection between $\mathcal{N}(V_2(G))$ and $\mathcal{N}(V_2(G'))$. Therefore, so does $h$.
+We have shown $G \cong G' \Rightarrow \varphi(G) \cong \varphi(G')$.
+To show the converse, suppose that we have a hypergraph isomorphism between $h: \varphi(G) \isomarrow \varphi(G')$.
+We define $f: G \rightarrow G'$ in two cases: $f \|_{V_1(G)} = h$ and $f \|_{V_2(G)} = \mathcal{N}^{-1} h \mathcal{N}$.
+We should check that the second definition is well defined. All vertices in $V_2(G)$ have distinct neighbourhoods, which is just another way of saying that $\mathcal{N}$ yields a bijection between vertices in $V_2(G)$ and their neighbourhoods, for all $G$. We also have that $h$ forms a bijection between the neighbourhoods of $V_2(G)$ and $V_2(G')$, by it's definition. These two facts are sufficcient to show that $f \|_{V_1(G)}$ is well defined.
+To show that $f$ is an isomorphism, we should check that whenever $v_1 \sim v_2$ in $G$, we get $f(v_1) \sim f(v_2)$ in $G'$, and vice-versa.
+Suppose that $v_1 \sim v_2$ in $G$, where $v_1 \in V_1(G)$ and $v_2 \in V_2(G)$. It follows that $v_1 \in \mathcal{N}(v_2)$.
+Therefore $h(v_1) \in h \mathcal{N}( v_2 )$, since $h$ is a bijection.
+Now, $h(v_1) = f(v_1)$ and $h \mathcal{N} (v_2) = \mathcal{N} f (v_2) $, so we have $f(v_1) \in \mathcal{N} f (v_2)$, which implies $f(v_1) \sim f(v_2)$.
+By symmetric reasoning (use $h^{-1}$ in place of $h$), we get $f(v_1) \sim f(v_2) \Rightarrow v_1 \sim v_2$.
 
+\textbf{Surjectivity:}
 To show \emph{surjectivity up to isomorphism}, we should show that, given any $H \in \mathfrak{H}$, there is a $G \in \mathfrak{B}$ such that $\varphi(G) \cong H$.
-\textbf{TODO: show surjectivity}
+So let $H = (V, \mathcal{F}) \in \mathfrak{H}$ be any hypergraph.
+Clearly, we can define a set $W$ such that $| W | = | \mathcal{F} |$ and $V \cap W = \emptyset$.
+Since $| W | = | \mathcal{F} |$ is finite, there exists a bijection $\phi: W \rightarrow \mathcal{F}$.
+We define $G \in \mathfrak{B}$ by $V_1(G) = V$, $V_2(G) = W$, and $v \sim w \Leftrightarrow v \in \phi(w)$, where $v \in V$ and $w \in W$.
+By definition, we then have $\varphi(G) = (V, \mathcal{N}(W))$.
+We take $h: \varphi(G) \rightarrow H$, given by $h \|_{V} = \text{id}$ and $h\|_{W} = \phi$, as a candidate for an isomorphism.
+This is clearly a bijection, so it remains to be seen that it is a hypergraph isomorphism.
+Given any $v \in V$ and $w \in W$, we get the followihg chain of equivalences:
+$v \sim_{\varphi(G)} w \Leftrightarrow v \in \mathcal{N}(w) \Leftrightarrow v \sim_G w \Leftrightarrow v \in \phi(w) \Leftrightarrow h(v) \in h(w) \Leftrightarrow h(v) \sim_H h(w)$.
 \qed
 \end{proof}
 
-We shall need a bit more precision, as provided by the following result, which follows immediately from the definition of $\varphi$.
+We need a bit more precision, as provided by the following result, which follow immediately from the definition of $\varphi$.
 
 \begin{corollary}
-Let $0 \leq d \leq D$. The set $\{ H : d \leq \left\| \mathcal{F}(H) \right\| \leq D \} \subset \mathfrak{H}$ corresponds up to isomorphism, via $\varphi$, to $ \{ G : d \leq \left\| \mathcal{N}(B) \right\| \leq D  \} \subset \mathfrak{B}$.
+There is a bijection between the set of all non-isomorphic bipartite graphs in $\mathfrak{B}$ with $m$ vertices in the first cllass and $n$ vertices in the second class, and the set of all non-isomorphic hypergraphs with $n$ vertices and $m$ hyperedges.
 \end{corollary}
 
-
+\begin{corollary}
+Given any two integers $d \leq D$, there is a bijection between the set of all non-isomorphic bipartite graphs $G \in \mathfrak{B}$ with $d \leq | \mathcal{N}(v) | \leq D$ for all $v \in V_2(G)$, and the set of all hypergraphs $H = (V, \mathcal{F}) \in \mathfrak{H}$ with $d \leq | W | \leq D$, for all $W \in \mathcal{F}$.
+\end{corollary}
