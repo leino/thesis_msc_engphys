@@ -51,6 +51,34 @@ query_02 = "SELECT numvertices, numedges, SUM(numfirstwins), SUM(numsecondwins),
 maybeProcess_02 = maybeProcess_01
 showRow_02 = showRow_01
 
+
+
+
+
+query_03 = "SELECT hc.numvertices, hc.numedges, IFNULL(numfirstwins, 0), IFNULL(numsecondwins, 0), IFNULL(numneitherwins, 0) \
+           \FROM (SELECT numvertices, numedges FROM hypergraphs GROUP BY numvertices, numedges) hc \
+           \LEFT OUTER JOIN \
+           \(SELECT numvertices, numedges, count(*) AS numfirstwins FROM hypergraphs NATURAL JOIN perfect WHERE winner = 'First' GROUP BY numvertices, numedges) fwc \
+           \ON (hc.numvertices = fwc.numvertices AND hc.numedges = fwc.numedges) \
+           \LEFT OUTER JOIN \
+           \(SELECT numvertices, numedges, count(*) AS numsecondwins FROM hypergraphs NATURAL JOIN perfect WHERE winner = 'Second' GROUP BY numvertices, numedges) swc \
+           \ON (hc.numvertices = swc.numvertices AND hc.numedges = swc.numedges) \
+           \LEFT OUTER JOIN \
+           \(SELECT numvertices, numedges, count(*) AS numneitherwins FROM hypergraphs NATURAL JOIN perfect WHERE winner = 'Neither' GROUP BY numvertices, numedges) nwc \
+           \ON (hc.numvertices = nwc.numvertices AND hc.numedges = nwc.numedges);"
+cols_03 = ["#vertices", "#edges", "#First wins", "#Second wins", "#Neither wins"]
+maybeProcess_03 :: [Maybe Int] -> (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int)
+maybeProcess_03 [v, e, f, s, n] = (v, e, f, s, n)
+showRow_03 :: (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int) -> [String]
+showRow_03 (v, e, f, s, n) = 
+  [maybeShowInt v, maybeShowInt e, maybeShowInt f, maybeShowInt s, maybeShowInt n]
+  where
+    maybeShowInt :: Maybe Int -> String
+    maybeShowInt = "s" `maybe` show
+    maybeShowFloat :: Maybe Float -> String
+    maybeShowFloat = "" `maybe` (printf "%.2f")
+
+
 showSql :: SqlValue -> String
 showSql SqlNull = ""
 showSql sql = 
@@ -75,8 +103,9 @@ main = do
             let results = map (map maybeFromSql) sqlResults
                 maybeProcessedResults = map processRow results
             putStrLn $ showTable $ colDescs : (map showRow maybeProcessedResults)
-      queryAndPrint (query_01, cols_01, maybeProcess_01, showRow_01)
-      queryAndPrint (query_02, cols_02, maybeProcess_02, showRow_02)
+      --queryAndPrint (query_01, cols_01, maybeProcess_01, showRow_01)
+      --queryAndPrint (query_02, cols_02, maybeProcess_02, showRow_02)
+      queryAndPrint (query_03, cols_03, maybeProcess_03, showRow_03)
       disconnect connection
     _ -> do
       putStrLn "Invalid arguments. Expecting a database filename."
