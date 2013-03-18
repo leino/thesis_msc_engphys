@@ -1,5 +1,5 @@
 module FromRepresentation
-       (fromRepresentation)
+       (winningSetsFromString, fromRepresentation)
        where
 
 import Text.Parsec
@@ -25,6 +25,9 @@ fromHypergraph wss =
     fromWinningSets board wss wss
 
 fromRepresentation :: String -> SetGame Int
-fromRepresentation representation =
-  let Right wss = parse hypergraph "unknown" representation in
-  fromHypergraph wss
+fromRepresentation  =
+  fromHypergraph . winningSetsFromString
+
+winningSetsFromString :: String -> (Set.Set (Set.Set Int))
+winningSetsFromString cs = 
+    let Right wss = parse hypergraph "unknown" representation in wss
