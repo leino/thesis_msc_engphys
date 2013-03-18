@@ -1,0 +1,3 @@
+Titel:		Exact and Monte-Carlo algorithms for combinatorial games
+Handledare:	Klas Markström (klas.markstrom@math.umu.se)
+Examinator:     Leif Persson (leif.persson@math.umu.se)
