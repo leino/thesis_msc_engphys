@@ -29,5 +29,5 @@ fromRepresentation  =
   fromHypergraph . winningSetsFromString
 
 winningSetsFromString :: String -> (Set.Set (Set.Set Int))
-winningSetsFromString cs = 
-    let Right wss = parse hypergraph "unknown" representation in wss
+winningSetsFromString string = 
+    let Right wss = parse hypergraph "unknown" string in wss
