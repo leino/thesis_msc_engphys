@@ -53,8 +53,6 @@ showRow_02 = showRow_01
 
 
 
-
-
 query_03 = "SELECT hc.numvertices, hc.numedges, IFNULL(numfirstwins, 0), IFNULL(numsecondwins, 0), IFNULL(numneitherwins, 0) \
            \FROM (SELECT numvertices, numedges FROM hypergraphs GROUP BY numvertices, numedges) hc \
            \LEFT OUTER JOIN \
@@ -74,10 +72,27 @@ showRow_03 (v, e, f, s, n) =
   [maybeShowInt v, maybeShowInt e, maybeShowInt f, maybeShowInt s, maybeShowInt n]
   where
     maybeShowInt :: Maybe Int -> String
-    maybeShowInt = "s" `maybe` show
+    maybeShowInt = "" `maybe` show
     maybeShowFloat :: Maybe Float -> String
     maybeShowFloat = "" `maybe` (printf "%.2f")
 
+
+detailedQuery winner numiterations = 
+  let query = "SELECT numedges, min_edge_size, SUM(numfirstwins), SUM(numsecondwins), SUM(numneitherwins) \
+              \FROM hypergraphs NATURAL JOIN perfect NATURAL JOIN hypergraph_structure NATURAL JOIN mctsvsperfect \
+              \WHERE winner = '"++ winner ++ "' AND numiterations = " ++ show numiterations ++ " GROUP BY numedges, min_edge_size"
+      cols = ["#edges", "min edge size", "#First wins", "#Second wins", "#Neither wins"]
+      maybeProcess :: [Maybe Int] -> (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int)
+      maybeProcess [e, m, f, s, n] = (e, m, f, s, n)
+      showRow :: (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int) -> [String]
+      showRow (e, m, f, s, n) = 
+        [maybeShowInt e, maybeShowInt m, maybeShowInt f, maybeShowInt s, maybeShowInt n] in
+  (query, cols, maybeProcess, showRow)
+  where
+    maybeShowInt :: Maybe Int -> String
+    maybeShowInt = "" `maybe` show
+    maybeShowFloat :: Maybe Float -> String
+    maybeShowFloat = "" `maybe` (printf "%.2f")
 
 showSql :: SqlValue -> String
 showSql SqlNull = ""
@@ -105,7 +120,19 @@ main = do
             putStrLn $ showTable $ colDescs : (map showRow maybeProcessedResults)
       --queryAndPrint (query_01, cols_01, maybeProcess_01, showRow_01)
       --queryAndPrint (query_02, cols_02, maybeProcess_02, showRow_02)
-      queryAndPrint (query_03, cols_03, maybeProcess_03, showRow_03)
+      --queryAndPrint (query_03, cols_03, maybeProcess_03, showRow_03)
+      putStrLn $ "First, 10 iterations"
+      queryAndPrint $ detailedQuery "First" 10
+      putStrLn $ "First, 20 iterations"
+      queryAndPrint $ detailedQuery "First" 20
+      putStrLn $ "First, 30 iterations"      
+      queryAndPrint $ detailedQuery "First" 30
+      putStrLn $ "Neither, 10 iterations"      
+      queryAndPrint $ detailedQuery "Neither" 10
+      putStrLn $ "Neither, 20 iterations"      
+      queryAndPrint $ detailedQuery "Neither" 20
+      putStrLn $ "Neither, 30 iterations"      
+      queryAndPrint $ detailedQuery "Neither" 30
       disconnect connection
     _ -> do
       putStrLn "Invalid arguments. Expecting a database filename."
