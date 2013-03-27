@@ -9,6 +9,12 @@ import Control.Applicative
 import Text.Printf
 import System.Environment (getArgs)
 
+
+maybeShowInt :: Maybe Int -> String
+maybeShowInt = "" `maybe` show
+maybeShowFloat :: Maybe Float -> String
+maybeShowFloat = "" `maybe` (printf "%.2f")
+
 -- columWidths rows gives the widths of the columns in the matrix with the given rows
 columnWidths :: [[String]] -> [Int]
 columnWidths = map (maximum . map length) . transpose
@@ -37,11 +43,6 @@ maybeProcess_01 [v, e, f, s, n, i] =
 showRow_01 :: (Maybe Int, Maybe Int, Maybe Float, Maybe Float, Maybe Float, Maybe Int) -> [String]
 showRow_01 (v, e, f, s, n, i) = 
   [maybeShowInt v, maybeShowInt e, maybeShowFloat f, maybeShowFloat s, maybeShowFloat n, maybeShowInt i]
-  where
-    maybeShowInt :: Maybe Int -> String
-    maybeShowInt = "" `maybe` show
-    maybeShowFloat :: Maybe Float -> String
-    maybeShowFloat = "" `maybe` (printf "%.2f")
 
 cols_02 = cols_01
 query_02 = "SELECT numvertices, numedges, SUM(numfirstwins), SUM(numsecondwins), SUM(numneitherwins), numiterations \
@@ -70,11 +71,6 @@ maybeProcess_03 [v, e, f, s, n] = (v, e, f, s, n)
 showRow_03 :: (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int) -> [String]
 showRow_03 (v, e, f, s, n) = 
   [maybeShowInt v, maybeShowInt e, maybeShowInt f, maybeShowInt s, maybeShowInt n]
-  where
-    maybeShowInt :: Maybe Int -> String
-    maybeShowInt = "" `maybe` show
-    maybeShowFloat :: Maybe Float -> String
-    maybeShowFloat = "" `maybe` (printf "%.2f")
 
 
 minEdgeQuery winner numiterations = 
@@ -99,11 +95,15 @@ detailedQuery winner numiterations =
               \FROM hypergraphs NATURAL JOIN perfect NATURAL JOIN hypergraph_structure NATURAL JOIN mctsvsperfect \
               \WHERE winner = '"++ winner ++ "' AND numiterations = " ++ show numiterations ++ " GROUP BY num_two_edges, num_three_edges"
       cols = ["#edges of size 2", "#edges of size 3", "#First wins", "#Second wins", "#Neither wins"]
-      maybeProcess :: [Maybe Int] -> (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int)
-      maybeProcess [e, m, f, s, n] = (e, m, f, s, n)
-      showRow :: (Maybe Int, Maybe Int, Maybe Int, Maybe Int, Maybe Int) -> [String]
-      showRow (e, m, f, s, n) = 
-        [maybeShowInt e, maybeShowInt m, maybeShowInt f, maybeShowInt s, maybeShowInt n] in
+      maybeProcess :: [Maybe Int] -> (Maybe Int, Maybe Int, Maybe Float, Maybe Float, Maybe Float)
+      maybeProcess [n2e, n3e, f, s, n] = 
+        let maybeSum = (\x y z -> x+y+z) <$> f <*> s <*> n in
+        (n2e, n3e, (/) <$> (fromIntegral <$> f) <*> (fromIntegral <$> maybeSum),
+                   (/) <$> (fromIntegral <$> s) <*> (fromIntegral <$> maybeSum),
+                   (/) <$> (fromIntegral <$> n) <*> (fromIntegral <$> maybeSum) )
+      showRow :: (Maybe Int, Maybe Int, Maybe Float, Maybe Float, Maybe Float) -> [String]
+      showRow (n2e, n3e, f, s, n) = 
+        [maybeShowInt n2e, maybeShowInt n3e, maybeShowFloat f, maybeShowFloat s, maybeShowFloat n] in
   (query, cols, maybeProcess, showRow)
   where
     maybeShowInt :: Maybe Int -> String
