@@ -227,9 +227,8 @@ The attentive reader will note that this is the sum of the above number of hyper
 sqlite> SELECT COUNT (*) FROM hypergraphs;
 4320006
 \end{code}
-\subsection{Results}
 
-\subsection{Overview}
+\subsection{Results at large}
 
 The following query shows the percentage of First wins, Second wins and Neither wins, respectively, for the games classified as a first player win.
 \begin{code}
@@ -245,11 +244,32 @@ sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
 Or, approximately and in normalized form:
 \begin{code}
 0.75 | 0.24 | 0.02 | 10
+0.59 | 0.40 | 0.01 | 20
+0.93 | 0.06 | 0.01 | 30
 \end{code}
-\subsubsection{Failure to win}
 
-Out of all the games in wich MCTS has a chance to win, i.e. the game is classified as a first player win, how many times does he actually manage to win?
+Here is the same query, but investigating games where neither player can win if both play perfectly:
+
+\begin{code}
+sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
+   ...> SUM(numneitherwins), numiterations
+   ...> FROM perfect NATURAL JOIN mctsvsperfect
+   ...> WHERE winner = "Neither"
+   ...> GROUP BY numiterations;
+0|29642|159858|10
+0|19103|170397|20
+0|12800|176700|30
+\end{code}
+
+Again, in normalized form:
+
+\begin{code}
+0.00 | 0.15 | 0.84 | 10
+0.00 | 0.10 | 0.90 | 20
+0.00 | 0.07 | 0.93 | 30
+\end{code}
+
+\subsection{More detailed results}
 
 
 
-\subsection{Failure to tie}
