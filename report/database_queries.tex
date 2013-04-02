@@ -365,19 +365,24 @@ The first two collumns contain the number of vertices and edges, respectively. T
 
 \subsection{More detailed results}
 
-The following table shows percentages of First, Second and Neither wins, respectively.
+The following tables show percentages of First, Second and Neither wins, respectively, for a given number of 2-edges and 3-edges.
+(Recall that all edges are of size either 2 or 3, as described in section \ref{sec:experiment1}.)
+Note that the number of 3-edges increase along rows, and the number of 2-edges increase along collumns.
+
+The query is split up into First player win games (games where First wins if both players play perfectly), and Neither player win games (games where neither player wins if both play perfectly).
+Table \ref{tab:detailed_results_first} shows the query for First player win games. Table \ref{tab:detailed_results_neither} shows the query for Neither player win games.
 
 \begin{landscape}
-
-First, 10 iterations
 
 \bgroup
 %\setlength{\tabcolsep}{.16em}
 \def\arraystretch{0.5}%  1 is the default, change whatever you need
 
+\begin{table}
+10
 \begin{tabular}{|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|}
 \hline
-&0&1&2&3&4&5&6&7&8&9&10&11&12&13\\ \hline
+\#2-edges/\#3-edges&0&1&2&3&4&5&6&7&8&9&10&11&12&13\\ \hline
 0&&&&&3,0,97&9,5,86&9,13,78&9,21,69&12,25,62&18,28,54&26,29,46&34,27,39&47,23,31&56,19,24\\ \hline
 1&&&22,11,68&26,19,55&25,29,46&20,38,42&19,45,37&19,49,32&20,53,27&23,55,22&28,54,18&35,50,15&44,44,12&\\ \hline
 2&25,0,76&32,15,54&40,27,33&41,34,26&41,38,21&42,41,18&45,40,15&49,39,12&55,36,9&60,33,7&65,29,6&71,25,4&&\\ \hline
@@ -393,12 +398,11 @@ First, 10 iterations
 12&100,0,0&100,0,0&&&&&&&&&&&&\\ \hline
 13&100,0,0&&&&&&&&&&&&&\\ \hline
 \end{tabular}
-
-First, 20 iterations
-
+\\
+20
 \begin{tabular}{|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|}
 \hline
-&0&1&2&3&4&5&6&7&8&9&10&11&12&13\\ \hline
+\#2-edges/\#3-edges&0&1&2&3&4&5&6&7&8&9&10&11&12&13\\ \hline
 0&&&&&4,0,97&2,5,93&4,10,86&4,14,82&7,17,77&11,18,71&19,19,63&30,17,53&43,14,43&53,15,32\\ \hline
 1&&&5,7,89&10,23,67&12,29,59&14,34,52&16,37,47&18,40,42&21,43,36&25,45,31&28,46,26&33,46,21&39,44,17&\\ \hline
 2&51,0,49&24,21,55&22,36,42&25,44,32&27,48,25&28,51,21&28,54,17&28,58,14&27,61,11&26,65,9&24,69,7&21,74,5&&\\ \hline
@@ -414,12 +418,11 @@ First, 20 iterations
 12&100,0,0&100,0,0&&&&&&&&&&&&\\ \hline
 13&100,0,0&&&&&&&&&&&&&\\ \hline
 \end{tabular}
-
-First, 30 iterations
-
+\\
+30
 \begin{tabular}{|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|}
 \hline
-&0&1&2&3&4&5&6&7&8&9&10&11&12&13\\ \hline
+\#2-edges/\#3-edges&0&1&2&3&4&5&6&7&8&9&10&11&12&13\\ \hline
 0&&&&&1,0,99&2,6,92&3,10,88&4,12,85&5,14,81&8,16,76&14,18,68&23,18,59&32,17,50&39,22,39\\ \hline
 1&&&8,20,73&9,31,60&12,31,57&14,33,53&18,34,48&22,36,43&27,36,36&34,36,30&42,34,24&51,31,19&60,26,14&\\ \hline
 2&0,0,100&7,26,67&19,44,38&24,45,31&29,43,28&34,41,25&40,39,22&46,36,18&52,33,14&59,30,11&66,26,9&72,22,6&&\\ \hline
@@ -435,49 +438,48 @@ First, 30 iterations
 12&100,0,0&100,0,0&&&&&&&&&&&&\\ \hline
 13&100,0,0&&&&&&&&&&&&&\\ \hline
 \end{tabular}
-
+\caption{Results for First player win games. 10, 20, 30 iterations.}
+\label{tab:detailed_results_first}
+\end{table}
 \egroup
 \end{landscape}
-
-
 \begin{landscape}
-
 \bgroup
 %\setlength{\tabcolsep}{.16em}
 \def\arraystretch{0.5}%  1 is the default, change whatever you need
-
-Neither, 10 iterations
-
+\begin{table}
+10
 \begin{tabular}{|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|}
 \hline
-&0&1&2&3&4&5&6&7&8&9&10&11&12\\ \hline
+\#2-edges/\#3-edges&0&1&2&3&4&5&6&7&8&9&10&11&12\\ \hline
 0&&0,0,100&0,0,100&0,0,100&0,1,99&0,4,96&0,9,91&0,12,88&0,12,88&0,9,91&0,4,96&0,0,100&0,0,100\\ \hline
 1&0,0,100&0,1,99&0,5,95&0,9,91&0,12,88&0,15,85&0,18,82&0,22,78&0,26,74&0,30,70&0,35,65&0,42,58&0,55,46\\ \hline
 2&0,0,100&0,3,97&0,9,91&0,15,85&0,18,82&0,19,81&0,20,80&0,20,80&0,21,79&0,19,81&0,21,79&0,18,82&\\ \hline
 3&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&&\\ \hline
 \end{tabular}
-
-Neither, 20 iterations
-
+\\
+20
 \begin{tabular}{|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|}
 \hline
-&0&1&2&3&4&5&6&7&8&9&10&11&12\\ \hline
+\#2-edges/\#3-edges&0&1&2&3&4&5&6&7&8&9&10&11&12\\ \hline
 0&&0,0,100&0,0,100&0,0,100&0,1,99&0,1,99&0,3,97&0,4,96&0,4,96&0,2,98&0,1,100&0,0,100&0,0,100\\ \hline
 1&0,0,100&0,0,100&0,5,95&0,9,91&0,11,89&0,13,87&0,15,85&0,17,83&0,19,81&0,20,80&0,24,76&0,24,76&0,29,71\\ \hline
 2&0,0,100&0,2,98&0,4,96&0,7,93&0,8,92&0,9,91&0,9,91&0,10,90&0,10,90&0,10,90&0,11,89&0,10,90&\\ \hline
 3&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&&\\ \hline
 \end{tabular}
-
-Neither, 30 iterations
-
+\\
+30
 \begin{tabular}{|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|>{\tiny\ttfamily}c|}
 \hline
-&0&1&2&3&4&5&6&7&8&9&10&11&12\\ \hline
+\#2-edges/\#3-edges&0&1&2&3&4&5&6&7&8&9&10&11&12\\ \hline
 0&&0,0,100&0,0,100&0,0,100&0,1,99&0,1,99&0,2,98&0,3,97&0,3,97&0,2,98&0,0,100&0,0,100&0,0,100\\ \hline
 1&0,0,100&0,2,98&0,8,92&0,11,89&0,11,89&0,11,89&0,11,89&0,13,87&0,15,85&0,17,83&0,21,79&0,26,74&0,34,67\\ \hline
 2&0,0,100&0,2,98&0,2,98&0,2,98&0,2,98&0,2,98&0,2,98&0,2,98&0,2,98&0,2,98&0,1,99&0,2,98&\\ \hline
 3&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&0,0,100&&\\ \hline
 \end{tabular}
+\caption{Results for Neither player win games. 10, 20, 30 iterations.}
+\label{tab:detailed_results_neither}
+\end{table}
 
 \egroup
 \end{landscape}
