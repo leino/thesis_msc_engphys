@@ -5,11 +5,11 @@ The plan is to try it out on many different games.
 In order to do that, we have to generate the games themselves.
 The goal of this chapter is to show how to do just that.
 
-This section talks about computationally generating positional games, given some parameters of said games, which we will cover later.
+This section talks about computationally generating positional games, given some constraints which we will cover later.
 Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is slightly more appropriate to talk about hyper-graphs in place of positional games.
 
 \begin{definition}
-  A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a list of \emph{hyperedges} $E$, which are simply non-empty subsets of $V$.
+  A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a set of \emph{hyperedges} $E$, which are non-empty subsets of $V$.
 \end{definition}
 
 A positional game is equivalent to a hypergraph, if we take the so-called winning sets to be the hyperedges.
@@ -17,24 +17,24 @@ A positional game is equivalent to a hypergraph, if we take the so-called winnin
 \subsection{Nauty and hypergraphs}
 
 
-Nauty is a tool to generate and work with graphs, and can be downloaded at http://cs.anu.edu.au/people/bdm/nauty/.
+Nauty is a tool to generate and work with graphs, and can be downloaded at \texttt{http://cs.anu.edu.au/people/bdm/nauty/}.
 We are particularly interested in the tools \texttt{genbg} and \texttt{showg}.
 
 \texttt{genbg} is used to generate (non-isomorphic) bipartite graphs. By default it will output the graphs in the very compact g6 format.
 \texttt{showg} is used to turn these g6-formatted graphs into more human-readable form.
 
 A bipartite graph corresponds to a hypergraph in the following manner.
-Let us say that the two colors are red and blue. Then we can decide that the red vertices correspond exactly with the set of vertices in our hypergraph.
-We can make the blue vertices correspond to hyperedges by defining the hyper edge for a given blue vertex as those red vertices which are connected to it.
+Let us say that the two colors of the bipartite graph are red and blue. Then we can decide that the red vertices correspond exactly to the set of vertices in our hypergraph.
+We can make the blue vertices correspond to hyperedges by defining the hyperedge for a given blue vertex as those red vertices which are connected to it.
 
 
 \subsection{Choosing the command line switches}
 \label{sec:nautycommandline}
 
 In this section, we work out as an example all of the hypergraphs with 2 vertices and 3 hyperedges, using Nauty.
-I will assume that Nauty has been installed and your current directory is wherever you installed Nauty or have \texttt{genbg} and \texttt{showg} available.
+I will assume that Nauty has been installed and your current working directory contains the executables \texttt{genbg} and \texttt{showg}.
 
-Here is the command to generate the bipartite graphs.
+Here is the command to generate and display all non-isomorphic bipartite graphs with 2 vertices in the first class and 3 vertices in the second class.
 
 \begin{code}
    $ ./genbg 2 3 | ./showg
@@ -204,13 +204,15 @@ Graph 13, order 5.
 \end{tabular}
 
 
-The first two vertices are from the first color and correspond to the vertices of our would-be hypergraphs.
-The remaining three vertices are of the second color and correspond to the would-be hyperedges.
-Clearly, there are some issues to work out. Firstly, note that \texttt{Graph 1} does not give us an actual hypergraph: both hyperedges would be empty, under our interpretation, which we do not allow. The same criticism holds for \texttt{Graph 2} and \texttt{Graph 3}.
+Each graph is displayed as five rows -- one row for each vertex.
+The rows contain the index of the vertex, followed by a list of it's neighbours.
+The first two rows correspond to the two vertices in the first class and thus correspond to the vertices of our would-be hypergraphs.
+The remaining three rows correspond to the vertices of the second color, and thus correspond to the would-be hyperedges.
+Clearly, there are some issues to work out. Firstly, note that \texttt{Graph 1} does not give us an actual hypergraph; both hyperedges would be empty, which we do not allow. The same criticism holds for \texttt{Graph 2} and \texttt{Graph 3}.
 
 To get around this, we use the command line switch $\texttt{-dm:n}$ where the \texttt{m} and \texttt{n} are the minimum degree of the first and second class of vertices, respectively.
 
-With something like \texttt{-d0:1} we are saying that the vertices of our hypergraph may be in no hyperedges, but each hyperedge must contain at least 1 vertex, i.e. must not be empty.
+With \texttt{-d0:1} we are saying that the vertices of our hypergraph may be in no hyperedges, but each hyperedge must contain at least one vertex, i.e. must not be empty.
 
 
 \begin{code}
@@ -304,14 +306,14 @@ Graph 6, order 5.
 \end{tabular}
 
 
-There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyper edge three times. That is to say, we would end up with a hypergraph of only a single hyper edge. If we were interested in such a hypergraph, we would have just ran \texttt{./genbg 2 1 -d0:1} to begin with.
+There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyper edge three times. That is to say, we would end up with a hypergraph containing only a single hyperedge.
 
 This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighborhood.
 
 \begin{code}
   $ ./genbg 2 3 -z -d0:1 | ./showg
 \end{code}
-Which yields the output:
+This yields the output:
 
 \begin{output}
 Graph 1, order 5.
@@ -340,7 +342,7 @@ Table \ref{tab:bipartite_hypergraph_correspondence} how this bipartite graph and
 
 Our hypothesis at this point is that a command such as \texttt{./genbg m n -z -d0:1} will generate all non-isomorphic hypergraphs of \texttt{m} vertices and \texttt{n} edges.
 
-In other words we need to prove the following two results.
+More precisely, we need to prove the following results.
 
 \begin{definition}
 The \emph{neighbourhood} $\mathcal{N}(v) \subset V(G)$ of a vertex $v \in V(G)$ is defined as the set of vertices which have edges connected directly to $v$.

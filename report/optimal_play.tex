@@ -11,9 +11,10 @@ We therefore also describe a common optimization of the minimax algorithm, calle
 Most of this material is covered in \citep{aimodernapproach}, though with some of the propositions given as exercises and with more imperative-style pseudo code.
 
 \subsection{Optimal play}
+\label{sec:optimal_play}
 
 What do we mean by ``optimal play''?
-In this section, we will give some pretty intuitive neccesary conditions.
+In this section, we will give some neccesary conditions.
 
 Clearly, a player cannot play optimally if he squanders an opportunity to win.
 More precisely; if current position is a win for the moving player, then he must make a choice which is also a win for him.
@@ -24,21 +25,24 @@ If a player can play as above, he will win if he can win, and if he can't win bu
 \subsection{The minimax algorithm}
 \label{sec:minimax}
 
-In this section, we will see how the considerations in the previous sections guide us to a pretty intuitive algorithm which leads to optimal play.
+In this section, we will see how the considerations in the previous sections guide us to a algorithm which leads to optimal play.
 It is intuitively clear that it is always possible to play as described in the previous section.
 The key in order to find an explicit algorithm is to extend the notion of First player win to be not just for leaf nodes.
 
 In terms of the game tree, what might it mean for any given position, not just a leaf node, to be a First player win? The definition is inductive.
 In the base case, i.e. we have a leaf node, the definition of winning node is clear from the rules of the particular game.
-If we are not on a leaf node, we break the definition up into two cases:
+If we are not on a leaf node, we break the definition up into two cases.
 
 \begin{definition}
 \label{def:positionclasses}
 
 \begin{itemize}
-  \item Case 1: It is Firsts turn to move. In this case, the position is a First win it has a child which is a First win.
 
-  \item Case 2: It is Seconds turn to move. In this case, the position is a First win if all of it's children have children which are First win.
+  \item Case 0: We are on a leaf node. In this case, the rules of the particular game tell us who is the winner, or if there's a tie.
+
+  \item Case 1: It is First's turn to move. In this case, the position is a First win if it has a child which is a First win, according to case 0 or case 2.
+
+  \item Case 2: It is Second's turn to move. In this case, the position is a First win if all of it's children are First win, according to case 0 or case 1.
 
 \end{itemize}
 
@@ -49,7 +53,7 @@ This does not mean that a position must be either a First win or a Second win; a
 We have now defined a kind of coloring of any game tree, with three different colors: First win, Second win and Neither win.
 Instead saying ``the color of a node'', it is more natural to speak of ``the \emph{winner} of a node'', which can be either First, Second or Neither.
 
-The following two propositions follow directly from the definition of optimal play:
+The following two propositions follow directly from the definition of optimal play, outlined in section~\ref{sec:optimal_play}.
 
 \begin{proposition}
 If the game is in a First win position and First plays optimally, then the path in the tree represented by a play will consist entirely of First win nodes.
@@ -88,12 +92,12 @@ This leads to the following recursive definition for the winner of a node, which
 
 \begin{code}
   winner position =
-    | terminal position       = terminalWinner position
-    | turn position == First  = max $ map winner $ choices position
-    | otherwise               = min $ map winner $ choices position
+    | terminal position      = terminalWinner position
+    | turn position == First = maximum $ map winner $ choices position
+    | otherwise              = minimum $ map winner $ choices position
 \end{code}
 The above is a taste of Haskell code.
-The \texttt{min} and \texttt{max} functions know about the ordering defined in equation \ref{eq:winnerordering}.
+The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in equation \ref{eq:winnerordering}.
 Since we know the rules of the game, the functions \texttt{turn}, \texttt{choices} and \texttt{terminal} are assumed to be given.
 (In turn, they tell who's turn it is, what his choices are and whether the position is terminal, given any position of the game.)
 
@@ -108,37 +112,36 @@ Namely alpha-beta pruning.
 
 \subsection {Alpha-Beta Pruning}
 
-The idea for this optimization is quite simple.
-Suppose that, as we are evaluating \texttt{max} function in the code segment from the previous section, and we run into a child with value First win.
+Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in the code segment from the previous section, and we run into a child which is a First win.
 We then know that we can stop searching because we cannot do any better than that.
-Similarly, whilst evaluating the \texttt{min} function, if we run into a Second win, then we can also stop prematurely.
+Similarly, if it is Second's turn to move, and we are evaluating the \texttt{minimum} function, and we run into a Second win, we can also stop prematurely.
 
 This is a specific case of alpha-beta pruning, and will allow us to disregard (or \emph{prune}) big parts of the game three as we search it.
 There is a generalization where the leaf node can have a bigger set of values than just First win, Second win or Neither win, but we don't need it here.
 The implementation is particularly easy in Haskell. We can even make it look exactly like the implementation above, but we need to take some special care when writing min and max so that they know what the absolute minimum is (Second win) and what the absolute maximum is (First win) and can therefore prune.
 
-This means that we can find the maximum without actually computing the entire list of elements in the list (which would require searching the entire game tree), thanks to a feature of Haskell known as laziness.
+This means that we can find the maximum without actually computing all elements in the list (which would require searching the entire game tree below the current position).
 
-Here is our version of \texttt{min} which is lazy and will consequently allow pruning:
+Here is our version of \texttt{minimum} which will allow pruning:
 \begin{code}
-  prunedMin ws = 
+  prunedMinimum ws = 
     case find ((==) Only Second) ws of
-      Nothing -> min ws
+      Nothing -> minimum ws
       _ -> Only Second
 \end{code}
-The implementation for prunedMax is similar:
+The implementation for \texttt{prunedMaximum} is similar:
 \begin{code}
   prunedMax ws = 
     case find ((==) Only First) ws of
-      Nothing -> max ws
+      Nothing -> maximum ws
       _ -> Only First
 \end{code}
 Now we can rewrite our pruned minimax algorithm so that it is very similar to the one in the previous section:
 \begin{code}
   winner position
     | terminal position       = terminalWinner position
-    | turn position == First  = prunedMax $ map winner $ choices play
-    | otherwise               = prunedMin $ map winner $ choices play
+    | turn position == First  = prunedMaximum $ map winner $ choices play
+    | otherwise               = prunedMinimum $ map winner $ choices play
 \end{code}
 Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.
 

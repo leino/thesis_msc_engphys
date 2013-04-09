@@ -11,7 +11,7 @@ We will mostly follow the exposition in \citep{mcts_survey12}, chapter 3.
 MCTS studies the game tree as follows.
 It keeps a record of a subtree of the game-tree containing the nodes that the algorithm has visited so far.
 It also keeps some extra information about each node, which is supposed to represent an approximation of the value of that node.
-The idea is to somehow find a good \emph{expandable node} (meaning that it has unvisited children) in the visited part of the game tree, and then to make an excursion from that node, which means doing a quicker kind of search from that node, in order to estimate the value of the node. The information gleaned from this excursion will then contribute to the algorithms knowledge of the game tree.
+The idea is to somehow find a good \emph{expandable node} (meaning that it has unvisited children) in the visited part of the game tree, and then to make an excursion from that node, which means doing a quicker kind of search from the node, in order to estimate the value of the node. The information gleaned from this excursion will then contribute to the algorithms knowledge of the game tree.
 
 It is assumed that we have a (reasonably efficient) function that lets us determine the value of a leaf node.
 Here is a sketch of the steps that will make up our algorithm:
@@ -31,12 +31,12 @@ The next section describes one of the possibilities: the UCT (Upper Confidence b
 
 In this section, we fill in each of the steps outlined in the previous section, for the special case of the UCT algorithm.
 
-Each node $v$ in the explored part of the game tree has an attached score, which is just a real-valued number, say $s(v)$.
+Each node $v$ in the explored part of the game tree has an attached score, which is just a real-valued number, say $S(v)$.
 
 
 \subsubsection{The selection step}
 
-Selection takes place in the explored part of the game tree, and can therefore use the score, $s$.
+Selection takes place in the explored part of the game tree, and can therefore use the score, $S$.
 We repeatedly pick the ``best child'' of the current node, in the following sense.
 If a child of $v$ has not been explored, then pick any of them as the best child.
 If all children of $v$ have already been explored, then we pick a child, $v'$, which maximizes
@@ -63,7 +63,7 @@ As we go, we update visit count, $N$, and accumulate the score, $Q$.
 We also make sure to alternate the sign of the score we use to accumulate as we go up the tree, since it represents the value for the player who's move it is at that node.
 
 \subsection{An example}
-In this section, and example of the UCT algorithm described above.
+In this section, we give an example of the UCT algorithm described above.
 To keep things simple, we do only a single iteration.
 However, in order to get a non-trivial iteration, we assume that five iterations have already been done, and do iteration number six.
 \begin{center}
@@ -87,7 +87,7 @@ This node is the result of the selection step.
 Now it is time to perform the exploration step.
 This is just a random search from the selected node, until we hit a leaf node.
 As can be seen from table \ref{tab:mcts_iteration_before}, there are two possible outcomes: either the seventh node on the fourth row, or the eight node on the fifth row.
-Suppose that the outcome is the latter. (This is the most illustrative case, perhaps.)
+Suppose that the outcome is the latter.
 This node is a win for First.
 We should now perform the backup step. We start with the score $1$, and alternate signs until we come back up to the selected node. Which get's initialized with $N=1$ and $Q=(-1)^2 = 1$.
 The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go.
@@ -109,7 +109,7 @@ The complete result after the backup step is shown in table \ref{fig:mcts_iterat
 It is assumed that we have a function, \texttt{value}, which gives a real number and which we can apply only to terminal positions.
 For our purposes, \texttt{value endPosition} is the value of \texttt{endPosition} for First player.
 
-We will assume that we have a data-type \texttt{Position} which represents a completely pure state of the game.
+We will assume that we have a data-type \texttt{Position} which represents a state of the game.
 Of course, there is a function
 
 \texttt{choices :: Position -> [Position]}, which given a position will give us a list of choices (also positions) of where we can go next (according to the structure of the game tree).
