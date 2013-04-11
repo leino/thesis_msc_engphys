@@ -1,0 +1,11 @@
+thesis.aux
+thesis.log
+thesis.pdf
+*.bak
+experiments_comments.txt
+generating_games_comments.txt
+*_comments.txt
+*Makefile~
+*.comments.txt
+*.pdf
+*.pdf_tex
