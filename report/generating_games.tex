@@ -394,10 +394,26 @@ Thus, we get $\varphi(G) = (V, \mathcal{F}) = H$.
 
 We need a bit more precision, as provided by the following result, which follow immediately from the definition of $\varphi$.
 
-\begin{corollary}
-There is a bijection between the set of all non-isomorphic bipartite graphs in $\mathfrak{B}$ with $m$ vertices in the first class and $n$ vertices in the second class, and the set of all non-isomorphic hypergraphs with $n$ vertices and $m$ hyperedges.
-\end{corollary}
+We might want to restrict the bijection on the number of vertices and hyperedges.
 
 \begin{corollary}
-Given any two integers $0 \leq d \leq D$, there is a bijection between the set of all non-isomorphic bipartite graphs $G \in \mathfrak{B}$ with $d \leq | \mathcal{N}(v) | \leq D$ for all $v \in V_2(G)$, and the set of all hypergraphs $H = (V, \mathcal{F}) \in \mathfrak{H}$ with $d \leq | W | \leq D$, for all $W \in \mathcal{F}$.
+Let $\mathfrak{B}_{n,m} \subset \mathfrak{B}$ be those bipartite graphs in $\mathfrak{B}$ with $n$ vertices in the first class and $m$ vertices in the second class.
+Let $\mathfrak{H}_{n,m}$ and the set of all non-isomorphic hypergraphs with $n$ vertices and $m$ hyperedges.
+Then there is a bijection between $\mathfrak{B}_{n,m}$ and $\mathfrak{H}_{n,m}$.
+\end{corollary}
+
+We can also restrict on the size of the hyperedges and the number of hyperedges a given vertex can ocurr in.
+
+\begin{corollary}
+Let $d,d',D,D'$ be integers.
+Let $\mathfrak{B}_{d,D,d',D'} \subset \mathfrak{B}$ be those bipartite graphs $G \in \mathfrak{B}$ which satisfy $d \leq | \mathcal{N}(V_1(G)) | \leq D$ and $d' \leq | \mathcal{N}(V_2(G) | \leq D'$.
+Let $\mathfrak{H}_{d,D,d',D'} \subset \mathfrak{H}$ be those hypergraphs $(V, \mathcal{F}) \in \mathfrak{B}$ with vertices that are in at least $d$ and at most $D$ hyperedges (inclusive), and $d' \leq | \mathcal{F} | \leq D'$.
+Then there is a bijection between $\mathfrak{B}_{d,D,d',D'}$ and $\mathfrak{H}_{d,D,d',D'}$.
+\end{corollary}
+
+Or, we can restrict it in both ways.
+
+\begin{corollary}
+\label{cor:restricted_bijection}
+There is a bijection between $\mathfrak{B}_{n,m} \cap \mathfrak{B}_{d,D,d',D'}$ and $\mathfrak{H}_{n,m} \cap \mathfrak{H}_{d,D,d',D'}$.
 \end{corollary}
