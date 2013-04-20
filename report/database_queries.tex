@@ -11,7 +11,7 @@ sqlite>
 \end{code}
 where you can begin typing the queries and commands covered below.
 
-For the sake of completeness, we will run all the subsequent queries against the database \texttt{twothree.db}, which corresponds to experiment 1, described in section \ref{sec:experiment1}.
+For the sake of completeness, we will run all the subsequent queries against the database \texttt{twothree.db}, which corresponds to our experiment, described in section \ref{sec:experiment1}.
 
 \subsection{Database overview}
 
@@ -20,7 +20,7 @@ The following commands are not queries, but they are very important to know.
 sqlite> .tables
 hypergraphs    mctsvsperfect  perfect 
 \end{code}
-These are the tables in \texttt{twothree.db}. The \texttt{hypergraphs} table contains the games we want to play, along with some meta-info about the games. (See next command.)
+These are the tables in \texttt{twothree.db}. The \texttt{hypergraphs} table contains the games we want to play, along with some meta information about the games. (See next command.)
 The table \texttt{perfect} contains the outcome for a given game when perfect First plays against perfect Second. (The perfect strategies are implemented using minimax, as covered in section \ref{sec:minimax}.)
 The table \texttt{mctsvsperfect} contains a number of sample outcomes when MCTS, or more precisely UCT, (section \ref{sec:uct}) plays as First against a perfect opponent as Second.
 
@@ -150,7 +150,7 @@ sqlite> SELECT COUNT (*) FROM
 \end{code}
 Note that we add the qualifier \texttt{DISTINCT} when pulling hypergraphs from \texttt{mctsvsperfect}, since each hypergraph in this table ocurrs three times. (See the experiment structure in \ref{sec:experiment1}.)
 
-If we want to know this number for all combinations of \texttt{numvertices} and \texttt{numedges} stored in \texttt{mctsvsperfect}, we can issue the following command
+If we want to know this number for all combinations of \texttt{numvertices} and \texttt{numedges} stored in \texttt{mctsvsperfect}, we can issue the following query
 \begin{code}
 sqlite> SELECT numvertices, numedges, count(hypergraph)
    ...> FROM ((SELECT DISTINCT hypergraph FROM mctsvsperfect) NATURAL JOIN hypergraphs)
@@ -222,7 +222,7 @@ sqlite> SELECT numvertices, numedges, count(hypergraph)
 \\
 \end{tabular}
 
-The attentive reader will note that this is the sum of the above number of hypergraphs is 4320006 -- the number of hypergraphs in the database:
+The attentive reader will note the number of hypergraphs listed in the above table adds up to 4320006 -- the number of hypergraphs in the database:
 \begin{code}
 sqlite> SELECT COUNT (*) FROM hypergraphs;
 4320006

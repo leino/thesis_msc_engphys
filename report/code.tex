@@ -11,7 +11,7 @@ The same goes for the entire \texttt{Graphics} submodule, which implements suppo
 \subsection {Positional game library}
 
 In this section, we introduce the \texttt{PoGa} library.
-One part of \texttt{PoGa} is mainly an interfaced used for representing and playing positional games.
+One part of \texttt{PoGa} is mainly an interface used for representing and playing positional games.
 However, \texttt{PoGa} also provides the two strategies discussed earlier: minimax with alpha-beta pruning, and the UCT variant of MCTS.
 
 \texttt{PoGa} also contains implementations of arbitrary sized ($m \times n$) Tic-Tac-Toe and Hex.
@@ -157,13 +157,13 @@ instance Ord v => Position (SetGame v) where
 
 In this section, we list the strategy submodule of \texttt{PoGa}.
 It contains implementations of minimax with alpha-beta pruning as well as UCT.
-The implementations of these were discussed in less detail in sections ??? and ???.
+The implementations of these were discussed in less detail in sections \ref{sec:alpha_beta} and \ref{sec:uct}, respectively.
 
 
 As mentioned, strategies take a position to a monadic position, where the monad typeically is in \texttt{MonadRandom} or is the \texttt{IO} monad.
 
 A strategy representing a human player would require some kind of user interface, which is not provided here.
-It is provided in the module named \texttt{GraphicalGame}, and the required user interfaces are specified for the cases of arbitrary sized Tic-Tac-Toe and Hex games.
+It is provided in the module named \texttt{GraphicalGame}, and the required user interfaces are specified for the cases of arbitrarily sized Tic-Tac-Toe and Hex games.
 
 Since it is not an important part of this paper, that entire module is left out of this section for space reasons.
 However, the interested reader can download them from the repository (TODO: insert repository address here).

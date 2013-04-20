@@ -22,7 +22,7 @@ In order to limit the number of vertices in a hyper-edge, we can use the argumen
 The argument \texttt{-dm:n} gives a lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
 Recall that the first class of vertices correspond to the vertices of the hyper-graph, and the second class refers to the hyper-edges, as described in section \ref{sec:nautycommandline}.
 Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
-By corollary \ref{cor:hypergraph_bipartite_bijection}, we can generate the class of hyper-graphs with 4 vertices and 2 hyper-edges which either have 2 or 3 vertices in them, by running:
+By corollary \ref{cor:hypergraph_bipartite_bijection}, we can generate the class of hyper-graphs with 4 vertices and 2 hyper-edges which have either 2 or 3 vertices in them, by running:
 
 
 \begin{code}
@@ -99,19 +99,19 @@ Graph 3, order 6.
 \end{tabular}
 
 
-\subsection{Experiment 1}
+\subsection{The experiment}
 \label{sec:experiment1}
 
-This chapter describes experiment 1. Mainly the setup and contents -- results are dealt with in the next chapter.
+This chapter describes our experiment. Mainly the setup and contents -- results are dealt with in the next chapter.
 We are dealing with the set of all hypergraphs with hyperedges of size either two or three, from the following classes:
 
 \begin{tabular}{ c | c }
 \#vertices & \#hyperedges \\ \hline
 2&1 \\ \hline
-3&1-4 \\ \hline
-4&1-10 \\ \hline
-5&1-20 \\ \hline
-6&1-13 \\ \hline
+3&1\ldots4 \\ \hline
+4&1\ldots10 \\ \hline
+5&1\ldots20 \\ \hline
+6&1\ldots13 \\ \hline
 \end{tabular}
 
 That ends up being about 4.3 million hypergraphs. 4320006, to be exact.
