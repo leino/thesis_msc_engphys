@@ -135,7 +135,9 @@ main = do
             let results = map (map maybeFromSql) sqlResults
                 maybeProcessedResults = map processRow results
             putStrLn $ showTable $ colDescs : (map showRow maybeProcessedResults)
+      --putStrLn $ "First"
       --queryAndPrint (query_01, cols_01, maybeProcess_01, showRow_01)
+      --putStrLn $ "Neither"
       --queryAndPrint (query_02, cols_02, maybeProcess_02, showRow_02)
       --queryAndPrint (query_03, cols_03, maybeProcess_03, showRow_03)
       -- putStrLn $ "First, 10 iterations"
