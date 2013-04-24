@@ -2,7 +2,7 @@ import Database.HDBC
 import Database.HDBC.Sqlite3
 import Control.Monad (when, unless)
 import Data.Functor ((<$>))
-import System (getArgs)
+import System.Environment (getArgs)
 import HypergraphProcessing
 import HDBUtils
 
