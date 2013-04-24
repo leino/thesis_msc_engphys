@@ -6,7 +6,6 @@ module HypergraphProcessing
 import Text.ParserCombinators.Parsec
 import qualified Data.Set as Set
 import Data.List (intercalate)
-import System.Environment (getEnv)
 import GHC.IO.Handle
 import System.Process
 import Control.Monad (unless)
@@ -56,13 +55,12 @@ parseEdgeLists numVerts output =
 
 
 
-batchProcessHypergraphs batchSize numVerts numEdges nautyArgs hypergraphBatchProc = do
-  nautyDir <- getEnv "NAUTYDIR"
+batchProcessHypergraphs genbgPath showgPath batchSize numVerts numEdges nautyArgs hypergraphBatchProc = do
   let genproc =
-        proc (nautyDir ++ "/genbg")
+        proc genbgPath
              ( ("-z"):("-q"):(show numVerts):(show numEdges):nautyArgs )
       process processHypergraphs g6s = do
-        output <- readProcess (nautyDir ++ "/showg") ["-q"] (unlines g6s)
+        output <- readProcess showgPath ["-q"] (unlines g6s)
         case map showHypergraph <$> (parseEdgeLists numVerts output) of
           Left err -> error $ show err
           Right rs -> processHypergraphs g6s rs
