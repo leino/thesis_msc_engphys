@@ -19,14 +19,14 @@ hypergraph =
   where
     natural = (read <$> many1 digit) :: Parsec String () Int
 
-fromHypergraph :: (Set.Set (Set.Set Int)) -> SetGame Int
-fromHypergraph wss = 
-    let board = Set.unions $ Set.toList wss in
+fromHypergraph :: Int -> (Set.Set (Set.Set Int)) -> SetGame Int
+fromHypergraph numvertices wss = 
+    let board = Set.fromList $ [0 .. numvertices] in
     fromWinningSets board wss wss
 
-fromRepresentation :: String -> SetGame Int
-fromRepresentation  =
-  fromHypergraph . winningSetsFromString
+fromRepresentation :: Int -> String -> SetGame Int
+fromRepresentation numvertices =
+  fromHypergraph numvertices . winningSetsFromString
 
 winningSetsFromString :: String -> (Set.Set (Set.Set Int))
 winningSetsFromString string = 

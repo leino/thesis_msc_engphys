@@ -62,7 +62,7 @@ runExperiment connection tableName numGames = do
 
   -- Get all the rows that need a result computed
   let query = concat ["SELECT ",
-                      "hypergraph, numiterations, representation",
+                      "hypergraph, numiterations, numvertices, representation",
                       " FROM ",
                       tableName, " NATURAL JOIN hypergraphs",
                       " WHERE numfirstwins IS NULL OR numsecondwins IS NULL OR numneitherwins IS NULL"
@@ -85,8 +85,8 @@ runExperiment connection tableName numGames = do
                 commit connection
                 putStrLn $ "done!"
             |(rc,i) <- zip rcs [1 ..]]
-  where      
-  convertResult [h, numiterations, rep] = (fromSql h, fromSql numiterations, fromRepresentation $ fromSql rep) :: (String, Int, SetGame Int)
+  where
+  convertResult [h, numiterations, numvertices, rep] = (fromSql h, fromSql numiterations, fromRepresentation (fromSql numvertices) (fromSql rep)) :: (String, Int, SetGame Int)
   convertResults :: [Winner] -> [Int]
   convertResults ws =
     let (nf, ns, nn) = tallyResults ws in [nf, ns, nn]

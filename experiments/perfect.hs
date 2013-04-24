@@ -32,7 +32,7 @@ runExperiment connection tableName = do
 
   -- Get all the rows that need a result computed
   let query = concat ["SELECT ",
-                      "hypergraph, representation",
+                      "hypergraph, numvertices, representation",
                       " FROM ",
                       tableName, " NATURAL JOIN hypergraphs",
                       " WHERE winner IS NULL"
@@ -55,7 +55,7 @@ runExperiment connection tableName = do
                 putStrLn $ "done!"
             |(rc,i) <- zip rcs [1 ..]]
   where      
-    convertResult [h, rep] = (fromSql h, fromRepresentation $ fromSql rep) :: (String, SetGame Int)
+    convertResult [h, numvertices, rep] = (fromSql h, fromRepresentation (fromSql numvertices) (fromSql rep)) :: (String, SetGame Int)
 
 main :: IO ()
 main = do
