@@ -21,7 +21,7 @@ hypergraph =
 
 fromHypergraph :: Int -> (Set.Set (Set.Set Int)) -> SetGame Int
 fromHypergraph numvertices wss = 
-    let board = Set.fromList $ [0 .. numvertices] in
+    let board = Set.fromList $ [0 .. numvertices-1] in
     fromWinningSets board wss wss
 
 fromRepresentation :: Int -> String -> SetGame Int
