@@ -64,10 +64,10 @@ main = do
     [fileName, experimentName] -> do
       connection <- connectSqlite3 fileName
       -- ensure that the required table exists
-      let createTable connection = do runRaw connection $ concat ["CREATE TABLE ", experimentName, " ", 
-                                                                  "(hypergraph STRING NOT NULL, \
-                                                                  \winner STRING NOT NULL)"]    
-      requireTable connection experimentName createTable requiredColumns
+      let createStatement = concat ["CREATE TABLE ", experimentName, " ", 
+                                    "(hypergraph STRING NOT NULL, \
+                                    \winner STRING NOT NULL)"]    
+      requireTable connection experimentName createStatement requiredColumns
       runExperiment connection experimentName
       commit connection
       disconnect connection

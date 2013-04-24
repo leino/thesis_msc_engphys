@@ -104,15 +104,15 @@ main = do
   [fileName, experimentName, numGamesStr] <- getArgs
   let numGames = read numGamesStr :: Int
 
-  let createTable connection = do runRaw connection $ concat ["CREATE TABLE ", experimentName, " ", 
-                                                              "(hypergraph STRING NOT NULL, \
-                                                               \numiterations INTEGER NOT NULL, \
-                                                               \numfirstwins INTEGER, \
-                                                               \numsecondwins INTEGER, \
-                                                               \numneitherwins INTEGER)"]
+  let createStatement concat ["CREATE TABLE ", experimentName, " ", 
+                              "(hypergraph STRING NOT NULL, \
+                              \numiterations INTEGER NOT NULL, \
+                              \numfirstwins INTEGER, \
+                              \numsecondwins INTEGER, \
+                              \numneitherwins INTEGER)"]
   
   connection <- connectSqlite3 fileName
-  success <- requireTable connection experimentName createTable requiredColumns
+  success <- requireTable connection experimentName createStatement requiredColumns
   unless success $ do error "something is wrong with the database"
   runExperiment connection experimentName numGames
   disconnect connection

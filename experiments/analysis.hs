@@ -3,7 +3,6 @@ import System.Environment (getArgs)
 import System.Posix.Env (putEnv)
 import Database.HDBC
 import Database.HDBC.Sqlite3
-import HDBUtils (requireTable)
 import Data.List (sort)
 import Data.List.Split (chunksOf)
 import qualified Data.Set as Set

@@ -5,12 +5,19 @@ module HDBUtils
 import Database.HDBC
 import Data.Functor ((<$>))
 
-requireTable connection tableName createTable requiredColumns = do
+requireTable :: IConnection c => c -> String -> String -> [(String, SqlColDesc)] -> IO Bool
+requireTable connection tableName createStatement requiredColumns = do
   tableExists <- (elem tableName) <$> getTables connection
   case tableExists of
     False -> do
-      createTable connection >> commit connection
-      return True
+      runRaw connection createStatement
+      colsOk <- checkForRequiredColumns connection requiredColumns tableName
+      case colsOk of
+        True -> do
+          commit connection
+          return True
+        False -> do
+          return False
     True -> do
       tableValid <- checkForRequiredColumns connection requiredColumns tableName
       case tableValid of

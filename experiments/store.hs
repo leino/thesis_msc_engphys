@@ -15,15 +15,20 @@ main = do
     _ -> putStrLn "incorrect arguments"
   
 storeResults databaseFileName experimentName numVerts numEdges nautyArgs = do
+  let createStatement =   "CREATE TABLE hypergraphs (hypergraph STRING PRIMARY KEY NOT NULL,\
+                          \numvertices INTEGER NOT NULL,\
+                          \numedges INTEGER NOT NULL,\
+                          \representation STRING NOT NULL)"
+
   connection <- connectSqlite3 databaseFileName
   -- set up data base
   acquiredHyp <- requireTable connection
                               "hypergraphs"
-                              createHypergraphTable
+                              createStatement
                               requiredHypergraphColumns
   acquiredExp <- requireTable connection
                               experimentName
-                              (createExperimentTable experimentName)
+                              (createExperimentStatement experimentName)
                               requiredExperimentColumns
   unless (acquiredHyp && acquiredExp) $ error "database is invalid"
   -- this batch processor inserts a batch into the hypergraphs table
@@ -45,17 +50,10 @@ storeResults databaseFileName experimentName numVerts numEdges nautyArgs = do
   batchProcessHypergraphs 2048 numVerts numEdges nautyArgs (\g6s rs -> representBatch g6s rs >> planBatch g6s)
   disconnect connection
 
-
-createHypergraphTable connection = do
-  runRaw connection "CREATE TABLE hypergraphs (hypergraph STRING PRIMARY KEY NOT NULL,\
-                                              \numvertices INTEGER NOT NULL,\
-                                              \numedges INTEGER NOT NULL,\
-                                              \representation STRING NOT NULL)"
-
-createExperimentTable experimentName connection = do
-  runRaw connection $ concat ["CREATE TABLE ",
-                              experimentName,
-                              " (hypergraph STRING PRIMARY KEY NOT NULL REFERENCES hypergraphs(hypergraph))"]
+createExperimentStatement experimentName =
+  concat ["CREATE TABLE ",
+          experimentName,
+          " (hypergraph STRING PRIMARY KEY NOT NULL REFERENCES hypergraphs(hypergraph))"]
 
 requiredHypergraphColumns = 
   [("hypergraph", SqlColDesc {colType = SqlUnknownT "string",
