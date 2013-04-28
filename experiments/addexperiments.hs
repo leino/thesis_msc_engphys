@@ -101,7 +101,10 @@ connectExperimentDatabase filename experiment = do
     requireExperimentTable :: IConnection c => c -> IO (Either String c) 
     requireExperimentTable connection = do
       let tableName = "experiments"
-          requiredColumns = []
+          requiredColumns = 
+            let stringDesc = SqlColDesc {colType = SqlUnknownT "string", colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing}
+                integerDesc = SqlColDesc {colType = SqlIntegerT, colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing} in
+            [("experiment", stringDesc), ("strategy_first", stringDesc), ("strategy_second", stringDesc), ("num_plays", integerDesc)]
           createStatement = concat ["CREATE TABLE ", tableName,
                                     " (experiment STRING PRIMARY KEY NOT NULL,",
                                     " strategy_first STRING NOT NULL,",
@@ -113,8 +116,10 @@ connectExperimentDatabase filename experiment = do
         Just connection -> return $ Right connection
     requireResultTable :: IConnection c => Experiment -> c -> IO (Either String c)
     requireResultTable (Deterministic _ _) connection = do
-      let tableName = experimentResultTableName experiment
-          requiredColumns = []
+      let tableName = experimentResultTableName experiment          
+          requiredColumns = 
+            let stringDesc = SqlColDesc {colType = SqlUnknownT "string", colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing} in
+            [("game", stringDesc), ("winner", stringDesc)]
           createStatement = concat ["CREATE TABLE ", tableName,
                                     " (game STRING PRIMARY KEY NOT NULL,",
                                     " winner STRING)"]
@@ -124,13 +129,15 @@ connectExperimentDatabase filename experiment = do
         Just connection -> return $ Right connection
     requireResultTable (Stochastic _ _ _) connection = do
       let tableName = experimentResultTableName experiment
-          requiredColumns = []
+          requiredColumns = 
+            let stringDesc = SqlColDesc {colType = SqlUnknownT "string", colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing}
+                integerDesc = SqlColDesc {colType = SqlIntegerT, colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing} in
+            [("game", stringDesc), ("num_first_wins", integerDesc), ("num_second_wins", integerDesc), ("num_neither_wins", integerDesc)]
           createStatement = concat ["CREATE TABLE ", tableName,
                                     " (game STRING PRIMARY KEY NOT NULL,",
                                     " num_first_wins INTEGER,",
                                     " num_second_wins INTEGER,",
-                                    " num_neither_wins INTEGER, ",
-                                    " num_plays )"]
+                                    " num_neither_wins INTEGER)"]
       result <- requireTable tableName createStatement requiredColumns connection
       case result of
         Nothing -> return $ Left "failed to require result table"
