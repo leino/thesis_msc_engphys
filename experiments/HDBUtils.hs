@@ -18,8 +18,8 @@ checkTablePresence :: IConnection c => TableMetadata -> c -> IO TablePresence
 checkTablePresence (TableMetadata tableName _ requiredColumns) connection = do
   exists <- (elem tableName) <$> getTables connection
   case exists of
-    True -> return Missing
-    False -> do
+    False -> return Missing
+    True -> do
       valid <- hasRequiredColumns requiredColumns tableName connection
       case valid of
         True -> return Present
