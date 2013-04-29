@@ -6,6 +6,7 @@ import HDBUtils (requireTable)
 import Control.Monad.Instances
 import Data.Functor ((<$>))
 import Data.List (lookup)
+import qualified DatabaseStructure as DS
 
 -- Arguments: [filename, numVertices, numEdges, nautyArgs]
 -- 'filename': the name of the database where the hypergraphs will be inserted
@@ -54,19 +55,11 @@ main = do
           putStrLn $ "error: incorrect arguments: " ++ errmsg
           putStrLn $ "usage: \n" ++ usage programName
         Right (fileName, numVerts, numEdges, nautyArgs) -> do
-          
-          let createStatement = "CREATE TABLE hypergraphs (hypergraph STRING PRIMARY KEY NOT NULL, numvertices INTEGER NOT NULL, numedges INTEGER NOT NULL, representation STRING NOT NULL)"
-              -- Columns required in order to insert hypergraphs.
-              requiredColumns = 
-                let stringDesc = SqlColDesc {colType = SqlUnknownT "string", colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing}
-                    integerDesc = SqlColDesc {colType = SqlIntegerT, colSize = Nothing, colOctetLength = Nothing, colDecDigits = Nothing, colNullable = Nothing} in
-                [("hypergraph", stringDesc), ("numvertices", integerDesc), ("numedges", integerDesc), ("representation", stringDesc)]
-                
           -- Create/open database and verify that it has the required columns (or create them if the table doesn't exist)
-          maybeConnection <- connectSqlite3 fileName >>= requireTable "hypergraphs" createStatement requiredColumns
+          maybeConnection <- connectSqlite3 fileName >>= requireTable (DS.hypergraphTableMetadata)
           case maybeConnection of
-            Nothing -> putStrLn "error: database contains a table named 'hypergraphs', but it is of the wrong format"
-            Just connection -> do
+            Left error -> putStrLn $ "error: when creating 'hypergraphs' table: " ++ error
+            Right connection -> do
               -- This is the main program: given a valid connection, we insert the
               -- described class of hypergraphs in batches, and commit the database after completing each batch.
               -- If there are already entries for the hypergraphs we are inserting, we simply ignore the insert statement
