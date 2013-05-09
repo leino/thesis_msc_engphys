@@ -5,23 +5,12 @@ import HDBUtils
 import Text.ParserCombinators.Parsec
 import Data.Functor ((<$>))
 import ExperimentDescription
+import ParsecUtils
 import qualified DatabaseStructure as DS
   
 appendError :: String -> Either String a -> Either String a
 appendError _ x@(Right _) = x
 appendError str (Left err) = Left (str ++ err)
-
-natural = read <$> many1 digit
-
-parseStrategy :: String -> Either String Strategy
-parseStrategy str = do
-  let p = choice [string "Perfect" >> return Perfect,
-                  string "UCT" >> natural >>= return . UCT]
-      parseResult = parse p "" str
-  case parseResult of
-    Left parseError -> Left $ show $ parseError
-    Right experiment -> return experiment
-    
   
 parsePositiveInteger :: String -> Either String Int
 parsePositiveInteger str = do
