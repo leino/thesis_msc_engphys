@@ -7,6 +7,8 @@ module HDBUtils
 
 import Database.HDBC
 import Data.Functor ((<$>))
+import Text.ParserCombinators.Parsec
+import Text.Parsec.Prim
 
 data TableMetadata = TableMetadata {tableName :: String,
                                     createStatement :: String,
@@ -30,7 +32,6 @@ checkTablePresence (TableMetadata tableName _ requiredColumns) connection = do
       cds <- describeTable connection tableName -- collumn decsriptions
       return $ and $ map (flip elem cds) reqCds
     
-
 requireTable :: IConnection c => TableMetadata -> c -> IO (Either String c)
 requireTable tmd@(TableMetadata tableName createStatement requiredColumns) connection = do
   presence <- checkTablePresence tmd connection
