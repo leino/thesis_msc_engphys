@@ -2,7 +2,8 @@ module DatabaseStructure
        (TableMetadata (..),
         hypergraphTableMetadata,
         experimentTableMetadata,
-        resultTableMetadata)
+        resultTableMetadata,
+        experimentResultTableName)
        where
 
 import Database.HDBC
