@@ -27,12 +27,10 @@ hypergraphTableMetadata = TableMetadata {tableName = "hypergraphs",
 experimentTableMetadata =
   TableMetadata {tableName = "experiments",
                  createStatement = concat ["CREATE TABLE ", "experiments",
-                                           " (name STRING PRIMARY KEY NOT NULL,",
-                                           " strategy_first STRING NOT NULL,",
+                                           "(strategy_first STRING NOT NULL,",
                                            " strategy_second STRING NOT NULL,",
                                            " num_plays INTEGER)"],
-                 requiredColumns = [("name", stringDesc),
-                                    ("strategy_first", stringDesc),
+                 requiredColumns = [("strategy_first", stringDesc),
                                     ("strategy_second", stringDesc),
                                     ("num_plays", integerDesc)]}
 

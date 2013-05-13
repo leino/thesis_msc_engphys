@@ -7,18 +7,6 @@ import Data.Functor ((<$>))
 import ExperimentDescription
 import ParsecUtils
 import qualified DatabaseStructure as DS
-  
-parseExperimentName :: String -> Either String String
-parseExperimentName str = do
-  let validChars = oneOf $ concat [ ['a' .. 'z'], ['0' .. '9'], ['_'] ]
-      p = do
-        name <- many1 validChars
-        eof
-        return name
-      parseResult = parse p "" str
-  case parseResult of
-    Left parseError -> Left $ show $ parseError
-    Right colname -> return colname
 
 appendError :: String -> Either String a -> Either String a
 appendError _ x@(Right _) = x
@@ -37,40 +25,37 @@ validateStrategy strat@(UCT numIterations)
   | numIterations > 0 = Right strat
   | otherwise         = Left "UCT strategy must have at least one iteration"
 
-sanitizeExperimentArgs :: [String] -> Either String (String, Experiment)
+sanitizeExperimentArgs :: [String] -> Either String Experiment
 sanitizeExperimentArgs args = 
   case args of
-    nameRaw:firstStratStr:secondStratStr:optionalArgs -> do
-      name <- appendError "name: " $ parseExperimentName nameRaw
+    firstStratStr:secondStratStr:optionalArgs -> do
       firstStrat <- appendError "first argument: " $ parseStrategy firstStratStr >>= validateStrategy
       secondStrat <- appendError "second argument: " $ parseStrategy secondStratStr >>= validateStrategy
       case (firstStrat, secondStrat) of
-        (Perfect, Perfect) -> return $ (name, Deterministic Perfect Perfect)
+        (Perfect, Perfect) -> return $ Deterministic Perfect Perfect
         (fstStrat, sndStrat) -> do
           case optionalArgs of
             [numPlaysStr] -> do
               numPlays <- appendError "third argument: " $ parsePositiveInteger numPlaysStr
-              return $ (name, Stochastic fstStrat sndStrat numPlays)
+              return $ Stochastic fstStrat sndStrat numPlays
             _ -> Left "when specifying stochastic strategies, you must also specify the number of games to play"
     _ -> Left "wrong number of arguments"
 
-addExperiment :: IConnection c => c -> String -> Experiment -> IO ()
-addExperiment connection name experiment@(Deterministic firstStrategy secondStrategy) = do
+addExperiment :: IConnection c => c -> Experiment -> IO ()
+addExperiment connection experiment@(Deterministic firstStrategy secondStrategy) = do
   let tableName = DS.tableName $ DS.resultTableMetadata experiment 
-  insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO experiments (name, strategy_first, strategy_second, num_plays)",
-                                                  " VALUES (?, ?, ?, ?)"]
-  execute insertStatement [toSql name,
-                           toSql $ show firstStrategy,
+  insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO experiments (strategy_first, strategy_second, num_plays)",
+                                                  " VALUES (?, ?, ?)"]
+  execute insertStatement [toSql $ show firstStrategy,
                            toSql $ show secondStrategy,
                            SqlNull
                           ]
   commit connection  
-addExperiment connection name experiment@(Stochastic firstStrategy secondStrategy numPlays) = do
+addExperiment connection experiment@(Stochastic firstStrategy secondStrategy numPlays) = do
   let tableName = DS.tableName $ DS.resultTableMetadata experiment 
-  insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO experiments (name, strategy_first, strategy_second, num_plays)",
-                                                  " VALUES (?, ?, ?, ?)" ]
-  execute insertStatement [toSql name,
-                           toSql $ show firstStrategy,
+  insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO experiments (strategy_first, strategy_second, num_plays)",
+                                                  " VALUES (?, ?, ?)" ]
+  execute insertStatement [toSql $ show firstStrategy,
                            toSql $ show secondStrategy,
                            toSql $ numPlays
                           ]
@@ -114,13 +99,13 @@ main = do
       case experimentParseResult of
         Left error -> do
           reportError $ "failed to parse experiment arguments: " ++ error
-        Right (name, experiment) -> do
+        Right experiment -> do
           connectionResult <- connectExperimentDatabase filename experiment
           case connectionResult of
             Left error -> do
               reportError $ "failed to connect to the database: " ++ error
             Right (connection, experiment) -> do
-              addExperiment connection name experiment
+              addExperiment connection experiment
               disconnect connection
     _ -> reportError $ unlines ["You need to specify a filename for the database where you wish to add the experiments.",
                                 "The file will be created if it doesn't exist."]
