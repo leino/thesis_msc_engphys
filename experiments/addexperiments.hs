@@ -66,7 +66,7 @@ addExperiment connection experiment@(Stochastic firstStrategy secondStrategy num
 -- If it fails to do both of these tasks, it will fail with an error message.
 connectExperimentDatabase :: String -> Experiment -> IO (Either String (Connection, Experiment))
 connectExperimentDatabase filename experiment = do
-  result <- (connectSqlite3 filename >>= requireExperimentTable >>= either (return . Left) (requireResultTable experiment))
+  result <- (connectSqlite3 filename >>= either (return . Left) requireExperimentTable)
   case result of
     Left error -> do
       return $ Left $ "connecting to experiment database: " ++ error
@@ -78,17 +78,6 @@ connectExperimentDatabase filename experiment = do
       result <- requireTable DS.experimentTableMetadata connection
       case result of 
         Left error -> return $ Left $ "failed to require experiment table: " ++ error
-        Right connection -> return $ Right connection
-    requireResultTable :: IConnection c => Experiment -> c -> IO (Either String c)
-    requireResultTable experiment@(Deterministic _ _) connection = do
-      result <- requireTable (DS.resultTableMetadata experiment) connection
-      case result of
-        Left error -> return $ Left $ "failed to require result table: " ++ error
-        Right connection -> return $ Right connection
-    requireResultTable (Stochastic _ _ _) connection = do
-      result <- requireTable (DS.resultTableMetadata experiment) connection
-      case result of
-        Left error -> return $ Left $  "failed to require result table: " ++ error
         Right connection -> return $ Right connection
 
 main = do
