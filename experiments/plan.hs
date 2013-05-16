@@ -6,40 +6,10 @@ import System.Environment (getArgs, getProgName)
 import System.Directory (doesFileExist)
 import HDBUtils
 import Data.Functor ((<$>))
-import Control.Arrow (left)
 import Data.Either (lefts, rights)
-import Data.Convertible
 import qualified ExperimentDescription as ED
 import qualified DatabaseStructure as DS
-
-safeSqlConvert :: Convertible SqlValue a => SqlValue -> Either String a
-safeSqlConvert = left prettyConvertError . safeFromSql
-
-readExperiments :: IConnection c => c -> IO [Either String ED.Experiment]
-readExperiments connection = do
-  let readRow row@[sqlFirstStrat,
-                   sqlSecondStrat,
-                   sqlNumPlays] = do
-        left ((++) $ "row: " ++ show row ++ ": ") $ do -- append the row sql representation to error messages, for context
-          firstStrategy <- safeSqlConvert sqlFirstStrat >>= ED.parseStrategy
-          secondStrategy <- safeSqlConvert sqlSecondStrat >>= ED.parseStrategy
-          case (firstStrategy, secondStrategy) of
-            ((ED.Perfect, ED.Perfect)) -> do
-              return $ ED.Deterministic {ED.firstStrategy = firstStrategy,
-                                         ED.secondStrategy = secondStrategy}
-            _ -> do -- we have at least one stochastic strategy, so the experiment is stochastic
-              numPlays <- (safeSqlConvert sqlNumPlays)::Either String Int
-              case numPlays > 0 of
-                False ->
-                  Left $ "number of plays specified is not strictly positive"
-                True -> 
-                  return $ ED.Stochastic {ED.firstStrategy = firstStrategy,
-                                          ED.secondStrategy = secondStrategy,
-                                          ED.numPlays = numPlays}
-            
-  map readRow <$> quickQuery connection (concat ["SELECT strategy_first, strategy_second, num_plays FROM ",
-                                                 tableName DS.experimentTableMetadata]) []
-
+import Common (readExperiments)
 
 requireResultTable :: IConnection c => c -> ED.Experiment -> IO (Either String c)
 requireResultTable connection experiment@(ED.Deterministic _ _) = do
