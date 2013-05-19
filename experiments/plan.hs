@@ -36,18 +36,24 @@ appendResults connection experiment@(ED.Deterministic ED.Perfect ED.Perfect) = d
 appendResults connection experiment@( ED.Stochastic ED.Perfect (ED.UCT num_iterations) num_plays) = do
   let resultTableName = DS.experimentResultTableName experiment
       temporaryTableName = "tmp_" ++ resultTableName
+  -- create a temporary table
   createTemporaryTableStatement <- prepare connection $ concat ["CREATE TEMPORARY TABLE ", temporaryTableName, " (num_iterations_second INTEGER NOT NULL, num_plays INTEGER NOT NULL)"]
+  execute createTemporaryTableStatement []  
+  -- insert the desired experiment into the temporary table
   insertTempTableStatement <- prepare connection $ concat ["INSERT INTO ", temporaryTableName, " (num_iterations_second, num_plays) VALUES (?, ?)"]
+  execute insertTempTableStatement [toSql num_iterations, toSql num_plays]  
+  -- make the insertion
   insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO ", resultTableName, 
-                                                  " (hypergraph, num_iterations_first, num_plays) ",
+                                                  " (hypergraph, num_iterations_second, num_plays) ",
                                                   " SELECT hypergraph, num_iterations_second, num_plays FROM ",
                                                   DS.tableName DS.hypergraphTableMetadata,
                                                   " CROSS JOIN ",
                                                   temporaryTableName
                                                  ]
-  execute createTemporaryTableStatement []
-  execute insertTempTableStatement [toSql num_iterations, toSql num_plays]
   execute insertStatement []
+  -- drop the temporary table
+  dropTemporaryTableStatement <- prepare connection $ concat ["DROP TABLE ", temporaryTableName]
+  execute dropTemporaryTableStatement []
   
 appendResults connection experiment@( ED.Stochastic (ED.UCT num_iterations) ED.Perfect num_plays) = do
   let resultTableName = DS.experimentResultTableName experiment
@@ -64,22 +70,32 @@ appendResults connection experiment@( ED.Stochastic (ED.UCT num_iterations) ED.P
                                                   temporaryTableName
                                                  ]
   execute insertStatement []
+  -- drop the temporary table
+  dropTemporaryTableStatement <- prepare connection $ concat ["DROP TABLE ", temporaryTableName]
+  execute dropTemporaryTableStatement []
   
 appendResults connection experiment@( ED.Stochastic (ED.UCT num_iterations_first) (ED.UCT num_iterations_second) num_plays) = do
   let resultTableName = DS.experimentResultTableName experiment
       temporaryTableName = "tmp_" ++ resultTableName
+      
   createTemporaryTableStatement <- prepare connection $ concat ["CREATE TEMPORARY TABLE ", temporaryTableName, " (num_iterations_first INTEGER NOT NULL, num_iterations_second INTEGER NOT NULL, num_plays INTEGER NOT NULL)"]
-  insertTempTableStatement <- prepare connection $ concat ["INSERT INTO ", temporaryTableName, " (num_iterations_first, num_iterations_second, num_plays) VALUES (?, ?)"]
+  execute createTemporaryTableStatement []  
+  
+  insertTempTableStatement <- prepare connection $ concat ["INSERT INTO ", temporaryTableName, " (num_iterations_first, num_iterations_second, num_plays) VALUES (?, ?, ?)"]
+  execute insertTempTableStatement [toSql num_iterations_first, toSql num_iterations_second, toSql num_plays]  
+  
   insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO ", resultTableName, 
-                                                  " (hypergraph, num_iterations_first, num_plays) ",                                                  
+                                                  " (hypergraph, num_iterations_first, num_iterations_second, num_plays) ",                                                  
                                                   " SELECT hypergraph, num_iterations_first, num_iterations_second, num_plays FROM ",
                                                   DS.tableName DS.hypergraphTableMetadata,
                                                   " CROSS JOIN ",
                                                   temporaryTableName
                                                  ]
-  execute createTemporaryTableStatement []
-  execute insertTempTableStatement [toSql num_iterations_first, toSql num_iterations_second, toSql num_plays]
   execute insertStatement []  
+  -- drop the temporary table
+  dropTemporaryTableStatement <- prepare connection $ concat ["DROP TABLE ", temporaryTableName]
+  execute dropTemporaryTableStatement []
+  
   
 main = do
   args <- getArgs

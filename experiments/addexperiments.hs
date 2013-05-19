@@ -50,7 +50,7 @@ addExperiment connection experiment@(Deterministic firstStrategy secondStrategy)
                            toSql $ show secondStrategy,
                            SqlNull
                           ]
-  commit connection  
+  commit connection
 addExperiment connection experiment@(Stochastic firstStrategy secondStrategy numPlays) = do
   let tableName = DS.tableName $ DS.resultTableMetadata experiment 
   insertStatement <- prepare connection $ concat ["INSERT OR REPLACE INTO experiments (strategy_first, strategy_second, num_plays)",
@@ -66,7 +66,8 @@ addExperiment connection experiment@(Stochastic firstStrategy secondStrategy num
 -- If it fails to do both of these tasks, it will fail with an error message.
 connectExperimentDatabase :: String -> Experiment -> IO (Either String (Connection, Experiment))
 connectExperimentDatabase filename experiment = do
-  result <- (connectSqlite3 filename >>= either (return . Left) requireExperimentTable)
+  connection <- connectSqlite3 filename
+  result <- requireExperimentTable connection
   case result of
     Left error -> do
       return $ Left $ "connecting to experiment database: " ++ error
