@@ -30,7 +30,7 @@ experimentTableMetadata =
                  createStatement = concat ["CREATE TABLE ", "experiments",
                                            "(strategy_first STRING NOT NULL,",
                                            " strategy_second STRING NOT NULL,",
-                                           " num_plays INTEGER)"],
+                                           " num_plays INTEGER, UNIQUE(strategy_first, strategy_second, num_plays))"],
                  requiredColumns = [("strategy_first", stringDesc),
                                     ("strategy_second", stringDesc),
                                     ("num_plays", integerDesc)]}
