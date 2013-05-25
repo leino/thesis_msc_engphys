@@ -2,12 +2,28 @@ import Database.HDBC
 import Database.HDBC.Sqlite3
 import System.Environment (getArgs, getProgName)
 import qualified DatabaseStructure as DS
+import qualified ExperimentDescription as ED
 import HDBUtils
 import Data.List (intersperse)
 import Common
 import Data.Functor ((<$>))
 import Data.Either (lefts, rights)
 import System.Directory (doesFileExist)
+
+runExperiment :: IConnection c => c -> ED.Experiment -> IO ()
+runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
+  let tableName = DS.experimentResultTableName experiment  
+      selectStatement = concat ["SELECT hypergraph, num_iterations_first, num_iterations_second, num_plays",
+                                " FROM ", tableName,
+                                " WHERE num_first_wins = NULL AND num_second_wins = NULL AND num_neither_wins = NULL"]
+
+  putStrLn $ "running unfinished experiments on table" ++ tableName
+  results <- quickQuery connection selectStatement []
+  putStrLn $ "number of results: " ++ (show $ length results)
+
+runExperiment connection (ED.Stochastic ED.Perfect (ED.UCT _) _) = return ()
+runExperiment connection (ED.Stochastic (ED.UCT _) ED.Perfect _) = return ()
+runExperiment connection (ED.Deterministic ED.Perfect ED.Perfect) = return ()
   
 main = do
   programName <- getProgName
@@ -38,7 +54,7 @@ main = do
                   case errors of
                     [] -> do
                       let experiments = rights readResults
-                      putStrLn $ unlines $ map show experiments
+                      mapM_ (runExperiment connection) experiments
                     errors -> do
                       putStrLn "the database is errorneously formatted: "
                       mapM_ putStrLn errors
