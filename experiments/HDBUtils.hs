@@ -1,14 +1,23 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module HDBUtils
        (TableMetadata (..),
         TablePresence (..),
         requireTable,
-        checkTablePresence)
+        checkTablePresence,
+        safeSqlConvert)
        where
 
 import Database.HDBC
 import Data.Functor ((<$>))
 import Text.ParserCombinators.Parsec
 import Text.Parsec.Prim
+import Control.Arrow (left)
+import Data.Convertible
+
+
+safeSqlConvert :: Convertible SqlValue a => SqlValue -> Either String a
+safeSqlConvert = left prettyConvertError . safeFromSql
 
 data TableMetadata = TableMetadata {tableName :: String,
                                     createStatement :: String,
