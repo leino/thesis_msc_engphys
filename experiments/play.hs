@@ -15,11 +15,19 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
   let tableName = DS.experimentResultTableName experiment  
       selectStatement = concat ["SELECT hypergraph, num_iterations_first, num_iterations_second, num_plays",
                                 " FROM ", tableName,
-                                " WHERE num_first_wins = NULL AND num_second_wins = NULL AND num_neither_wins = NULL"]
+                                " WHERE num_first_wins IS NULL AND num_second_wins IS NULL AND num_neither_wins IS NULL"]
+      toExperiment :: [SqlValue] -> Either String (String, ED.Experiment)
+      toExperiment [hypergraphSql, numIterationsFirstSql, numIterationsSecondSql, numPlaysSql] = do
+        hypergraph <- safeSqlConvert hypergraphSql
+        numIterationsFirst <- safeSqlConvert numIterationsFirstSql
+        numIterationsSecond <- safeSqlConvert numIterationsSecondSql
+        numPlays <- safeSqlConvert numPlaysSql
+        return (hypergraph, ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)
 
   putStrLn $ "running unfinished experiments on table" ++ tableName
   results <- quickQuery connection selectStatement []
   putStrLn $ "number of results: " ++ (show $ length results)
+  putStrLn $ unlines $ map (show . toExperiment) results
 
 runExperiment connection (ED.Stochastic ED.Perfect (ED.UCT _) _) = return ()
 runExperiment connection (ED.Stochastic (ED.UCT _) ED.Perfect _) = return ()
