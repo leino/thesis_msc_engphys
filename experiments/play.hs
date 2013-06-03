@@ -31,8 +31,12 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
                                 " WHERE num_first_wins IS NULL AND num_second_wins IS NULL AND num_neither_wins IS NULL"]
       insertStatement = concat ["REPLACE INTO ", tableName,
-                                " (hypergraph, num_first_wins, num_second_wins, num_neither_wins)",
+                                " (hypergraph, num_first_wins, num_second_wins, num_neither_wins)", -- result columns follows from experiment type
                                 " VALUES (?,?,?,?)"
+                                ]
+      updateStatement = concat ["UPDATE ", tableName,
+                                " SET num_first_wins = ?, num_second_wins = ?, num_neither_wins = ?",
+                                " WHERE hypergraph = ?"
                                 ]
       toExperiment :: [SqlValue] -> Either String (String, PoGa.SetGame Int, ED.Experiment)
       toExperiment [hypergraphSql, numIterationsFirstSql, numIterationsSecondSql, numPlaysSql, numVerticesSql, representationSql] = do
@@ -44,19 +48,21 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
         representation <- safeSqlConvert representationSql
         return (hypergraph, fromRepresentation numVertices representation, ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)
       convertResult (hypergraph, result) = 
-        [toSql hypergraph, toSql $ numFirstWins result, toSql $ numSecondWins result, toSql $ numNeitherWins result]
+        [toSql $ numFirstWins result, toSql $ numSecondWins result, toSql $ numNeitherWins result, toSql hypergraph]
   experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
   let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
   case errors of
     [] -> do
-      insertion <- prepare connection insertStatement
-      sequence_ [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
-                                         (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                         (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
-                                         (ED.numPlays experiment)
-                    putStrLn $ concat ["hypergraph: ", hypergraph, ", result: ", show result]
-                | (hypergraph, game, experiment) <- experiments]
-      -- executeMany insertion (map convertResult results)
+      --insertion <- prepare connection insertStatement
+      update <- prepare connection updateStatement
+      results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
+                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                                                   (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                                                   (ED.numPlays experiment)
+                              return (hypergraph, result)
+                          | (hypergraph, game, experiment) <- experiments]
+      executeMany update (map convertResult results)
+      commit connection
     _ -> putStrLn $ unlines errors
 
 runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
