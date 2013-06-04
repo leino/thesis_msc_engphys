@@ -30,12 +30,14 @@ readExperimentRowUCTvsUCT [numIterationsFirstSql, numIterationsSecondSql, numPla
 
 runExperiment :: IConnection c => c -> ED.Experiment -> IO ()
 runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
-  let tableName = DS.experimentResultTableName experiment
+  let tableName = DS.experimentResultTableName experiment -- general
+      -- specific
       hypergraphColumns = ["hypergraph"]
       strategyColumns = ["num_iterations_first", "num_iterations_second"]
       experimentColumns = ["num_plays"]
       hypergraphMetaInfoColumns = ["numvertices", "representation"]
       resultColumns = ["num_first_wins", "num_second_wins", "num_neither_wins"]      
+      -- general
       selectColumns = concat [hypergraphColumns,
                               hypergraphMetaInfoColumns,
                               strategyColumns,
