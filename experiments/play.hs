@@ -22,48 +22,31 @@ processJob game firstStrategy secondStrategy numPlays = do
   results <- PoGa.playTournament numPlays game firstStrategy secondStrategy
   return $ foldl accumulate (Result 0 0 0) results
 
-readExperimentRowUCTvsUCT [numIterationsFirstSql, numIterationsSecondSql, numPlaysSql] = do
-  numIterationsFirst <- safeSqlConvert numIterationsFirstSql
-  numIterationsSecond <- safeSqlConvert numIterationsSecondSql
-  numPlays <- safeSqlConvert numPlaysSql
-  return $ ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays -- specific
-
 runExperiment :: IConnection c => c -> ED.Experiment -> IO ()
 runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
-  let tableName = DS.experimentResultTableName experiment -- general
-      -- specific
-      hypergraphColumns = ["hypergraph"]
-      strategyColumns = ["num_iterations_first", "num_iterations_second"]
-      experimentColumns = ["num_plays"]
-      hypergraphMetaInfoColumns = ["numvertices", "representation"]
-      resultColumns = ["num_first_wins", "num_second_wins", "num_neither_wins"]      
-      -- general
-      selectColumns = concat [hypergraphColumns,
-                              hypergraphMetaInfoColumns,
-                              strategyColumns,
-                              experimentColumns
-                             ]
-      selectStatement = concat ["SELECT ",
-                                concat $ intersperse "," selectColumns,
-                                " FROM ",
-                                tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
-                                " WHERE ",
-                                concat $ intersperse " AND " $ map (flip (++) $ " IS NULL") resultColumns
-                               ]
+  let tableName = DS.experimentResultTableName experiment
+      selectStatement = concat ["SELECT hypergraph",
+                                ", num_iterations_first, num_iterations_second, num_plays", -- experiment columns
+                                ", numvertices, representation",                            -- hypergraph columns
+                                " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
+                                " WHERE num_first_wins IS NULL AND num_second_wins IS NULL AND num_neither_wins IS NULL"]
+      insertStatement = concat ["REPLACE INTO ", tableName,
+                                " (hypergraph, num_first_wins, num_second_wins, num_neither_wins)", -- result columns follows from experiment type
+                                " VALUES (?,?,?,?)"
+                                ]
       updateStatement = concat ["UPDATE ", tableName,
-                                " SET ",
-                                concat $ intersperse ", " $ map (flip (++) $ " = ?") resultColumns,
-                                " WHERE ",
-                                concat $ map (flip (++) $ " = ?") hypergraphColumns
+                                " SET num_first_wins = ?, num_second_wins = ?, num_neither_wins = ?",
+                                " WHERE hypergraph = ?"
                                 ]
       toExperiment :: [SqlValue] -> Either String (String, PoGa.SetGame Int, ED.Experiment)
-      toExperiment (hypergraphSql:numVerticesSql:representationSql:experimentRow) = do
-        -- common
+      toExperiment [hypergraphSql, numIterationsFirstSql, numIterationsSecondSql, numPlaysSql, numVerticesSql, representationSql] = do
         hypergraph <- safeSqlConvert hypergraphSql
+        numIterationsFirst <- safeSqlConvert numIterationsFirstSql
+        numIterationsSecond <- safeSqlConvert numIterationsSecondSql
+        numPlays <- safeSqlConvert numPlaysSql
         numVertices <- safeSqlConvert numVerticesSql
         representation <- safeSqlConvert representationSql
-        experiment <- readExperimentRowUCTvsUCT experimentRow -- "specific" could be refactored if we knew the signature ("UCTvsUCT") as data
-        return (hypergraph, fromRepresentation numVertices representation, experiment)
+        return (hypergraph, fromRepresentation numVertices representation, ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)
       convertResult (hypergraph, result) = 
         [toSql $ numFirstWins result, toSql $ numSecondWins result, toSql $ numNeitherWins result, toSql hypergraph]
   experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
