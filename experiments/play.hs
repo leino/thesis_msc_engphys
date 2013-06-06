@@ -30,10 +30,6 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
                                 ", numvertices, representation",                            -- hypergraph columns
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
                                 " WHERE num_first_wins IS NULL AND num_second_wins IS NULL AND num_neither_wins IS NULL"]
-      insertStatement = concat ["REPLACE INTO ", tableName,
-                                " (hypergraph, num_first_wins, num_second_wins, num_neither_wins)", -- result columns follows from experiment type
-                                " VALUES (?,?,?,?)"
-                                ]
       updateStatement = concat ["UPDATE ", tableName,
                                 " SET num_first_wins = ?, num_second_wins = ?, num_neither_wins = ?",
                                 " WHERE hypergraph = ?"
@@ -53,7 +49,6 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
   let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
   case errors of
     [] -> do
-      --insertion <- prepare connection insertStatement
       update <- prepare connection updateStatement
       results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
                                                    (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
