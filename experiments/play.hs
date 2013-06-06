@@ -67,6 +67,10 @@ runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
                                 ", numvertices, representation",      -- hypergraph columns
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
                                 " WHERE num_first_wins IS NULL AND num_second_wins IS NULL AND num_neither_wins IS NULL"]
+      updateStatement = concat ["UPDATE ", tableName,
+                                " SET num_first_wins = ?, num_second_wins = ?, num_neither_wins = ?",
+                                " WHERE hypergraph = ?"
+                                ]
       toExperiment :: [SqlValue] -> Either String (String, PoGa.SetGame Int, ED.Experiment)
       toExperiment [hypergraphSql, numIterationsSecondSql, numPlaysSql, numVerticesSql, representationSql] = do
         hypergraph <- safeSqlConvert hypergraphSql
@@ -75,9 +79,22 @@ runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
         numVertices <- safeSqlConvert numVerticesSql
         representation <- safeSqlConvert representationSql
         return (hypergraph, fromRepresentation numVertices representation, ED.Stochastic ED.Perfect (ED.UCT numIterationsSecond) numPlays)
-  experiments <- map toExperiment <$> quickQuery connection selectStatement []
-  return ()
---  putStrLn $ unlines $ map show experiments
+      convertResult (hypergraph, result) = 
+        [toSql $ numFirstWins result, toSql $ numSecondWins result, toSql $ numNeitherWins result, toSql hypergraph]        
+  experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
+  let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
+  case errors of
+    [] -> do
+      update <- prepare connection updateStatement
+      results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
+                                                   (PoGa.perfectStrategyFirst)
+                                                   (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                                                   (ED.numPlays experiment)
+                              return (hypergraph, result)
+                          | (hypergraph, game, experiment) <- experiments]
+      executeMany update (map convertResult results)
+      commit connection
+    _ -> putStrLn $ unlines errors
 
 runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
   let tableName = DS.experimentResultTableName experiment
@@ -86,6 +103,10 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
                                 ", numvertices, representation",     -- hypergraph columns
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
                                 " WHERE num_first_wins IS NULL AND num_second_wins IS NULL AND num_neither_wins IS NULL"]
+      updateStatement = concat ["UPDATE ", tableName,
+                                " SET num_first_wins = ?, num_second_wins = ?, num_neither_wins = ?",
+                                " WHERE hypergraph = ?"
+                                ]
       toExperiment :: [SqlValue] -> Either String (String, PoGa.SetGame Int, ED.Experiment)
       toExperiment [hypergraphSql, numIterationsFirstSql, numPlaysSql, numVerticesSql, representationSql] = do
         hypergraph <- safeSqlConvert hypergraphSql
@@ -94,9 +115,22 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
         numVertices <- safeSqlConvert numVerticesSql
         representation <- safeSqlConvert representationSql
         return (hypergraph, fromRepresentation numVertices representation, ED.Stochastic (ED.UCT numIterationsFirst) ED.Perfect numPlays)
-  experiments <- map toExperiment <$> quickQuery connection selectStatement []
-  return ()
---  putStrLn $ unlines $ map show experiments  
+      convertResult (hypergraph, result) = 
+        [toSql $ numFirstWins result, toSql $ numSecondWins result, toSql $ numNeitherWins result, toSql hypergraph]
+  experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
+  let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
+  case errors of
+    [] -> do
+      update <- prepare connection updateStatement
+      results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
+                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                                                   (PoGa.perfectStrategySecond)
+                                                   (ED.numPlays experiment)
+                              return (hypergraph, result)
+                          | (hypergraph, game, experiment) <- experiments]
+      executeMany update (map convertResult results)
+      commit connection
+    _ -> putStrLn $ unlines errors
 
 runExperiment connection experiment@(ED.Deterministic ED.Perfect ED.Perfect) = do
   let tableName = DS.experimentResultTableName experiment
@@ -104,16 +138,36 @@ runExperiment connection experiment@(ED.Deterministic ED.Perfect ED.Perfect) = d
                                 " numvertices, representation",  -- hypergraph columns
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
                                 " WHERE winner IS NULL"]
+      updateStatement = concat ["UPDATE ", tableName,
+                                " SET winner = ?",
+                                " WHERE hypergraph = ?"
+                                ]
       toExperiment :: [SqlValue] -> Either String (String, PoGa.SetGame Int, ED.Experiment)
       toExperiment [hypergraphSql, numVerticesSql, representationSql] = do
         hypergraph <- safeSqlConvert hypergraphSql
         numVertices <- safeSqlConvert numVerticesSql
         representation <- safeSqlConvert representationSql
         return (hypergraph, fromRepresentation numVertices representation, ED.Deterministic ED.Perfect ED.Perfect)
-  experiments <- map toExperiment <$> quickQuery connection selectStatement []
-  return ()
---  putStrLn $ unlines $ map show experiments
+      showWinner (PoGa.Only PoGa.First) = show PoGa.First
+      showWinner (PoGa.Only PoGa.Second) = show PoGa.Second
+      showWinner (PoGa.Neither) = show PoGa.Neither      
+      convertResult (hypergraph, winner) = 
+        [toSql $ showWinner $ winner, toSql hypergraph]
+  experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
+  let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
+  case errors of
+    [] -> do
+      update <- prepare connection updateStatement
+      winners <- sequence [do winner <- PoGa.playGame (PoGa.Game game)
+                                                      (PoGa.perfectStrategyFirst)
+                                                      (PoGa.perfectStrategySecond)
+                              return (hypergraph, winner)
+                          | (hypergraph, game, experiment) <- experiments]
+      executeMany update (map convertResult winners)
+      commit connection
+    _ -> putStrLn $ unlines errors
 
+  
 main = do
   programName <- getProgName
   args <- getArgs
