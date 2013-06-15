@@ -134,8 +134,7 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
 
 runExperiment connection experiment@(ED.Deterministic ED.Perfect ED.Perfect) = do
   let tableName = DS.experimentResultTableName experiment
-      selectStatement = concat ["SELECT hypergraph",
-                                " numvertices, representation",  -- hypergraph columns
+      selectStatement = concat ["SELECT hypergraph, numvertices, representation",  -- hypergraph columns
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
                                 " WHERE winner IS NULL"]
       updateStatement = concat ["UPDATE ", tableName,
