@@ -63,13 +63,15 @@ resultTableMetadata experiment@(Stochastic (UCT _) (UCT _) _) =
                                     ("num_plays", integerDesc)
                                    ],
                  createStatement = concat ["CREATE TABLE ", tableName,
-                                           " (hypergraph STRING PRIMARY KEY NOT NULL,",
+                                           " (hypergraph STRING NOT NULL,",
                                            " num_iterations_first INTEGER NOT NULL,",
                                            " num_iterations_second INTEGER NOT NULL,",
                                            " num_first_wins INTEGER,",
                                            " num_second_wins INTEGER,",
                                            " num_neither_wins INTEGER,",
-                                           " num_plays INTEGER NOT NULL)"
+                                           " num_plays INTEGER NOT NULL,",
+                                           " UNIQUE (hypergraph, num_iterations_first, num_iterations_second, num_plays)",
+                                           ")"
                                           ]}
  
 resultTableMetadata experiment@(Stochastic Perfect (UCT _) _) = 
@@ -83,12 +85,14 @@ resultTableMetadata experiment@(Stochastic Perfect (UCT _) _) =
                                     ("num_plays", integerDesc)
                                     ],
                  createStatement = concat ["CREATE TABLE ", tableName,
-                                           " (hypergraph STRING PRIMARY KEY NOT NULL,",
+                                           " (hypergraph STRING NOT NULL,",
                                            " num_iterations_second INTEGER NOT NULL,",
                                            " num_first_wins INTEGER,",
                                            " num_second_wins INTEGER,",
                                            " num_neither_wins INTEGER,",
-                                           " num_plays INTEGER NOT NULL)"
+                                           " num_plays INTEGER NOT NULL",
+                                           " UNIQUE (hypergraph, num_iterations_second, num_plays)"
+                                           ")"
                                            ]}
  
 resultTableMetadata experiment@(Stochastic (UCT _) Perfect _) = 
@@ -102,11 +106,13 @@ resultTableMetadata experiment@(Stochastic (UCT _) Perfect _) =
                                     ("num_plays", integerDesc)                                    
                                    ],
                  createStatement = concat ["CREATE TABLE ", tableName,
-                                           " (hypergraph STRING PRIMARY KEY NOT NULL,",
+                                           " (hypergraph STRING NOT NULL,",
                                            " num_iterations_first INTEGER NOT NULL,",
                                            " num_first_wins INTEGER,",
                                            " num_second_wins INTEGER,",
                                            " num_neither_wins INTEGER,",
-                                           " num_plays INTEGER NOT NULL)"
+                                           " num_plays INTEGER NOT NULL,",
+                                           " UNIQUE (hypergraph, num_iterations_first, num_plays)",
+                                           ")"
                                            ]}
  
