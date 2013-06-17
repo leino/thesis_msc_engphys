@@ -91,7 +91,7 @@ resultTableMetadata experiment@(Stochastic Perfect (UCT _) _) =
                                            " num_second_wins INTEGER,",
                                            " num_neither_wins INTEGER,",
                                            " num_plays INTEGER NOT NULL",
-                                           " UNIQUE (hypergraph, num_iterations_second, num_plays)"
+                                           " UNIQUE (hypergraph, num_iterations_second, num_plays)",
                                            ")"
                                            ]}
  
