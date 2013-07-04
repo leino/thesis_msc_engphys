@@ -14,6 +14,7 @@ import GameTheory.PoGa.Game as Game
 import qualified Data.Set as Set
 import Data.List (find, sortBy, maximumBy, minimumBy)
 import qualified Control.Monad.Random as Random
+import Test.QuickCheck
 
 type Strategy m p = p -> m p
 
@@ -65,7 +66,21 @@ perfectStrategy player pos =
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 type Score = Double
-data MCTSNode p = Unexplored p | Explored p Int Score [MCTSNode p]
+data MCTSNode p = Unexplored p | Explored p Int Score [MCTSNode p] deriving Show
+
+instance Arbitrary p => Arbitrary (MCTSNode p) where
+  arbitrary = do
+    coinFlipResult <- arbitrary
+    case coinFlipResult of
+      True -> do
+        pos <- arbitrary
+        return $ Unexplored pos
+      False -> do
+        pos <- arbitrary
+        visitCount <- arbitrary
+        children <- arbitrary
+        score <- arbitrary
+        return $ Explored pos visitCount score children
 
 
 instance Position p => Position (MCTSNode p) where
@@ -109,17 +124,19 @@ mctsStrategy leafValue numSteps node = do
 
 
 explore :: (Position p, Random.MonadRandom m) => (p -> Score) -> MCTSNode p -> m (Score, MCTSNode p)
-explore leafValue (Unexplored pos) = do
-  s <- recon leafValue pos
-  return $ (-s, Explored pos 1 s (map Unexplored $ choices pos)) --note that the score changes sign
+explore leafValue node@(Unexplored pos)
+  | terminal node = do let s = leafValue pos
+                       return $ (s, Explored pos 1 s [])
+  | otherwise = do s <- recon leafValue pos
+                   return $ (s, Explored pos 1 s (map Unexplored $ choices pos))
 explore leafValue node@(Explored pos visitCount score children)
   | terminal node = do
       let s = leafValue pos
-      return $ (-s, Explored pos (visitCount+1) s []) -- note that score changes sign
+      return $ (s, Explored pos (visitCount+1) s [])
   | otherwise = do
       let (c, cs) = popBestChild node
       (s, c') <- explore leafValue c
-      return $ (-s, Explored pos (visitCount+1) (score+s) (c':cs)) -- note that score changes sign    
+      return $ (-s, Explored pos (visitCount+1) (score+s) (c':cs)) -- note that score changes sign, since this is the child's score
 
 recon :: (Random.MonadRandom m, Position p) => (p -> Score) -> p -> m Score
 recon leafValue pos
@@ -127,7 +144,7 @@ recon leafValue pos
   | otherwise = do
       c <- Random.fromList [(c,1) | c <- choices pos]
       s <- recon leafValue c
-      return $ -s
+      return $ -s -- note that score changes sign, since this is the childs score
 
 -- helper function: takes a non-empty list and
 -- extracts it's maximum
@@ -168,7 +185,22 @@ mctsStrategySecond = mctsStrategy valueSecond
 
 
 
-test_popMaximumBy :: Ord a => a -> [a] -> Bool
-test_popMaximumBy x xs =
+test_popMaximumBy_preservesLength :: Ord a => a -> [a] -> Bool
+test_popMaximumBy_preservesLength x xs =
   let (m, xs') = popMaximumBy compare (x:xs) in
-  length (x:xs) == length (m:xs') && m == maximumBy compare (x:xs)
+  length xs == length xs'
+  
+test_popMaximumBy_popsMaximum :: Ord a => a -> [a] -> Bool
+test_popMaximumBy_popsMaximum x xs =
+  let (m, xs') = popMaximumBy compare (x:xs) in
+  m == maximumBy compare (x:xs)
+
+test_compareChildren :: (Arbitrary p, Position p) => MCTSNode p -> MCTSNode p -> MCTSNode p -> Bool
+test_compareChildren parent a@(Unexplored _) b@(Unexplored _) = 
+  compareChildren parent a b == EQ
+test_compareChildren parent a@(Unexplored _) b@(Explored _ _ _ _) = 
+  compareChildren parent a b == LT
+test_compareChildren parent a@(Explored _ _ _ _) b@(Unexplored _) = 
+  compareChildren parent a b == GT
+test_compareChildren parent a@(Explored _ _ _ _) b@(Explored _ _ _ _) = 
+  True
