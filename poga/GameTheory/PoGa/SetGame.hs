@@ -63,3 +63,4 @@ instance Ord v => Position (SetGame v) where
       (True, True) -> Both
   terminal sg =
     (Set.null $ availableVertices sg) || (winner sg /= Neither)
+  turn sg = turn sg

@@ -2,8 +2,7 @@ module GameTheory.PoGa.Game
        (Player(First, Second),
         Game(..),
         Winner(..),
-        terminal,
-        Position(choices, winner),
+        Position(choices, winner, terminal, turn),
         playGame,
         playTournament,
         opponent)
@@ -27,6 +26,7 @@ class Position p where
   choices :: p -> [p]     -- available branches at position p
   winner :: p -> Winner   -- Nothing on non-leaf nodes
   terminal :: p -> Bool   -- Can a move be made? (For instance if the board is full, the position is terminal)
+  turn :: p -> Player
 
 opponent :: Player -> Player
 opponent First = Second
