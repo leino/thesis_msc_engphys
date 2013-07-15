@@ -3,8 +3,7 @@ module GameTheory.PoGa.Strategy
         perfectStrategyFirst,
         perfectStrategySecond,
         randomStrategy,
-        mctsStrategyFirst,
-        mctsStrategySecond,
+        mctsStrategy,
         MCTSNode (..))
        where
 
@@ -82,6 +81,8 @@ instance Position p => Position (MCTSNode p) where
   choices (Explored _ _ _ children) = children
   winner (Unexplored pos) = winner pos
   winner (Explored pos _ _ _) = winner pos
+  turn (Unexplored p) = turn p
+  turn (Explored p _ _ _) = turn p
 
 compareChildren cExp node a@(Explored _ _ _ _) b@(Explored _ _ _ _) =
   compare (reconScore node a) (reconScore node b)
@@ -100,39 +101,39 @@ popBestChild cExp node@(Explored pos visitCount score children) =
   popMaximumBy (compareChildren cExp node) children
 popBestChild _ (Unexplored _) = error "popBestChild: un-explored node given"
 
-mctsStrategy :: (Position p, Random.MonadRandom m) => (p -> Score) -> Int -> MCTSNode p -> m (MCTSNode p)
-mctsStrategy leafValue 0 node = do
+mctsStrategy :: (Position p, Random.MonadRandom m) => Int -> MCTSNode p -> m (MCTSNode p)
+mctsStrategy 0 node = do
   let (c, _) = popBestChild 0.0 node
   return c
-mctsStrategy leafValue numSteps node = do
-  (_, node') <- explore cExp leafValue node
-  mctsStrategy leafValue (numSteps-1) node'
+mctsStrategy numSteps node = do
+  (_, node') <- explore cExp node
+  mctsStrategy (numSteps-1) node'
   where
   cExp :: Double  
   cExp = 1.0 / (sqrt 2.0) -- amount of exploration
   
 
-explore :: (Position p, Random.MonadRandom m) => Double -> (p -> Score) -> MCTSNode p -> m (Score, MCTSNode p)
-explore cExp leafValue node@(Unexplored pos)
-  | terminal node = do let s = leafValue pos
+explore :: (Position p, Random.MonadRandom m) => Double -> MCTSNode p -> m (Score, MCTSNode p)
+explore cExp node@(Unexplored pos)
+  | terminal node = do let s = value pos
                        return $ (s, Explored pos 1 s [])
-  | otherwise = do s <- recon leafValue pos
+  | otherwise = do s <- recon pos
                    return $ (s, Explored pos 1 s (map Unexplored $ choices pos))
-explore cExp leafValue node@(Explored pos visitCount score children)
+explore cExp node@(Explored pos visitCount score children)
   | terminal node = do
-      let s = leafValue pos
+      let s = value pos
       return $ (s, Explored pos (visitCount+1) (score+s) [])
   | otherwise = do
       let (c, cs) = popBestChild cExp node
-      (s, c') <- explore cExp leafValue c
+      (s, c') <- explore cExp c
       return $ (-s, Explored pos (visitCount+1) (score-s) (c':cs)) -- note that score changes sign, since this is the child's score
 
-recon :: (Random.MonadRandom m, Position p) => (p -> Score) -> p -> m Score
-recon leafValue pos
-  | terminal pos = return $ leafValue pos
+recon :: (Random.MonadRandom m, Position p) => p -> m Score
+recon pos
+  | terminal pos = return $ value pos
   | otherwise = do
       c <- Random.fromList [(c,1) | c <- choices pos]
-      s <- recon leafValue c
+      s <- recon c
       return $ -s -- note that score changes sign, since this is the childs score
 
 -- helper function: takes a non-empty list and
@@ -144,6 +145,11 @@ popMaximumBy cmp (x:xs) =
   let (m, xs') = popMaximumBy cmp xs in
   if cmp m x == LT then (x, m:xs') else (m, x:xs')
 
+value :: Position p => p -> Score
+value pos
+  | turn pos == First = valueFirst pos
+  | otherwise = negate $ valueFirst pos
+
 valueFirst :: Position p => p -> Score
 valueFirst pos =
   case winner pos of
@@ -151,16 +157,6 @@ valueFirst pos =
     Both -> 0.0
     Only First -> -1.0
     Only Second -> 1.0
-
-valueSecond :: Position p =>  p -> Score
-valueSecond = negate . valueFirst
-
-mctsStrategyFirst :: (Position p, Random.MonadRandom m) =>
-  Int -> MCTSNode p ->  m (MCTSNode p) 
-mctsStrategyFirst = mctsStrategy valueFirst
-mctsStrategySecond :: (Position p, Random.MonadRandom m) =>
-  Int -> MCTSNode p ->  m (MCTSNode p)
-mctsStrategySecond = mctsStrategy valueSecond
 
 -- ~~~~~ Tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
