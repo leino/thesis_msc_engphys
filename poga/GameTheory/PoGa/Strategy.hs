@@ -83,46 +83,48 @@ instance Position p => Position (MCTSNode p) where
   winner (Unexplored pos) = winner pos
   winner (Explored pos _ _ _) = winner pos
 
-compareChildren node a@(Explored _ _ _ _) b@(Explored _ _ _ _) =
+compareChildren cExp node a@(Explored _ _ _ _) b@(Explored _ _ _ _) =
   compare (reconScore node a) (reconScore node b)
   where
-  cExp :: Double  
-  cExp = 1.0 / (sqrt 2.0) -- amount of exploration
   reconScore :: (Position p) => MCTSNode p -> MCTSNode p -> Score
   reconScore parent@(Explored _ vcp sp _) child@(Explored _ vcc sc _) =
     ( sc / (fromIntegral vcc) ) +
     cExp * sqrt (  2.0*(log $ fromIntegral vcp) / (fromIntegral vcc)  )
-compareChildren _ (Unexplored _) (Unexplored _) = EQ
-compareChildren _ (Explored _ _ _ _) (Unexplored _) = LT
-compareChildren _ (Unexplored _) (Explored _ _ _ _) = GT 
+compareChildren _ _ (Unexplored _) (Unexplored _) = EQ
+compareChildren _ _ (Explored _ _ _ _) (Unexplored _) = LT
+compareChildren _ _ (Unexplored _) (Explored _ _ _ _) = GT 
 
 -- This function is only defined for non-terminal nodes
-popBestChild :: Position p => MCTSNode p -> (MCTSNode p, [MCTSNode p])
-popBestChild node@(Explored pos visitCount score children) = 
-  popMaximumBy (compareChildren node) children
-popBestChild (Unexplored _) = error "popBestChild: un-explored node given"
+popBestChild :: Position p => Double -> MCTSNode p -> (MCTSNode p, [MCTSNode p])
+popBestChild cExp node@(Explored pos visitCount score children) = 
+  popMaximumBy (compareChildren cExp node) children
+popBestChild _ (Unexplored _) = error "popBestChild: un-explored node given"
 
 mctsStrategy :: (Position p, Random.MonadRandom m) => (p -> Score) -> Int -> MCTSNode p -> m (MCTSNode p)
 mctsStrategy leafValue 0 node = do
-  let (c, _) = popBestChild node
+  let (c, _) = popBestChild 0.0 node
   return c
 mctsStrategy leafValue numSteps node = do
-  (_, node') <- explore leafValue node
+  (_, node') <- explore cExp leafValue node
   mctsStrategy leafValue (numSteps-1) node'
+  where
+  cExp :: Double  
+  cExp = 1.0 / (sqrt 2.0) -- amount of exploration
+  
 
-explore :: (Position p, Random.MonadRandom m) => (p -> Score) -> MCTSNode p -> m (Score, MCTSNode p)
-explore leafValue node@(Unexplored pos)
+explore :: (Position p, Random.MonadRandom m) => Double -> (p -> Score) -> MCTSNode p -> m (Score, MCTSNode p)
+explore cExp leafValue node@(Unexplored pos)
   | terminal node = do let s = leafValue pos
                        return $ (s, Explored pos 1 s [])
   | otherwise = do s <- recon leafValue pos
                    return $ (s, Explored pos 1 s (map Unexplored $ choices pos))
-explore leafValue node@(Explored pos visitCount score children)
+explore cExp leafValue node@(Explored pos visitCount score children)
   | terminal node = do
       let s = leafValue pos
       return $ (s, Explored pos (visitCount+1) (score+s) [])
   | otherwise = do
-      let (c, cs) = popBestChild node
-      (s, c') <- explore leafValue c
+      let (c, cs) = popBestChild cExp node
+      (s, c') <- explore cExp leafValue c
       return $ (-s, Explored pos (visitCount+1) (score-s) (c':cs)) -- note that score changes sign, since this is the child's score
 
 recon :: (Random.MonadRandom m, Position p) => (p -> Score) -> p -> m Score
@@ -172,12 +174,12 @@ test_popMaximumBy_popsMaximum x xs =
   let (m, xs') = popMaximumBy compare (x:xs) in
   m == maximumBy compare (x:xs)
 
-test_compareChildren :: (Arbitrary p, Position p) => MCTSNode p -> MCTSNode p -> MCTSNode p -> Bool
-test_compareChildren parent a@(Unexplored _) b@(Unexplored _) = 
-  compareChildren parent a b == EQ
-test_compareChildren parent a@(Unexplored _) b@(Explored _ _ _ _) = 
-  compareChildren parent a b == LT
-test_compareChildren parent a@(Explored _ _ _ _) b@(Unexplored _) = 
-  compareChildren parent a b == GT
-test_compareChildren parent a@(Explored _ _ _ _) b@(Explored _ _ _ _) = 
+test_compareChildren :: (Arbitrary p, Position p) => Double -> MCTSNode p -> MCTSNode p -> MCTSNode p -> Bool
+test_compareChildren cExp parent a@(Unexplored _) b@(Unexplored _) = 
+  compareChildren cExp parent a b == EQ
+test_compareChildren cExp parent a@(Unexplored _) b@(Explored _ _ _ _) = 
+  compareChildren cExp parent a b == LT
+test_compareChildren cExp parent a@(Explored _ _ _ _) b@(Unexplored _) = 
+  compareChildren cExp parent a b == GT
+test_compareChildren cExp parent a@(Explored _ _ _ _) b@(Explored _ _ _ _) = 
   True
