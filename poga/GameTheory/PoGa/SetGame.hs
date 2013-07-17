@@ -6,10 +6,10 @@ module GameTheory.PoGa.SetGame
        where
 
 import Data.Set as Set
-import GameTheory.PoGa.Game
+import qualified GameTheory.PoGa.Game as G
 
 data SetGame v = SetGame {board :: Set v,               -- all vertices of board
-                          turn :: Player,               -- who's turn is it?
+                          turn :: G.Player,               -- who's turn is it?
                           firstChoices :: Set v,        -- vertices that First occupy
                           secondChoices :: Set v,       -- vertices that Second occupy
                           firstWin :: Set v -> Bool,    -- is First winner?
@@ -28,17 +28,17 @@ availableVertices sg =
 makeMove :: Ord v => SetGame v -> v -> SetGame v
 makeMove sg vtx = 
   case turn sg of
-    First -> sg{firstChoices = Set.insert vtx (firstChoices sg),
-                turn = Second}
-    Second -> sg{secondChoices = Set.insert vtx (secondChoices sg),
-                 turn = First}
+    G.First -> sg{firstChoices = Set.insert vtx (firstChoices sg),
+                turn = G.Second}
+    G.Second -> sg{secondChoices = Set.insert vtx (secondChoices sg),
+                 turn = G.First}
 
 -- construct a game given a board and winning sets
 fromWinningSets :: (Ord v) =>
   Set.Set v -> Set.Set (Set.Set v) -> Set.Set (Set.Set v) -> SetGame v
 fromWinningSets board wssFirst wssSecond = 
   SetGame {board = board,
-           turn = First,
+           turn = G.First,
            firstChoices = Set.empty,
            secondChoices = Set.empty,
            firstWin = win wssFirst,
@@ -51,16 +51,16 @@ fromWinningSets board wssFirst wssSecond =
 
 
 -- All possible moves that can be made for the given game.
-instance Ord v => Position (SetGame v) where
+instance Ord v => G.Position (SetGame v) where
   choices sg = 
     Set.toList $ Set.mapMonotonic (makeMove sg) (availableVertices sg)
   winner sg =
     case (firstWin sg $ firstChoices sg,
           secondWin sg $ secondChoices sg) of
-      (True, False) -> Only First
-      (False, True) -> Only Second
-      (False, False) -> Neither
-      (True, True) -> Both
+      (True, False) -> G.Only G.First
+      (False, True) -> G.Only G.Second
+      (False, False) -> G.Neither
+      (True, True) -> G.Both
   terminal sg =
-    (Set.null $ availableVertices sg) || (winner sg /= Neither)
+    (Set.null $ availableVertices sg) || (G.winner sg /= G.Neither)
   turn sg = turn sg

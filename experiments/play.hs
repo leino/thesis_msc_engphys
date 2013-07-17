@@ -51,8 +51,8 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
     [] -> do
       update <- prepare connection updateStatement
       results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
-                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                                   (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                                                   (PoGa.mctsStrategy . ED.numIterations . ED.firstStrategy $ experiment)
+                                                   (PoGa.mctsStrategy . ED.numIterations . ED.secondStrategy $ experiment)
                                                    (ED.numPlays experiment)
                               return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
                           | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) <- experiments]
@@ -88,7 +88,7 @@ runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
       update <- prepare connection updateStatement
       results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
                                                    (PoGa.perfectStrategyFirst)
-                                                   (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                                                   (PoGa.mctsStrategy . ED.numIterations . ED.secondStrategy $ experiment)
                                                    (ED.numPlays experiment)
                               return (hypergraph, numIterationsSecond, numPlays, result)
                           | (hypergraph, game, experiment@(ED.Stochastic ED.Perfect (ED.UCT numIterationsSecond) numPlays)) <- experiments]
@@ -123,7 +123,7 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
     [] -> do
       update <- prepare connection updateStatement
       results <- sequence [do result <- processJob (PoGa.Game $ PoGa.Unexplored game)
-                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                                                   (PoGa.mctsStrategy . ED.numIterations . ED.firstStrategy $ experiment)
                                                    (PoGa.perfectStrategySecond)
                                                    (ED.numPlays experiment)
                               return (hypergraph, numIterationsFirst, numPlays, result)
