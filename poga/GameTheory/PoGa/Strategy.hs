@@ -101,10 +101,18 @@ popBestChild cExp node@(Explored pos visitCount score children) =
   popMaximumBy (compareChildren cExp node) children
 popBestChild _ (Unexplored _) = error "popBestChild: un-explored node given"
 
+findBestMove node =
+  let isExplored (Unexplored _) = False
+      isExplored (Explored _ _ _ _) = True in
+  case filter isExplored (choices node) of
+    [] ->
+      error "cannot find a best move: no children are explored"
+    explored ->
+      maximumBy (compareChildren 0.0 node) explored
+
 mctsStrategy :: (Position p, Random.MonadRandom m) => Int -> MCTSNode p -> m (MCTSNode p)
 mctsStrategy 0 node = do
-  let (c, _) = popBestChild 0.0 node
-  return c
+  return $ findBestMove node
 mctsStrategy numSteps node = do
   (_, node') <- explore cExp node
   mctsStrategy (numSteps-1) node'
