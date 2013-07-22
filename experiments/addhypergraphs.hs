@@ -1,6 +1,7 @@
 import Database.HDBC
 import Database.HDBC.Sqlite3
 import System.Environment (getArgs, getProgName, getEnvironment)
+import System.Exit (exitFailure, exitSuccess)
 import HypergraphProcessing (batchProcessHypergraphs)
 import HDBUtils (requireTable)
 import Control.Monad.Instances
@@ -29,7 +30,8 @@ sanitizeArgs args =
       numVerts <- assertInteger "second argument" numVertsStr >>= assertPositive "number of vertices"
       numEdges <- assertInteger "third argument" numEdgesStr >>= assertPositive "number of edges"
       return (fileName, numVerts, numEdges, nautyArgs)
-    _ -> Left "wrong number of arguments"
+    _ -> Left $ concat ["wrong number of arguments: ", "you gave " ++ (show $ length args) ++ " arguments", "\n",
+                        "(", concat $ map show args, ")"]
 
 usage programName = unlines [programName ++ " [filename] [number of vertices] [number of edges] [Optionally: extra arguments for genbg]",
                              "filename: the file name of the database you wish to add the hypergraphs to. If the file does not exist then it is created.",
@@ -54,11 +56,14 @@ main = do
         Left errmsg -> do
           putStrLn $ "error: incorrect arguments: " ++ errmsg
           putStrLn $ "usage: \n" ++ usage programName
+          exitFailure
         Right (fileName, numVerts, numEdges, nautyArgs) -> do
           -- Create/open database and verify that it has the required columns (or create them if the table doesn't exist)
           maybeConnection <- connectSqlite3 fileName >>= requireTable (DS.hypergraphTableMetadata)
           case maybeConnection of
-            Left error -> putStrLn $ "error: when creating 'hypergraphs' table: " ++ error
+            Left error -> do
+              putStrLn $ "error: when creating 'hypergraphs' table: " ++ error
+              exitFailure
             Right connection -> do
               -- This is the main program: given a valid connection, we insert the
               -- described class of hypergraphs in batches, and commit the database after completing each batch.
@@ -69,5 +74,5 @@ main = do
                 -- process a batch
                 executeMany insertStatement [[toSql g6, toSql numVerts, toSql numEdges, toSql r] | (g6, r) <- zip g6s rs]
                 commit connection
-                
               disconnect connection
+              exitSuccess
