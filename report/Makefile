@@ -1,4 +1,4 @@
-thesis: thesis.tex 
+thesis: thesis.tex images
 	pdflatex thesis.tex
 
 .PHONY:
