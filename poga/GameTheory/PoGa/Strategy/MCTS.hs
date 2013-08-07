@@ -1,5 +1,10 @@
 module GameTheory.PoGa.Strategy.MCTS
-       (mctsStrategy)
+       (
+         mctsStrategyFirst,
+         mctsStrategySecond,
+         unexploredMetaDataNode,
+         MCTSNodeData (..)
+        )
        where
 
 import qualified GameTheory.PoGa.Game as Game
@@ -21,13 +26,25 @@ data MCTSNodeData = MCTSNodeData {visitCount :: Int, score :: Score}
 newtype MCTSNodeFirst b p = MCTSNodeFirst (MetaDataNode MCTSNodeData b p)
 newtype MCTSNodeSecond a p = MCTSNodeSecond (MetaDataNode a MCTSNodeData p)
 
+mctsStrategyFirst :: (Game.Position p, Random.MonadRandom m) =>
+                     Int -> MetaDataNode MCTSNodeData b p -> m (MetaDataNode MCTSNodeData b p)
+mctsStrategyFirst numIterations node = do
+  MCTSNodeFirst node' <- mctsStrategy numIterations (MCTSNodeFirst node)
+  return node'
+  
+mctsStrategySecond :: (Game.Position p, Random.MonadRandom m) =>
+                     Int -> MetaDataNode a MCTSNodeData p -> m (MetaDataNode a MCTSNodeData p)
+mctsStrategySecond numIterations node = do
+  MCTSNodeSecond node' <- mctsStrategy numIterations (MCTSNodeSecond node)
+  return node'
+
 -- We can make an empty node with no metadata, given a node
-emptyMetaDataNode :: Game.Position p => p -> MetaDataNode a b p
-emptyMetaDataNode p =
+unexploredMetaDataNode :: Game.Position p => p -> MetaDataNode a b p
+unexploredMetaDataNode p =
   MetaDataNode {
     firstData = Nothing,
     secondData = Nothing,
-    choices = map emptyMetaDataNode $ Game.choices p,
+    choices = map unexploredMetaDataNode $ Game.choices p,
     turn = Game.turn p,
     terminal = Game.terminal p,
     winner = Game.winner p
@@ -60,6 +77,18 @@ instance Game.Position p => Game.Position (MetaDataNode a b p) where
   winner mdn = winner mdn
   terminal mdn = terminal mdn
   turn mdn = turn mdn
+  
+instance Game.Position p => Game.Position (MCTSNodeFirst b p) where
+  choices (MCTSNodeFirst mdn) = map MCTSNodeFirst $ choices mdn
+  winner (MCTSNodeFirst mdn) = winner mdn
+  terminal (MCTSNodeFirst mdn) = terminal mdn
+  turn (MCTSNodeFirst mdn) = turn mdn
+  
+instance Game.Position p => Game.Position (MCTSNodeSecond a p) where
+  choices (MCTSNodeSecond mdn) = map MCTSNodeSecond $ choices mdn
+  winner (MCTSNodeSecond mdn) = winner mdn
+  terminal (MCTSNodeSecond mdn) = terminal mdn
+  turn (MCTSNodeSecond mdn) = turn mdn
 
 type Score = Double
 
