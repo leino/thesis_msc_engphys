@@ -22,6 +22,10 @@ processJob game firstStrategy secondStrategy numPlays = do
   results <- PoGa.playTournament numPlays game firstStrategy secondStrategy
   return $ foldl accumulate (Result 0 0 0) results
 
+chunksOf n [] = []
+chunksOf n xs = (take n xs):(chunksOf n $ drop n xs)
+
+
 runExperiment :: IConnection c => c -> ED.Experiment -> IO ()
 runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
   let tableName = DS.experimentResultTableName experiment
@@ -50,14 +54,19 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      results <- sequence [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                                   (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
-                                                   (ED.numPlays experiment)
-                              return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
-                          | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) <- experiments]
-      executeMany update (map convertResult results)
-      commit connection
+      let jobChunks = chunksOf 100 [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                                                 (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                                                 (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                                                 (ED.numPlays experiment)
+                                       return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
+                                   | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) <- experiments]
+      sequence_ [do putStrLn "doing job chunk"
+                    batch <- sequence jobChunk
+                    putStrLn "chunk done, updating db"
+                    executeMany update (map convertResult batch)
+                    putStrLn "update done, committing"
+                    commit connection
+                | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
 
 runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
