@@ -191,9 +191,11 @@ main = do
             True -> playWithArgs filename batchSize
             False -> do
               putStrLn "argument 'batch size' is negative"
+              putStrLn "usage: "
               putStrLn $ usage programName
         _ -> do
-          putStrLn "argument 'batch size' is not an integer"
+          putStrLn $ "second argument: " ++ batchSizeString ++ " ('batch size') is not an integer"
+          putStrLn "usage: "
           putStrLn $ usage programName
     _ -> do
       putStrLn "incorrect number of arguments"
@@ -201,7 +203,7 @@ main = do
       putStrLn $ usage programName
   where
     defaultBatchSize = 500    
-    usage programName = programName ++ " [database filename]" ++ "[optionally: batch size (default is: " ++ show defaultBatchSize ++ ")"
+    usage programName = programName ++ " [database filename] " ++ "[optionally: batch size (default is: " ++ show defaultBatchSize ++ ")"
     playWithArgs filename batchSize = do
       fileExists <- doesFileExist filename
       case fileExists of
