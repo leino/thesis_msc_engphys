@@ -26,8 +26,8 @@ chunksOf n [] = []
 chunksOf n xs = (take n xs):(chunksOf n $ drop n xs)
 
 
-runExperiment :: IConnection c => c -> ED.Experiment -> IO ()
-runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
+runExperiment :: IConnection c => c -> Int -> ED.Experiment -> IO ()
+runExperiment connection batchSize experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
   let tableName = DS.experimentResultTableName experiment
       selectStatement = concat ["SELECT hypergraph",
                                 ", num_iterations_first, num_iterations_second, num_plays", -- experiment columns
@@ -54,22 +54,19 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) (ED.UCT _) _) = do
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      let jobChunks = chunksOf 100 [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                 (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                                 (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
-                                                 (ED.numPlays experiment)
-                                       return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
-                                   | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) <- experiments]
-      sequence_ [do putStrLn "doing job chunk"
-                    batch <- sequence jobChunk
-                    putStrLn "chunk done, updating db"
+      let jobChunks = map sequence $ chunksOf batchSize [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                                                                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                                                                      (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                                                                      (ED.numPlays experiment)
+                                                            return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
+                                                        | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) <- experiments]
+      sequence_ [do batch <- jobChunk
                     executeMany update (map convertResult batch)
-                    putStrLn "update done, committing"
                     commit connection
                 | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
 
-runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
+runExperiment connection batchSize experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
   let tableName = DS.experimentResultTableName experiment
       selectStatement = concat ["SELECT hypergraph",
                                 ", num_iterations_second, num_plays", -- experiment columns
@@ -95,17 +92,19 @@ runExperiment connection experiment@(ED.Stochastic ED.Perfect (ED.UCT _) _) = do
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      results <- sequence [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                   (PoGa.perfectStrategyFirst)
-                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.secondStrategy $ experiment)
-                                                   (ED.numPlays experiment)
-                              return (hypergraph, numIterationsSecond, numPlays, result)
-                          | (hypergraph, game, experiment@(ED.Stochastic ED.Perfect (ED.UCT numIterationsSecond) numPlays)) <- experiments]
-      executeMany update (map convertResult results)
-      commit connection
+      let jobChunks = map sequence $ chunksOf batchSize [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                                                                      (PoGa.perfectStrategyFirst)
+                                                                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.secondStrategy $ experiment)
+                                                                      (ED.numPlays experiment)
+                                                            return (hypergraph, numIterationsSecond, numPlays, result)
+                                                        | (hypergraph, game, experiment@(ED.Stochastic ED.Perfect (ED.UCT numIterationsSecond) numPlays)) <- experiments]
+      sequence_ [do batch <- jobChunk
+                    executeMany update (map convertResult batch)
+                    commit connection
+                | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
 
-runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
+runExperiment connection batchSize experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
   let tableName = DS.experimentResultTableName experiment
       selectStatement = concat ["SELECT hypergraph",
                                 ", num_iterations_first, num_plays", -- experiment columns
@@ -131,17 +130,19 @@ runExperiment connection experiment@(ED.Stochastic (ED.UCT _) ED.Perfect _) = do
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      results <- sequence [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                   (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                                   (PoGa.perfectStrategySecond)
-                                                   (ED.numPlays experiment)
-                              return (hypergraph, numIterationsFirst, numPlays, result)
-                          | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) ED.Perfect numPlays )) <- experiments]
-      executeMany update (map convertResult results)
-      commit connection
+      let jobChunks = map sequence $ chunksOf batchSize [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                                                                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                                                                      (PoGa.perfectStrategySecond)
+                                                                      (ED.numPlays experiment)
+                                                            return (hypergraph, numIterationsFirst, numPlays, result)
+                                                        | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) ED.Perfect numPlays )) <- experiments]
+      sequence_ [do batch <- jobChunk
+                    executeMany update (map convertResult batch)
+                    commit connection
+                | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
 
-runExperiment connection experiment@(ED.Deterministic ED.Perfect ED.Perfect) = do
+runExperiment connection batchSize experiment@(ED.Deterministic ED.Perfect ED.Perfect) = do
   let tableName = DS.experimentResultTableName experiment
       selectStatement = concat ["SELECT hypergraph, numvertices, representation",  -- hypergraph columns
                                 " FROM ", tableName, " NATURAL JOIN ", DS.tableName DS.hypergraphTableMetadata,
@@ -166,21 +167,42 @@ runExperiment connection experiment@(ED.Deterministic ED.Perfect ED.Perfect) = d
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      winners <- sequence [do winner <- PoGa.playGame (PoGa.Game game)
-                                                      (PoGa.perfectStrategyFirst)
-                                                      (PoGa.perfectStrategySecond)
-                              return (hypergraph, winner)
-                          | (hypergraph, game, experiment) <- experiments]
-      executeMany update (map convertResult winners)
-      commit connection
+      let jobChunks = map sequence $ chunksOf batchSize [do winner <- PoGa.playGame (PoGa.Game game)
+                                                                      (PoGa.perfectStrategyFirst)
+                                                                      (PoGa.perfectStrategySecond)
+                                                            return (hypergraph, winner)
+                                                        | (hypergraph, game, experiment) <- experiments]
+      sequence_ [do batch <- jobChunk
+                    executeMany update (map convertResult batch)
+                    commit connection
+                | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
-
   
 main = do
   programName <- getProgName
   args <- getArgs
   case args of
     [filename] -> do
+      playWithArgs filename defaultBatchSize
+    [filename, batchSizeString] -> do
+      case reads batchSizeString of
+        [(batchSize, "")] -> do
+          case batchSize > 0 of
+            True -> playWithArgs filename batchSize
+            False -> do
+              putStrLn "argument 'batch size' is negative"
+              putStrLn $ usage programName
+        _ -> do
+          putStrLn "argument 'batch size' is not an integer"
+          putStrLn $ usage programName
+    _ -> do
+      putStrLn "incorrect number of arguments"
+      putStrLn "usage: "
+      putStrLn $ usage programName
+  where
+    defaultBatchSize = 500    
+    usage programName = programName ++ " [database filename]" ++ "[optionally: batch size (default is: " ++ show defaultBatchSize ++ ")"
+    playWithArgs filename batchSize = do
       fileExists <- doesFileExist filename
       case fileExists of
         False -> putStrLn $ "file does not exist: " ++ filename
@@ -205,14 +227,9 @@ main = do
                   case errors of
                     [] -> do
                       let experiments = rights readResults
-                      mapM_ (runExperiment connection) experiments
+                      mapM_ (runExperiment connection batchSize) experiments
                     errors -> do
                       putStrLn "the database is errorneously formatted: "
                       mapM_ putStrLn errors
           disconnect connection
-    _ -> do
-      putStrLn "incorrect number of arguments"
-      putStrLn "usage: "
-      putStrLn $ usage programName
-  where
-    usage programName = programName ++ " [database filename]"
+    
