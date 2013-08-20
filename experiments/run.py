@@ -53,7 +53,7 @@ if len(sys.argv) >= 2:
 
     # comile play command
     print("compiling the play command")
-    subprocess.check_call(["ghc", "-O2", "-threaded", "-i../poga", "--make", "play.hs"])
+    subprocess.check_call(["ghc", "-O2", "-threaded", "-rtsopts", "-i../poga", "--make", "play.hs"])
 
     # play with the given number of cores
     print('playing (using %(num_cores)d cores)' % {'num_cores': num_cores})
