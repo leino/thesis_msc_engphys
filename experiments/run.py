@@ -8,6 +8,9 @@ tournament_size = 100
 iteration_stepsize = 1
 min_iterations, max_iterations = 2, 30
 
+# number of cores:
+# can be figured out by counting the number of lines in '$ grep processor /proc/cpuinfo'
+num_cores = 4
 
 hypergraph_classes = []
 
@@ -44,11 +47,17 @@ if len(sys.argv) >= 2:
         first_player_desc = 'UCT%(num_iterations)d' % {'num_iterations': i}
         subprocess.check_call(["runhaskell", "addexperiments.hs", database_filename, first_player_desc, "Perfect", str(tournament_size)])
 
-    print("plan and play")
-
-    # plan and play (takes a long time)
+    # plan out the experiments
+    print("plan")
     subprocess.check_call(["runhaskell", "plan.hs", database_filename])
-    subprocess.check_call(["runhaskell", "-i../poga", "play.hs", database_filename])
+
+    # comile play command
+    print("compiling the play command")
+    subprocess.check_call(["ghc", "-O2", "-threaded", "-i../poga", "--make", "play.hs"])
+
+    # play with the given number of cores
+    print('playing (using %(num_cores)d cores)' % {'num_cores': num_cores})
+    subprocess.check_call(["time", "./play", database_filename, "+RTS", '-N%(num_cores)d'%{'num_cores': num_cores}])
 
 else:
     print("you need to specify a database filename")
