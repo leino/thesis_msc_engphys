@@ -54,15 +54,21 @@ runExperiment connection batchSize experiment@(ED.Stochastic (ED.UCT _) (ED.UCT 
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      let jobChunks = map sequence $ chunksOf batchSize [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                                                      (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
-                                                                      (ED.numPlays experiment)
-                                                            return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
-                                                        | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) <- experiments]
-      sequence_ [do batch <- jobChunk
+      let jobChunks = chunksOf batchSize experimentOrErrors 
+          processOneJob (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) (ED.UCT numIterationsSecond) numPlays)) = do
+            result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                      (PoGa.mctsStrategySecond . ED.numIterations . ED.secondStrategy $ experiment)
+                      (ED.numPlays experiment)
+            return (hypergraph, numIterationsFirst, numIterationsSecond, numPlays, result)
+      sequence_ [do batch <- mapM processOneJob $ rights jobChunk
                     executeMany update (map convertResult batch)
                     commit connection
+                    case lefts jobChunk of
+                      [] -> return ()
+                      errors -> do
+                        putStrLn "errors:"                        
+                        print $ unlines $ errors
                 | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
 
@@ -92,15 +98,21 @@ runExperiment connection batchSize experiment@(ED.Stochastic ED.Perfect (ED.UCT 
   case errors of
     [] -> do
       update <- prepare connection updateStatement
-      let jobChunks = map sequence $ chunksOf batchSize [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                                      (PoGa.perfectStrategyFirst)
-                                                                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.secondStrategy $ experiment)
-                                                                      (ED.numPlays experiment)
-                                                            return (hypergraph, numIterationsSecond, numPlays, result)
-                                                        | (hypergraph, game, experiment@(ED.Stochastic ED.Perfect (ED.UCT numIterationsSecond) numPlays)) <- experiments]
-      sequence_ [do batch <- jobChunk
+      let jobChunks = chunksOf batchSize experimentOrErrors 
+          processOneJob (hypergraph, game, experiment@(ED.Stochastic ED.Perfect (ED.UCT numIterationsSecond) numPlays)) = do
+            result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                      (PoGa.perfectStrategyFirst)
+                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.secondStrategy $ experiment)
+                      (ED.numPlays experiment)
+            return (hypergraph, numIterationsSecond, numPlays, result)
+      sequence_ [do batch <- mapM processOneJob $ rights jobChunk
                     executeMany update (map convertResult batch)
                     commit connection
+                    case lefts jobChunk of
+                      [] -> return ()
+                      errors -> do
+                        putStrLn "errors:"                        
+                        print $ unlines $ errors
                 | jobChunk <- jobChunks]
     _ -> putStrLn $ unlines errors
 
@@ -126,21 +138,24 @@ runExperiment connection batchSize experiment@(ED.Stochastic (ED.UCT _) ED.Perfe
       convertResult (hypergraph, numIterationsFirst, numPlays, result) = 
         [toSql $ numFirstWins result, toSql $ numSecondWins result, toSql $ numNeitherWins result, toSql hypergraph, toSql numIterationsFirst, toSql numPlays]
   experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
-  let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
-  case errors of
-    [] -> do
-      update <- prepare connection updateStatement
-      let jobChunks = map sequence $ chunksOf batchSize [do result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
-                                                                      (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
-                                                                      (PoGa.perfectStrategySecond)
-                                                                      (ED.numPlays experiment)
-                                                            return (hypergraph, numIterationsFirst, numPlays, result)
-                                                        | (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) ED.Perfect numPlays )) <- experiments]
-      sequence_ [do batch <- jobChunk
-                    executeMany update (map convertResult batch)
-                    commit connection
-                | jobChunk <- jobChunks]
-    _ -> putStrLn $ unlines errors
+  update <- prepare connection updateStatement
+  let jobChunks = chunksOf batchSize experimentOrErrors
+      processOneJob (hypergraph, game, experiment@(ED.Stochastic (ED.UCT numIterationsFirst) ED.Perfect numPlays )) = do
+        result <- processJob (PoGa.Game $ PoGa.unexploredMetaDataNode game)
+                  (PoGa.mctsStrategyFirst . ED.numIterations . ED.firstStrategy $ experiment)
+                  (PoGa.perfectStrategySecond)
+                  (ED.numPlays experiment)
+        return (hypergraph, numIterationsFirst, numPlays, result)      
+  sequence_ [do batch <- mapM processOneJob $ rights jobChunk
+                executeMany update (map convertResult batch)
+                commit connection
+                -- print out errors if any
+                case lefts jobChunk of
+                  [] -> return ()
+                  errors -> do
+                    putStrLn "errors:"
+                    print $ unlines $ errors
+            | jobChunk <- jobChunks]
 
 runExperiment connection batchSize experiment@(ED.Deterministic ED.Perfect ED.Perfect) = do
   let tableName = DS.experimentResultTableName experiment
@@ -163,20 +178,23 @@ runExperiment connection batchSize experiment@(ED.Deterministic ED.Perfect ED.Pe
       convertResult (hypergraph, winner) = 
         [toSql $ showWinner $ winner, toSql hypergraph]
   experimentOrErrors <- map toExperiment <$> quickQuery connection selectStatement []
-  let (errors, experiments) = (lefts experimentOrErrors, rights experimentOrErrors)
-  case errors of
-    [] -> do
-      update <- prepare connection updateStatement
-      let jobChunks = map sequence $ chunksOf batchSize [do winner <- PoGa.playGame (PoGa.Game game)
-                                                                      (PoGa.perfectStrategyFirst)
-                                                                      (PoGa.perfectStrategySecond)
-                                                            return (hypergraph, winner)
-                                                        | (hypergraph, game, experiment) <- experiments]
-      sequence_ [do batch <- jobChunk
-                    executeMany update (map convertResult batch)
-                    commit connection
-                | jobChunk <- jobChunks]
-    _ -> putStrLn $ unlines errors
+  update <- prepare connection updateStatement
+  let jobChunks = chunksOf batchSize experimentOrErrors
+      processOneJob (hypergraph, game, experiment) = do
+        winner <- PoGa.playGame (PoGa.Game game)
+                  (PoGa.perfectStrategyFirst)
+                  (PoGa.perfectStrategySecond)
+        return (hypergraph, winner)
+  sequence_ [do batch <- mapM processOneJob $ rights jobChunk
+                executeMany update (map convertResult batch)
+                commit connection
+                -- print out errors if any
+                case lefts jobChunk of
+                  [] -> return ()
+                  errors -> do
+                    putStrLn "errors:"
+                    print $ unlines $ errors                
+            | jobChunk <- jobChunks]
   
 main = do
   programName <- getProgName
