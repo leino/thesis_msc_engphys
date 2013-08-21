@@ -6,7 +6,7 @@ min_edge_size, max_edge_size = 2, 3
 min_edges, max_edges = 1, 10 # minimum number of edges
 
 tournament_size = 100
-iteration_stepsize = 1
+iteration_stepsize = 5
 min_iterations, max_iterations = 2, 30
 
 hypergraph_classes = []
