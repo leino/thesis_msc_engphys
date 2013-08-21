@@ -1,9 +1,9 @@
 import sys
 import subprocess
 
-min_vertices, max_vertices = 3, 3
+min_vertices, max_vertices = 6, 6
 min_edge_size, max_edge_size = 2, 3
-min_edges = 1 # minimum number of edges
+min_edges, max_edges = 1, 10 # minimum number of edges
 
 tournament_size = 100
 iteration_stepsize = 1
@@ -12,7 +12,7 @@ min_iterations, max_iterations = 2, 30
 hypergraph_classes = []
 
 for num_vertices in range(min_vertices, max_vertices+1):
-    for num_edges in range(min_edges, 2**num_vertices + 1):
+    for num_edges in range(min_edges, min(2**num_vertices, max_edges) + 1):
         print("appending hypergraphs", num_vertices, num_edges)
         hypergraph_classes.append({'num_vertices': num_vertices, 'num_edges': num_edges, 'min_edge_size': min_edge_size, 'max_edge_size': max_edge_size})
 
