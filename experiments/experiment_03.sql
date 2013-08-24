@@ -1,0 +1,1 @@
+SELECT COUNT (*) FROM hypergraphs WHERE numvertices = 6 AND numedges = 7;

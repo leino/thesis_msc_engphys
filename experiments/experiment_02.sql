@@ -1,0 +1,1 @@
+SELECT numvertices, numedges FROM hypergraphs ORDER BY numvertices, numedges;

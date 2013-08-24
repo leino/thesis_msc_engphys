@@ -1,0 +1,1 @@
+SELECT num_iterations_first, SUM(num_first_wins), SUM(num_second_wins), SUM(num_neither_wins) FROM results_Perfect_vs_Perfect NATURAL JOIN results_UCT_vs_Perfect WHERE winner = "Neither" GROUP BY num_iterations_first;
