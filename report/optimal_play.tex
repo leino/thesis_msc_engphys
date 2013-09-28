@@ -90,12 +90,17 @@ Thus, to find the winner of a position in which it's First's time to move, we ta
 To find the winner of a position in which it's Seconts time to move, we take the minimum.
 This leads to the following recursive definition for the winner of a node, which can be used to play optimally:
 
-\begin{code}
+\begin{lstlisting}[frame=single, caption={Winner function (no pruning)}, label={codelisting:winner-nopruning}]
+
   winner position =
-    | terminal position      = terminalWinner position
-    | turn position == First = maximum $ map winner $ choices position
-    | otherwise              = minimum $ map winner $ choices position
-\end{code}
+    | terminal position      =
+        terminalWinner position
+    | turn position == First =
+        maximum $ map winner $ choices position
+    | otherwise              =
+        minimum $ map winner $ choices position
+
+\end{lstlisting}
 The above is a taste of Haskell code.
 The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in equation \ref{eq:winnerordering}.
 Since we know the rules of the game, the functions \texttt{turn}, \texttt{choices} and \texttt{terminal} are assumed to be given.
@@ -113,7 +118,7 @@ Namely alpha-beta pruning.
 \subsection {Alpha-Beta Pruning}
 \label{sec:alpha_beta}
 
-Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in code segment \ref{code:winner_noprune}, and we run into a child which is a First win.
+Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in code listing \ref{codelisting:winner-nopruning}, and we run into a child which is a First win.
 We then know that we can stop searching because we cannot do any better than that.
 Similarly, if it is Second's turn to move, and we are evaluating the \texttt{minimum} function, and we run into a Second win, we can also stop prematurely.
 
