@@ -1,7 +1,7 @@
 \subsection{Definitions}
 
 To define a \emph{positional game}, or \emph{strong game}, or simply \emph{game} from now on, we need a few things.
-First of all, we need a ``board'', $V$ and a collection of ``winning subsets'', $\mathcal F \subset \mathcal P(V)$.
+First of all, we need a ``board'', $V$, which is just a finite set, as well as a collection of \emph{winning sets}, $\mathcal F \subset \mathcal P(V)$.
 The tuple $(V,\mathcal F)$ constitutes a \emph{hypergraph}.
 The elements of the set $V$ are sometimes called the \emph{vertices} and the elements of the set $\mathcal F$ are sometimes called the \emph{hyperedges} of the hypergraph $(V,\mathcal F)$.
 
@@ -124,7 +124,7 @@ A good conceptual tool when reasoning about positional games is the so-called \e
 The root node of the game tree is the starting position of the game.
 That is to say, it corresponds to the empty board of the game.
 The children of the root node are all possible positions of the board after First has made his first move.
-The children of \emph{those} nodes are the position after Second has made his move, and so on.
+The children of \emph{those} nodes are the possible positions after Second has made his move, and so on.
 Since we are only considering games played on finite boards, the game tree is finite as well, but can be extremely large.
 
 In table \ref{tab:ex_gametree} you can see an example of a portion of the game tree for 3x3 Tic-Tac-Toe, below a certain position which has been chosen as the root node. The large white squares are not part of the tree; they are only in the picture to provide visual balance.

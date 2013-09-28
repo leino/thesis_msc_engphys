@@ -17,15 +17,15 @@ What do we mean by ``optimal play''?
 In this section, we will give some neccesary conditions.
 
 Clearly, a player cannot play optimally if he squanders an opportunity to win.
-More precisely; if current position is a win for the moving player, then he must make a choice which is also a win for him.
+More precisely; if the current position is a win for the moving player, then he must make a choice which is also a win for him.
 Furthermore, if the moving player does not have any opportunity to win in the given position (i.e. none of the leaf-nodes in the tree below the current node contains a winning node for the moving player), but if he does have an opportunity to tie, he must still have an opportunity to tie after he makes his move.
 
-If a player can play as above, he will win if he can win, and if he can't win but he can tie, he will do that.
+If a player can play as described above, he will win if he can win, and if he can't win but he can tie, he will do that.
 
 \subsection{The minimax algorithm}
 \label{sec:minimax}
 
-In this section, we will see how the considerations in the previous sections guide us to a algorithm which leads to optimal play.
+In this section, we will see how the considerations in the previous sections guide us to an algorithm which leads to optimal play.
 It is intuitively clear that it is always possible to play as described in the previous section.
 The key in order to find an explicit algorithm is to extend the notion of First player win to be not just for leaf nodes.
 
@@ -86,9 +86,9 @@ To get something a bit more operational, we define an ordering on the set of col
 It is clear that First plays optimally if he at all times makes choices which are \emph{maximal} with respect to the above ordering.
 Similarly, Second plays optimally if he at all times makes choices which are \emph{minimal} with respect to the same ordering.
 
-Thus, to find the winner of a position in which it's Firsts time to move, we take the maximum of it's children, according to the above ordering.
+Thus, to find the winner of a position in which it's First's time to move, we take the maximum of it's children, according to the above ordering.
 To find the winner of a position in which it's Seconts time to move, we take the minimum.
-This leads to the following recursive definition for the winner of a node, which can me used to play optimally:
+This leads to the following recursive definition for the winner of a node, which can be used to play optimally:
 
 \begin{code}
   winner position =
@@ -103,8 +103,8 @@ Since we know the rules of the game, the functions \texttt{turn}, \texttt{choice
 
 The code breaks the definition of \texttt{winner} up into three cases.
 In the first case, where the position is terminal, we trivially know the winner from the definition of the game, so \texttt{terminalWinner} is assumed to be given.
-In the second case, where the position is not terminal and it is Firsts turn to play, the winner is the maximum of \texttt{winner} mapped over the choices available from the given position.
-In the final case, we know that the node is not terminal and it is not Firsts turn to move. Thus it is Seconds turn to move, and so the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
+In the second case, where the position is not terminal and it is First's turn to play, the winner is the maximum of \texttt{winner} mapped over the choices available from the given position.
+In the final case, we know that the node is not terminal and it is not First's turn to move. Thus it is Second's turn to move, and so the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
 
 With the above function in hand, it is easy for either player to play optimally.
 The actual code used to run the experiments later on is not quite this simple: as mentioned there's a common optimization which we will take advantage of.
@@ -113,7 +113,7 @@ Namely alpha-beta pruning.
 \subsection {Alpha-Beta Pruning}
 \label{sec:alpha_beta}
 
-Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in the code segment from the previous section, and we run into a child which is a First win.
+Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in code segment \ref{code:winner_noprune}, and we run into a child which is a First win.
 We then know that we can stop searching because we cannot do any better than that.
 Similarly, if it is Second's turn to move, and we are evaluating the \texttt{minimum} function, and we run into a Second win, we can also stop prematurely.
 
