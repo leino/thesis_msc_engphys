@@ -1,7 +1,7 @@
 \subsection{Introduction}
 
 In this section, we will introduce an algorithm called the minimax algorithm which can play any positional game (and more general games) in an optimal manner.
-The natural structure on which algorithmic play takes place is the game tree, as described in section \ref{subsec:gametree}.
+The natural structure on which algorithmic play takes place is the game tree, as described in section~\ref{subsec:gametree}.
 A playing algorithm can then be seen as a search algorithm on the game tree.
 
 The minimax algorithm in it's most naive implementation will search trough the entire game tree. This is not feasible for most games.
@@ -72,7 +72,7 @@ Finally, as a simple corollary of the above two propositions:
 \begin{proposition}
 If both players play optimally, then the nodes in the play path will all have the same winner (First, Second or Neither).
 \end{proposition}
-From the above results, we have the following nice re-characterization of definition \ref{def:positionclasses}.
+From the above results, we have the following nice re-characterization of definition~\ref{def:positionclasses}.
 
 \begin{theorem}
 The winner for a given node is the same as the winner of the leaf node (end position) which results when both players play optimally.
@@ -91,7 +91,6 @@ To find the winner of a position in which it's Seconts time to move, we take the
 This leads to the following recursive definition for the winner of a node, which can be used to play optimally:
 
 \begin{lstlisting}[frame=single, caption={Winner function (no pruning)}, label={codelisting:winner-nopruning}]
-
   winner position =
     | terminal position      =
         terminalWinner position
@@ -99,10 +98,9 @@ This leads to the following recursive definition for the winner of a node, which
         maximum $ map winner $ choices position
     | otherwise              =
         minimum $ map winner $ choices position
-
 \end{lstlisting}
 The above is a taste of Haskell code.
-The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in equation \ref{eq:winnerordering}.
+The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in equation~\ref{eq:winnerordering}.
 Since we know the rules of the game, the functions \texttt{turn}, \texttt{choices} and \texttt{terminal} are assumed to be given.
 (In turn, they tell who's turn it is, what his choices are and whether the position is terminal, given any position of the game.)
 
@@ -118,7 +116,7 @@ Namely alpha-beta pruning.
 \subsection {Alpha-Beta Pruning}
 \label{sec:alpha_beta}
 
-Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in code listing \ref{codelisting:winner-nopruning}, and we run into a child which is a First win.
+Suppose that it is First's turn to move, and we are evaluating \texttt{maximum} function in code listing~\ref{codelisting:winner-nopruning}, and we run into a child which is a First win.
 We then know that we can stop searching because we cannot do any better than that.
 Similarly, if it is Second's turn to move, and we are evaluating the \texttt{minimum} function, and we run into a Second win, we can also stop prematurely.
 
@@ -129,31 +127,31 @@ The implementation is particularly easy in Haskell. We can even make it look exa
 This means that we can find the maximum without actually computing all elements in the list (which would require searching the entire game tree below the current position).
 
 Here is our version of \texttt{minimum} which will allow pruning:
-\begin{code}
+\begin{lstlisting}[frame=single, label={codelisting:prunedminimum}]
   prunedMinimum ws = 
     case find ((==) Only Second) ws of
       Nothing -> minimum ws
       _ -> Only Second
-\end{code}
+\end{lstlisting}
 The implementation for \texttt{prunedMaximum} is similar:
-\begin{code}
-  prunedMax ws = 
+\begin{lstlisting}[frame=single, label={codelisting:prunedmaximum}]
+  prunedMaximum ws = 
     case find ((==) Only First) ws of
       Nothing -> maximum ws
       _ -> Only First
-\end{code}
-Now we can rewrite our pruned minimax algorithm so that it is very similar to the one in the previous section:
-\begin{code}
+\end{lstlisting}
+Now we can rewrite our pruned minimax algorithm so that it is very similar to listing~\ref{codelisting:winner-nopruning}:
+\begin{lstlisting}[frame=single, caption={Winner function (with pruning)}, label={codelisting:winner-pruning}]
   winner position
     | terminal position       = terminalWinner position
     | turn position == First  = prunedMaximum $ map winner $ choices play
     | otherwise               = prunedMinimum $ map winner $ choices play
-\end{code}
+\end{lstlisting}
 Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.
 
-In table \ref{tab:ex_alphabeta}, we can recognize the game tree example from table \ref{tab:ex_gametree}, with some parts taken out; the gray squares represent positions that do not need to be considered by minimax, thanks to alpha-beta pruning.
-As in table \ref{tab:ex_gametree}, the white squares represent positions which are not part of the game tree, but are included in the picture for visual balance.
-Also as in table \ref{tab:ex_gametree}, the moves are chosen by considering the first free position on the board when going trough the board in left to right and bottom to top order.
+In table~\ref{tab:ex_alphabeta}, we can recognize the game tree example from table~\ref{tab:ex_gametree}, with some parts taken out; the gray squares represent positions that do not need to be considered by minimax, thanks to alpha-beta pruning.
+As in table~\ref{tab:ex_gametree}, the white squares represent positions which are not part of the game tree, but are included in the picture for visual balance.
+Also as in table~\ref{tab:ex_gametree}, the moves are chosen by considering the first free position on the board when going trough the board in left to right and bottom to top order.
 
 \begin{center}
 \def\arraystretch{5.5}
