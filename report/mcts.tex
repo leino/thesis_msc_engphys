@@ -106,77 +106,87 @@ The complete result after the backup step is shown in table \ref{fig:mcts_iterat
 
 \subsection{UCT implementation}
 
-
-It is assumed that we have a function, \texttt{value}, which gives a real number and which we can apply only to terminal positions.
+It is assumed that we have a function, \texttt{value}, which gives a real number intended to represent the value of a given node for First, but which we can apply only to terminal positions.
 For our purposes, \texttt{value terminalPosition} is the value of some terminal position, \texttt{terminalPosition}, for First player.
+Apart from that, we will also assume that we have a function named \texttt{choices}, which we can apply to a node in order to find the set of possible choices of nodes that the player in turn could move to.
 
-We will assume that we have a data-type, \texttt{Position}, which represents a state of the game.
-Of course, there is a function
-\texttt{choices :: Position -> [Position]}, which given a position will give us a list of choices (also positions) of where we can go next (according to the structure of the game tree).
-For explored nodes, we need to store extra information in addition to position: we need a visit count and an accumulated score. 
-Thus we define
+We further assume that our nodes can carry ``MCTS data'' of the following format.
 \begin{lstlisting}[frame=single]
-  data MCTSPosition =
-    Explored {
-      position :: Position,
-      visitCount :: Integer,
-      score :: Real, choices :: [MCTSPosition]
-    }
-    | Unexplored {position :: Position}
+data MCTSNodeData = MCTSNodeData { visitCount :: Int,
+                                   score :: Score }
 \end{lstlisting}
-This reads as follows: an MCTSNode can either be explored or unexplored, and must have a position in both cases.
-In the case of an explored node, we must also have a visit count and an accumulated score, as well as a way to get at the explored children.
-\begin{code}
-explore (Unexplored position) =
-  let s = value . randomSearch $ position in
-  (-s, Explored position 1 s (map Unexplored $ choices position))
-explore (Explored position visitCount score choices) = 
-  case terminal position of
-    True ->
-      let s = value position in
-      (-s, Explored position (visitCount+1) (score+s) [])
-    False ->
-      let (best, rest) = popBestChoice position
-          (s, best') = explore best in
-          (-s, Explored position (visitCount+1) (score+s) (best':rest))
-\end{code}
-The above function implicitly encodes all of the steps discussed in the previous section.
-If we apply \texttt{explore} repeatedly, we will refine and expand our explored game tree.
+The \texttt{Score} type is just a synonym for a real number type, like \texttt{Float}. We can view a node's MCTS data, if it has been explored, by means of the \texttt{getMCTSData} function, and we can update it by means of \texttt{setMCTSData}.
 
-In this case, we want to stop after a fixed number of iterations (in other cases we might want to stop after a certain time has gone by), like so:
+We begin by looking at the \texttt{recon} function, which denotes the score \emph{from the point of view of the player in turn}, of a random search from the given position.
+\begin{lstlisting}[frame=single]
+recon position
+  | Game.terminal position = return $ value pos
+  | otherwise = do
+      c <- Random.fromList [(c,1)
+                           | c <- Game.choices position]
+      s <- recon c
+      return $ -s
+\end{lstlisting}
+It reads as follows: in case the given position is terminal, then we can return the \texttt{value} of that position. Otherwise we select a random child, apply \texttt{recon} to it, and get a score, \texttt{s}, back.
+Note that $\texttt{s}$ represents the score from the point of view of the opponent of the player in turn, since \texttt{recon} was applied to a child of \texttt{position}.
 
-\begin{code}
-  strategy 0 position =
-    bestChoice position
-    where
-    bestChoice = fst . popBestChoice
-  strategy numIterations position  = 
-    strategy (numIterations-1) (explore position)
-\end{code}
-Note again that this strategy is for whoever the \texttt{value} function was written for. In our case this is First.
+The \texttt{explore} function is the core of the algorithm. The return value of the function is a tuple of a score together with the result of exploring the node. Just like \texttt{recon}, the score it returns is relative to the player who's turn it is in the given node.
 
-There are a few blanks left to fill in.
-The function \texttt{randomSearch} simply takes an unexplored position and searches randomly from it, and is trivial to implement.
-To define the function \texttt{popBestChoice}, we can say that if \texttt{(best, rest) = popBestSearch position} for some \texttt{position}, then \texttt{best} is the best choice from \texttt{position} and \texttt{rest} is a list of the remaining choices from \texttt{position}.
-The function \texttt{bestChoice} is just a helper, and is defined above simply to apply \texttt{popBestChoice} and throw away \texttt{rest} (since we aren't interested in that).
-Thus \texttt{popBestChoice} is trivial to write if we have a notion of 'best'.
-This notion is gotten by defining an ordering on the data-type MCTSNode, as follows:
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[frame=single]
+explore cExp node = 
+  case getMCTSData node of
+    Nothing -> do
+      s <- if Game.terminal node
+           then return $ value node
+           else recon node
+      return ( s,
+               setMCTSData node $
+               MCTSNodeData {visitCount = 1,
+                             score = s} )
+    Just (MCTSNodeData {visitCount = vc,
+                        score = sc}) -> do
+      case Game.terminal node of
+        True -> do
+          let s = value node
+          return ( s,
+                   setMCTSData node $
+                   MCTSNodeData {visitCount = vc + 1,
+                                 score = sc + s} )
+        False -> do
+          let (c, cs) = popBestChild cExp node
+          (s, c') <- explore cExp c
+          let s' = negate s
+              node' = setChoices node (c':cs) in
+            return ( s',
+                     setMCTSData node' $
+                     MCTSNodeData {visitCount = vc + 1,
+                                   score = sc + s'} )
+\end{lstlisting}
+\end{minipage}
+At the top level, the function is split up into two cases -- either our node has no MCTS data, or it does.
+If the node does not have MCTS data, we obtain a score, \texttt{s}, in either of two ways: using the \texttt{value} function if the node is terminal, or else by applying the \texttt{recon} to the node, i.e. doing a random search.
+In either case we get a score, and so we can return the explored version of our node.
 
-\begin{code}
-  compare node a@(Explored _ _ _ _) b@(Explored _ _ _ _) =
-    compare (reconScore node a) (reconScore node b)
-    where
-    cExp :: Double  
-    cExp = 1.0 / (sqrt 2.0) -- amount of exploration
-    reconScore :: (Position p) => MCTSNode p -> MCTSNode p -> Score
-    reconScore parent@(Explored _ vcp sp _) child@(Explored _ vcc sc _) =
-      ( sc / (fromIntegral vcc) ) +
-      cExp * sqrt (  2.0*(log $ fromIntegral vcp) / (fromIntegral vcc)  )
-  compare _ (Unexplored _) (Unexplored _) = EQ
-  compare _ (Explored _ _ _ _) (Unexplored _) = LT
-  compare _ (Unexplored _) (Explored _ _ _ _) = GT
-\end{code}
-This is a direct mapping of the rules described in the selection step: Unexplored nodes always win over explored nodes and tie against each other.
-When comparing two explored nodes to each other, we have to be a little more clever and use equation \ref{eq:uctnodevalue}, as written in the previous section.
+In case the node has MCTS data, i.e. is explored, we again have two sub-cases: terminal or not terminal.
+If the explored node is terminal, we again use the value function to obtain a score, and use that to update the MCTS data for the node.
+If the explored node is not terminal, then we select the best child as described in \ref{blah}, explore that child recursively with another call to \texttt{explore} and use the result to return an updated node.
 
-For complete code and more details, see section \ref{sec:code}.
+Now we can easily write the final MCTS strategy. It needs two parameters: a number of iterations and a node to work on.
+\begin{lstlisting}[frame=single]
+mctsStrategy 0 node = do
+  return $ findBestMove node
+mctsStrategy numSteps node = do
+  (_, node') <- explore cExp node
+  mctsStrategy (numSteps-1) node'
+  where
+  cExp :: Double  
+  cExp = 1.0 / (sqrt 2.0)
+\end{lstlisting}
+The base case of zero iterations is listed first. It uses the function \texttt{findBestMove} which in turn uses the comparison function \ref{code:blah} to determine the best move for the player in turn, according to the currently available MCTS data. In the other case, one round of \texttt{explore} is executed, and the strategy is applied recursively to the resulting node.
+
+One important ingredient we'll leave out is the \texttt{compareChildren} function. It takes a node and two children of the node, and returns an ordering.
+It allows us to sort a set of children, and therefore to write \texttt{popBestChild} and \texttt{findBestMove} with relative ease.
+The function is just a straight encoding of the rules mentioned in \ref{blah}, and so is omitted here.
+
+There are still a few minor blanks left to fill in. For the complete code, see section \ref{sec:code}.
