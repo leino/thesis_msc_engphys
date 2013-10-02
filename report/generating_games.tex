@@ -1,12 +1,11 @@
 \subsection{Introduction and basic definitions}
 
-In the last section, we showed how to implement MCTS (or more specifically: UCT), which can be used directly to play games in a probabilistic manner.
+In the previous section, we showed how to implement MCTS (or more specifically: UCT), which can be used directly to play games in a probabilistic manner.
 The plan is to try it out on many different games.
 In order to do that, we have to generate the games themselves.
-The goal of this chapter is to show how to do just that.
+The goal of this chapter is to show how to do just that, given some constraints which we will cover later.
 
-This section talks about computationally generating positional games, given some constraints which we will cover later.
-Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is slightly more appropriate to talk about hyper-graphs in place of positional games.
+Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is appropriate to talk about hyper-graphs in place of positional games.
 
 \begin{definition}
   A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a set of \emph{hyperedges} $E$, which are non-empty subsets of $V$.
@@ -32,7 +31,7 @@ We can make the blue vertices correspond to hyperedges by defining the hyperedge
 \label{sec:nautycommandline}
 
 In this section, we work out as an example all of the hypergraphs with 2 vertices and 3 hyperedges, using Nauty.
-I will assume that Nauty has been installed and your current working directory contains the executables \texttt{genbg} and \texttt{showg}.
+We will assume that the reader has obtained Nauty, and that the current working directory contains the executables \texttt{genbg} and \texttt{showg}.
 
 Here is the command to generate and display all non-isomorphic bipartite graphs with 2 vertices in the first class and 3 vertices in the second class.
 
@@ -212,60 +211,19 @@ Clearly, there are some issues to work out. Firstly, note that \texttt{Graph 1} 
 
 To get around this, we use the command line switch $\texttt{-dm:n}$ where the \texttt{m} and \texttt{n} are the minimum degree of the first and second class of vertices, respectively.
 
-With \texttt{-d0:1} we are saying that the vertices of our hypergraph may be in no hyperedges, but each hyperedge must contain at least one vertex, i.e. must not be empty.
+If we pick \texttt{-d1:1} we are saying that each vertex in our hypergraph must be in some hyperedge, and that each hyperedge must contain at least one vertex, i.e. must not be empty.
 
 
 \begin{code}
-  $ ./genbg 2 3 -d0:1 | ./showg
+  $ ./genbg 2 3 -d1:1 | ./showg
 \end{code}
 The output is:
 
 \begin{tabular}{|c|c|c|}
+
 \begin{minipage}{1.5in}
 \begin{datalisting}
 Graph 1, order 5.
-  0 : 2 3 4;
-  1 : ;
-  2 : 0;
-  3 : 0;
-  4 : 0;
-
-\end{datalisting}
-\end{minipage}
-
-&
-
-\begin{minipage}{1.5in}
-\begin{datalisting}
-Graph 3, order 5.
-  0 : 2 4;
-  1 : 3;
-  2 : 0;
-  3 : 1;
-  4 : 0;
-
-\end{datalisting}
-\end{minipage}
-
-&
-
-\begin{minipage}{1.5in}
-\begin{datalisting}
-Graph 5, order 5.
-  0 : 2 3 4;
-  1 : 3 4;
-  2 : 0;
-  3 : 0 1;
-  4 : 0 1;
-
-\end{datalisting}
-\end{minipage}
-
-\\
-
-\begin{minipage}{1.5in}
-\begin{datalisting}
-Graph 2, order 5.
   0 : 2 3 4;
   1 : 4;
   2 : 0;
@@ -279,7 +237,7 @@ Graph 2, order 5.
 
 \begin{minipage}{1.5in}
 \begin{datalisting}
-Graph 4, order 5.
+Graph 3, order 5.
   0 : 2 4;
   1 : 3 4;
   2 : 0;
@@ -293,7 +251,7 @@ Graph 4, order 5.
 
 \begin{minipage}{1.5in}
 \begin{datalisting}
-Graph 6, order 5.
+Graph 5, order 5.
   0 : 2 3 4;
   1 : 2 3 4;
   2 : 0 1;
@@ -302,16 +260,50 @@ Graph 6, order 5.
 \end{datalisting}
 \end{minipage}
 
+
+\\
+
+\begin{minipage}{1.5in}
+\begin{datalisting}
+Graph 2, order 5.
+  0 : 2 4;
+  1 : 3;
+  2 : 0;
+  3 : 1;
+  4 : 0;
+
+\end{datalisting}
+\end{minipage}
+
+
+&
+
+\begin{minipage}{1.5in}
+\begin{datalisting}
+Graph 4, order 5.
+  0 : 2 3 4;
+  1 : 3 4;
+  2 : 0;
+  3 : 0 1;
+  4 : 0 1;
+
+\end{datalisting}
+\end{minipage}
+
+
+&
+
+
 \\
 \end{tabular}
 
 
-There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyper edge three times. That is to say, we would end up with a hypergraph containing only a single hyperedge.
+There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyperedge two times.
 
-This issue is resolved with the command line switch \texttt{-z}, which makes sure that no two vertices in the second class can have the same neighborhood.
+This issue is resolved with the command line switch \texttt{-z}, which ensures that no two vertices in the second class can have the same neighborhood.
 
 \begin{code}
-  $ ./genbg 2 3 -z -d0:1 | ./showg
+  $ ./genbg 2 3 -z -d1:1 | ./showg
 \end{code}
 This yields the output:
 
