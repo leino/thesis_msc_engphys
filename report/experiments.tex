@@ -1,11 +1,11 @@
 \subsection{Introduction}
 
-
+In this section we give an overview of the experiments.
 We want to find out how ``good'' the UCT strategy is for various numbers of iterations.
 Of course we expect that it becomes better at higher numbers of iterations, but how many are necessary?
 We would also want to know at what number, or even if, it becomes virtually perfect.
 
-We can measure the performance of UCT, for a given game, by playing with perfect as First versus UCT at $n$ iterations as Second.
+We can measure the performance of UCT, for a given game, by playing with UCT at $n$ iterations as First versus perfect as Second.
 Since the outcome is random, we'll want to repeat this many times, and record how many times UCT wins, looses and ties.
 
 We also want to classify the game being played as a first player win, second player win or neither player wins.
@@ -17,16 +17,15 @@ As discussed in section \ref{sec:minimax}, this means running perfect vs perfect
 The number of positional games grows rapidly with the number of vertices (or positions).
 If we want to study interesting games of higher number of vertices, we are going to need to focus on particular classes.
 
-In the experiment outlined below, we will focus on games which have hyper-edges (winning sets) with either two or three vertices.
-In order to limit the number of vertices in a hyper-edge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
+In the experiment outlined below, we will focus on games which have hyperedges (winning sets) with either two or three vertices.
+In order to limit the number of vertices in a hyperedge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
 The argument \texttt{-dm:n} gives a lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
-Recall that the first class of vertices correspond to the vertices of the hyper-graph, and the second class refers to the hyper-edges, as described in section \ref{sec:nautycommandline}.
+Recall that the first class of vertices correspond to the vertices of the hyper-graph, and the second class refers to the hyperedges, as described in section \ref{sec:nautycommandline}.
 Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
-By corollary \ref{cor:hypergraph_bipartite_bijection}, we can generate the class of hyper-graphs with 4 vertices and 2 hyper-edges which have either 2 or 3 vertices in them, by running:
-
+By corollary \ref{cor:hypergraph_bipartite_bijection}, we can list the class of hyper-graphs with 4 vertices and 2 hyperedges containing either 2 or 3 vertices, and where each vertex is in at least one hyperedge, by running:
 
 \begin{code}
-  $ ./genbg -z 4 2 -d0:2 -D2:3 | ./showg
+  $ ./genbg -z 4 2 -d1:2 -D2:3 | ./showg
 \end{code}
 The output is:
 
@@ -34,32 +33,6 @@ The output is:
 \begin{minipage}{1.5in}
 \begin{datalisting}
 Graph 1, order 6.
-  0 : 4 5;
-  1 : 4;
-  2 : 5;
-  3 : ;
-  4 : 0 1;
-  5 : 0 2;
-
-\end{datalisting}
-\end{minipage}
-&
-\begin{minipage}{1.5in}
-\begin{datalisting}
-Graph 4, order 6.
-  0 : 4 5;
-  1 : 4;
-  2 : 5;
-  3 : 5;
-  4 : 0 1;
-  5 : 0 2 3;
-
-\end{datalisting}
-\end{minipage}
-\\
-\begin{minipage}{1.5in}
-\begin{datalisting}
-Graph 2, order 6.
   0 : 4;
   1 : 4;
   2 : 5;
@@ -72,29 +45,27 @@ Graph 2, order 6.
 &
 \begin{minipage}{1.5in}
 \begin{datalisting}
-Graph 5, order 6.
+Graph 2, order 6.
+  0 : 4 5;
+  1 : 4;
+  2 : 5;
+  3 : 5;
+  4 : 0 1;
+  5 : 0 2 3;
+\end{datalisting}
+\end{minipage}
+&
+\begin{minipage}{1.5in}
+\begin{datalisting}
+Graph 3, order 6.
   0 : 4 5;
   1 : 4 5;
   2 : 4;
   3 : 5;
   4 : 0 1 2;
   5 : 0 1 3;
-
 \end{datalisting}
 \end{minipage}
-\\
-\begin{minipage}{1.5in}
-\begin{datalisting}
-Graph 3, order 6.
-  0 : 4 5;
-  1 : 4 5;
-  2 : 5;
-  3 : ;
-  4 : 0 1;
-  5 : 0 1 2;
-\end{datalisting}
-\end{minipage}
-&
 \\
 \end{tabular}
 
