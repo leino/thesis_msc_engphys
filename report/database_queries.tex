@@ -259,41 +259,53 @@ sqlite> SELECT COUNT (*) FROM hypergraphs;
 
 The following query shows the percentage of First wins, Second wins and Neither wins, respectively, for the games classified as a first player win.
 \begin{code}
-sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
-   ...>        SUM(numneitherwins), numiterations
-   ...> FROM perfect NATURAL JOIN mctsvsperfect
+sqlite> SELECT SUM(num_first_wins), SUM(num_second_wins),
+   ...>        SUM(num_neither_wins), num_iterations_first
+   ...> FROM results_Perfect_vs_Perfect NATURAL JOIN results_UCT_vs_Perfect
    ...> WHERE winner = "First"
-   ...> GROUP BY numiterations;
-323672354|101627304|6511442|10
-253345343|172140755|6325002|20
-401797389|24320391|5693320|30
+   ...> GROUP BY num_iterations_first;
+15900100|205213500|292400|2
+95947824|122110522|3347654|7
+170292845|48178221|2934934|12
+197396923|21355856|2653221|17
+208304245|10629080|2472675|22
+213217957|5808092|2379951|27
 \end{code}
 Or, approximately and in normalized form:
 \begin{code}
-0.75 | 0.24 | 0.02 | 10
-0.59 | 0.40 | 0.01 | 20
-0.93 | 0.06 | 0.01 | 30
+0.07 | 0.93 | 0.00 | 2
+0.43 | 0.55 | 0.02 | 7
+0.77 | 0.22 | 0.01 | 12
+0.89 | 0.10 | 0.01 | 17
+0.94 | 0.05 | 0.01 | 22
+0.96 | 0.03 | 0.01 | 27
 \end{code}
 
 Here is the same query, but investigating games where neither player can win if both play perfectly:
 
 \begin{code}
-sqlite> SELECT SUM(numfirstwins), SUM(numsecondwins),
-   ...> SUM(numneitherwins), numiterations
-   ...> FROM perfect NATURAL JOIN mctsvsperfect
+sqlite> SELECT SUM(num_first_wins), SUM(num_second_wins),
+   ...>        SUM(num_neither_wins), num_iterations_first
+   ...> FROM results_Perfect_vs_Perfect NATURAL JOIN results_UCT_vs_Perfect
    ...> WHERE winner = "Neither"
-   ...> GROUP BY numiterations;
-0|29642|159858|10
-0|19103|170397|20
-0|12800|176700|30
+   ...> GROUP BY num_iterations_first;
+0|22900|154900|2
+0|9516|168284|7
+0|12010|165790|12
+0|7051|170749|17
+0|3315|174485|22
+0|1107|176693|27
 \end{code}
 
 Again, in normalized form:
 
 \begin{code}
-0.00 | 0.15 | 0.84 | 10
-0.00 | 0.10 | 0.90 | 20
-0.00 | 0.07 | 0.93 | 30
+0.00 | 0.13 | 0.87 | 2
+0.00 | 0.05 | 0.95 | 7
+0.00 | 0.07 | 0.93 | 12
+0.00 | 0.04 | 0.96 | 17
+0.00 | 0.02 | 0.98 | 22
+0.00 | 0.01 | 0.99 | 27
 \end{code}
 
 \subsection{Results in perfect play}
