@@ -312,89 +312,86 @@ Again, in normalized form:
 
 Here is a query which will summarize the results from our games when two perfect players play against each other:
 
+\begin{minipage}{\linewidth}
 \begin{datalisting}
 sqlite> SELECT hc.numvertices, hc.numedges,
    ...> IFNULL(numfirstwins, 0), IFNULL(numsecondwins, 0), IFNULL(numneitherwins, 0)
    ...> FROM (SELECT numvertices, numedges FROM hypergraphs GROUP BY numvertices, numedges) hc
    ...> LEFT OUTER JOIN
-   ...>   (SELECT numvertices, numedges, count(*) AS numfirstwins
-   ...>    FROM hypergraphs NATURAL JOIN perfect
-   ...>    WHERE winner = 'First' GROUP BY numvertices, numedges) fwc
+   ...> (SELECT numvertices, numedges, COUNT(*) AS numfirstwins
+   ...> FROM hypergraphs NATURAL JOIN results_Perfect_vs_Perfect
+   ...> WHERE winner = "First" GROUP BY numvertices, numedges) fwc
    ...> ON (hc.numvertices = fwc.numvertices AND hc.numedges = fwc.numedges)
    ...> LEFT OUTER JOIN
-   ...>   (SELECT numvertices, numedges, count(*) AS numsecondwins
-   ...>    FROM hypergraphs NATURAL JOIN perfect
-   ...>    WHERE winner = 'Second' GROUP BY numvertices, numedges) swc
+   ...> (SELECT numvertices, numedges, COUNT(*) AS numsecondwins
+   ...> FROM hypergraphs NATURAL JOIN results_Perfect_vs_Perfect
+   ...> WHERE winner = "Second" GROUP BY numvertices, numedges) swc
    ...> ON (hc.numvertices = swc.numvertices AND hc.numedges = swc.numedges)
    ...> LEFT OUTER JOIN
-   ...>   (SELECT numvertices, numedges, count(*) AS numneitherwins
-   ...>    FROM hypergraphs NATURAL JOIN perfect
-   ...>    WHERE winner = 'Neither' GROUP BY numvertices, numedges) nwc
+   ...> (SELECT numvertices, numedges, COUNT(*) AS numneitherwins
+   ...> FROM hypergraphs NATURAL JOIN results_Perfect_vs_Perfect
+   ...> WHERE winner = "Neither" GROUP BY numvertices, numedges) nwc
    ...> ON (hc.numvertices = nwc.numvertices AND hc.numedges = nwc.numedges);
 \end{datalisting}
+\end{minipage}
 The output is as follows:
 
 \begin{tabular}{c | c | c}
 \begin{minipage}{1.0in}
 \begin{datalisting}
-2|1|0|0|1|
-3|1|0|0|2|
-3|2|1|0|1|
-3|3|2|0|0|
-3|4|1|0|0|
-4|1|0|0|2|
-4|2|1|0|4|
-4|3|6|0|5|
-4|4|12|0|5|
-4|5|16|0|2|
-4|6|16|0|1|
-4|7|11|0|0|
-4|8|5|0|0|
-4|9|2|0|0|
-4|10|1|0|0|
-5|1|0|0|2|
+3|1|0|0|1
+3|2|1|0|1
+3|3|2|0|0
+3|4|1|0|0
+4|2|0|0|3
+4|3|4|0|5
+4|4|11|0|5
+4|5|16|0|2
+4|6|16|0|1
+4|7|11|0|0
+4|8|5|0|0
+4|9|2|0|0
+4|10|1|0|0
+5|2|0|0|2
+5|3|5|0|8
 \end{datalisting}
 \end{minipage}
 &
 \begin{minipage}{1.0in}
 \begin{datalisting}
-5|2|1|0|6|
-5|3|11|0|13|
-5|4|53|0|22|
-5|5|171|0|21|
-5|6|418|0|13|
-5|7|802|0|4|
-5|8|1258|0|1|
-5|9|1644|0|0|
-5|10|1806|0|0|
-5|11|1644|0|0|
-5|12|1259|0|0|
-5|13|806|0|0|
-5|14|431|0|0|
-5|15|192|0|0|
-5|16|75|0|0|
-5|17|24|0|0|
+5|4|41|0|17
+5|5|155|0|19
+5|6|402|0|12
+5|7|791|0|4
+5|8|1253|0|1
+5|9|1642|0|0
+5|10|1805|0|0
+5|11|1644|0|0
+5|12|1259|0|0
+5|13|806|0|0
+5|14|431|0|0
+5|15|192|0|0
+5|16|75|0|0
+5|17|24|0|0
 \end{datalisting}
 \end{minipage}
 &
 \begin{minipage}{1.0in}
 \begin{datalisting}
-5|18|7|0|0|
-5|19|2|0|0|
-5|20|1|0|0|
-6|1|0|0|2|
-6|2|1|0|7|
-6|3|12|0|23|
-6|4|94|0|69|
-6|5|559|0|156|
-6|6|2684|0|274|
-6|7|10660|0|351|
-6|8|35931|0|346|
-6|9|104799|0|271|
-6|10|267357|0|165|
-6|11|600047|0|83|
-6|12|1190378|0|32|
-6|13|2094910|0|11|
+5|18|7|0|0
+5|19|2|0|0
+5|20|1|0|0
+6|2|0|0|1
+6|3|1|0|10
+6|4|41|0|47
+6|5|388|0|135
+6|6|2266|0|261
+6|7|9858|0|347
+6|8|34673|0|345
+6|9|103155|0|271
+6|10|265551|0|165
+6|11|598403|0|83
+6|12|1189119|0|32
 \end{datalisting}
 \end{minipage}
 \\
