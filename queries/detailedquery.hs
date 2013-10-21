@@ -48,9 +48,9 @@ showAsTable rs =
     
     
 query winner numiterations =
-  "SELECT num_two_edges, num_three_edges, SUM(numfirstwins), SUM(numsecondwins), SUM(numneitherwins) \
-  \FROM hypergraphs NATURAL JOIN perfect NATURAL JOIN hypergraph_structure NATURAL JOIN mctsvsperfect \
-  \WHERE winner = '"++ winner ++ "' AND numiterations = " ++ show numiterations ++ " GROUP BY num_two_edges, num_three_edges"
+  "SELECT num_two_sets, num_three_sets, SUM(num_first_wins), SUM(num_second_wins), SUM(num_neither_wins) \
+  \FROM hypergraphs NATURAL JOIN results_Perfect_vs_Perfect NATURAL JOIN hypergraph_structure NATURAL JOIN results_UCT_vs_Perfect \
+  \WHERE winner = '"++ winner ++ "' AND num_iterations_first = " ++ show numiterations ++ " GROUP BY num_two_sets, num_three_sets"
 
 cols = ["#edges of size 2", "#edges of size 3", "#First wins", "#Second wins", "#Neither wins"]    
 
@@ -76,13 +76,18 @@ main = do
             Just rows <- sequence . map (processRow . map maybeFromSql) <$> quickQuery' connection (query winner niter) []
             putStrLn $ "winner: " ++ winner
             putStrLn $ showTable $ showAsTable rows
-      runQuery "First" 10
-      runQuery "First" 20
-      runQuery "First" 30
-      runQuery "Neither" 10
-      runQuery "Neither" 20
-      runQuery "Neither" 30
-      --runQuery "Neither"
+      runQuery "First" 2
+      runQuery "First" 7
+      runQuery "First" 12
+      runQuery "First" 17      
+      runQuery "First" 22      
+      runQuery "First" 27      
+      runQuery "Neither" 2
+      runQuery "Neither" 7
+      runQuery "Neither" 12
+      runQuery "Neither" 17      
+      runQuery "Neither" 22      
+      runQuery "Neither" 27
       disconnect connection
     _ -> do
       putStrLn "error: invalid arguments: expected a database filename as first and only argument"
