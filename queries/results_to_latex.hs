@@ -54,7 +54,7 @@ resultsTable = do
       -- skip first column (contains only row number)
       manyTill (noneOf ['\n']) (char '|')
       -- read in actual data columns
-      cs <- column `sepEndBy1` (char '|')
+      cs <- init <$> column `sepBy1` (char '|')
       newline
       return $ Row cs
   
@@ -85,27 +85,47 @@ columnLatex Nothing = ""
 columnLatex (Just triples) =
   concat . intersperse "\n" $
   [ header, 
-    concat . intersperse "\\\n" . map tripleLatex $ triples,
+    concat . intersperse "\\\\\n" . map tripleLatex $ triples,
     footer ]
   where
-    header = undefined -- TODO: should be some kind of table
-    footer = undefined
-    tripleLatex (a,b,c) = concat $ intersperse ", " $ [a, b, c]
+    header = "\\begin{tabular}{>{\\tiny\\ttfamily}c}" -- TODO: should be some kind of table
+    footer = "\\end{tabular}"
+    tripleLatex (a,b,c) = concat $ intersperse "," $ map convertNumber [a, b, c]
 
 -- convert row of result table into latex
 rowLatex :: [Maybe [(String, String, String)]] -> String
-rowLatex = concat . intersperse "&&\n" . map columnLatex
+rowLatex = concat . intersperse "\n&\n" . map columnLatex
 
 -- conver the whole result table to latex
 tableLatex :: [[Maybe [(String, String, String)]]] -> String
 tableLatex rs =
   concat . intersperse "\n" $
   [ header,
-    concat . intersperse "\\\n" . map rowLatex $ rs,
+    concat . map (flip (++) "\\\\\\hline\n") . map rowLatex $ rs,
     footer ]
   where
-    header = undefined -- TODO: should be some kind of table
-    footer = undefined
+    numColumns = 14
+    columnDescriptor = ">{\\small\\ttfamily}c|"
+    columnDescriptors = concat ["{", "|", concat $ replicate numColumns columnDescriptor, "}"]
+    header = concat $ intersperse "\n" $ ["\\begin{landscape}",
+                                          "\\bgroup",
+                                          "\\setlength{\\tabcolsep}{.16em}",
+                                          "\\def\\arraystretch{0.5}",
+                                          "\\begin{table}",
+                                          "\\begin{tabular}" ++ columnDescriptors,
+                                          "\\hline"
+                                          ]
+    footer = concat $ intersperse "\n" $ ["%\\hline",
+                                          "\\end{tabular}",
+                                          "\\end{table}",
+                                          "\\egroup",
+                                          "\\end{landscape}"]
+
+-- converts number to the format we want
+convertNumber :: String -> String
+convertNumber "1.00" = "100"
+convertNumber ('0':'.':'0':b) = b
+convertNumber ('0':'.':a:b) = a:b
 
 main = do
   [resultsFile] <- getArgs
@@ -114,6 +134,8 @@ main = do
     Success (ResultsFile tables) -> do
       let firstWinnerTables = filter ((==) First . winner) tables
           neitherWinnerTables = filter ((==) Neither . winner) tables
-      print $ head $ processTables neitherWinnerTables
+      --print neitherWinnerTables
+      writeFile "firstWinnerTablesLatex.txt" $ tableLatex $ processTables firstWinnerTables
+      writeFile "neitherWinnerTablesLatex.txt" $ tableLatex $ processTables neitherWinnerTables
     Failure err -> print err
   
