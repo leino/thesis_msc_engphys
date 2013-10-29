@@ -93,20 +93,28 @@ columnLatex (Just triples) =
     tripleLatex (a,b,c) = concat $ intersperse "," $ map convertNumber [a, b, c]
 
 -- convert row of result table into latex
-rowLatex :: [Maybe [(String, String, String)]] -> String
-rowLatex = concat . intersperse "\n&\n" . map columnLatex
+rowLatex :: (Int, [Maybe [(String, String, String)]]) -> String
+rowLatex (i,cs) = concat . intersperse "\n&\n" . (++) [show i] . map columnLatex $ cs
 
 -- conver the whole result table to latex
 tableLatex :: [[Maybe [(String, String, String)]]] -> String
 tableLatex rs =
   concat . intersperse "\n" $
   [ header,
-    concat . map (flip (++) "\\\\\\hline\n") . map rowLatex $ rs,
+    topRow,
+    concat . map (flip (++) "\\\\\\hline\n") . map rowLatex $ zip [0 ..] rs,
     footer ]
   where
-    numColumns = 14
+    numColumns = length $ head rs
+    upperRightCorner = concat ["\\begin{tabular}{>{\\tiny\\ttfamily}c}",
+                               "\\#3-edges \\\\\\hline\n",
+                               "\\#2-edges \\\\\n",
+                               "\\end{tabular}"]
+    topRow = (concat $ intersperse "&" $ [upperRightCorner] ++ map show [0 .. numColumns-1]) ++ "\\\\\\hline\n"
+    firstColumnDescriptor = ">{\\small\\ttfamily}r|"
     columnDescriptor = ">{\\small\\ttfamily}c|"
-    columnDescriptors = concat ["{", "|", concat $ replicate numColumns columnDescriptor, "}"]
+    columnDescriptors = concat ["{", "|", firstColumnDescriptor,
+                                concat $ replicate numColumns columnDescriptor, "}"]
     header = concat $ intersperse "\n" $ ["\\begin{landscape}",
                                           "\\bgroup",
                                           "\\setlength{\\tabcolsep}{.16em}",
@@ -134,7 +142,6 @@ main = do
     Success (ResultsFile tables) -> do
       let firstWinnerTables = filter ((==) First . winner) tables
           neitherWinnerTables = filter ((==) Neither . winner) tables
-      --print neitherWinnerTables
       writeFile "firstWinnerTablesLatex.txt" $ tableLatex $ processTables firstWinnerTables
       writeFile "neitherWinnerTablesLatex.txt" $ tableLatex $ processTables neitherWinnerTables
     Failure err -> print err
