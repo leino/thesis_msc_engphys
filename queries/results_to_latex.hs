@@ -106,8 +106,8 @@ rowLatex (i,cs) =
 
 
 -- conver the whole result table to latex
-tableLatex :: [[Maybe [(String, String, String)]]] -> String
-tableLatex rs =
+tableLatex :: String -> String -> [[Maybe [(String, String, String)]]] -> String
+tableLatex caption label rs =
   concat . intersperse "\n" $
   [ header,
     topRow,
@@ -134,6 +134,8 @@ tableLatex rs =
                                           ]
     footer = concat $ intersperse "\n" $ ["%\\hline",
                                           "\\end{tabular}",
+                                          "\\caption{" ++ caption ++ "}",
+                                          "\\label{"++ label ++"}",
                                           "\\end{table}",
                                           "\\egroup",
                                           "\\end{landscape}"]
@@ -151,7 +153,13 @@ main = do
     Success (ResultsFile tables) -> do
       let firstWinnerTables = filter ((==) First . winner) tables
           neitherWinnerTables = filter ((==) Neither . winner) tables
-      writeFile "firstWinnerTablesLatex.txt" $ tableLatex $ processTables firstWinnerTables
-      writeFile "neitherWinnerTablesLatex.txt" $ tableLatex $ processTables neitherWinnerTables
+      writeFile "firstWinnerTablesLatex.txt" $
+        tableLatex "Results for First player win games. 2, 7, \\dots 27 iterations."
+        "tab:detailed_results_first" $
+        processTables firstWinnerTables
+      writeFile "neitherWinnerTablesLatex.txt" $
+        tableLatex "Results for Neither player win games. 2, 7, \\dots 27 iterations."
+        "tab:detailed_results_neither" $
+        processTables neitherWinnerTables
     Failure err -> print err
   
