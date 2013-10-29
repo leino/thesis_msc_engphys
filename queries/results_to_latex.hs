@@ -120,7 +120,7 @@ tableLatex rs =
                                "\\#2-edges \\\\\n",
                                "\\end{tabular}"]
     topRow = (concat $ intersperse "&" $ [upperRightCorner] ++ map show [0 .. numColumns-1]) ++ "\\\\\\hline\n"
-    firstColumnDescriptor = ">{\\small\\ttfamily}r|"
+    firstColumnDescriptor = ">{\\small\\ttfamily}r" ++ "!{\\vrule width 1pt}"
     columnDescriptor = ">{\\small\\ttfamily}c|"
     columnDescriptors = concat ["{", "|", firstColumnDescriptor,
                                 concat $ replicate numColumns columnDescriptor, "}"]
