@@ -94,7 +94,16 @@ columnLatex (Just triples) =
 
 -- convert row of result table into latex
 rowLatex :: (Int, [Maybe [(String, String, String)]]) -> String
-rowLatex (i,cs) = concat . intersperse "\n&\n" . (++) [show i] . map columnLatex $ cs
+rowLatex (i,cs) =
+  concat . intersperse "\n&\n" . (++) [firstColumn i] . map columnLatex $ cs
+  where
+    numIters = [2,7,12,17,22,27] -- TODO: make not be hardcoded
+    firstColumn i = concat [
+      "\\begin{tabular}{>{\\small\\ttfamily}c|>{\\tiny\\ttfamily}c}",
+      "\\multirow{3}{*}{" ++ show i ++ "}",
+      concat $ map (\n -> "& " ++ show n ++ " \\\\") numIters,
+      "\\end{tabular}" ]
+
 
 -- conver the whole result table to latex
 tableLatex :: [[Maybe [(String, String, String)]]] -> String
