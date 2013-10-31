@@ -5,8 +5,6 @@ In this section, we give an overview of the overall structure of the code and th
 
 Some parts of the \texttt{PoGa} library, such as the implementations of the games Tic-Tac-Toe and Hex, are not relevant and are thus not brought up here.
 The same goes for the entire \texttt{Graphics} submodule, which implements support for a human player for the cases of Tic-Tac-Toe and Hex.
-(The reason that we cannot just implement support for a human player for all positional games is that we cannot implement attractive user interfaces for the class of all games.)
-
 
 \subsection {Positional game library}
 
@@ -14,7 +12,7 @@ In this section, we introduce the \texttt{PoGa} library.
 One part of \texttt{PoGa} is mainly an interface used for representing and playing positional games.
 However, \texttt{PoGa} also provides the two strategies discussed earlier: minimax with alpha-beta pruning, and the UCT variant of MCTS.
 
-\texttt{PoGa} also contains implementations of arbitrary sized ($m \times n$) Tic-Tac-Toe and Hex.
+\texttt{PoGa} also contains implementations of arbitrarily sized ($m \times n$) Tic-Tac-Toe and Hex.
 
 \subsubsection {Game.hs}
 
@@ -25,56 +23,7 @@ Note that a strategy is just a move function, but that the result of the move is
 If we use the \texttt{IO} monad, we can represent a human player as a strategy. If we use a monad in the \texttt{MonadRandom} type-class, we can represent a random strategy. (Though, typically not completely random, of course.)
 
 \begin{code}
-module GameTheory.PoGa.Game
-       (Player(First, Second),
-        Game(..),
-        Winner(..),
-        terminal,
-        Position(choices, winner),
-        playGame,
-        playTournament,
-        opponent)
-        where
-
-data Player = First | Second
-  deriving (Eq, Show)
-           
-type Strategy m p = p -> m p
-
-data Winner = Neither | Both | Only Player
-  deriving (Eq, Show)
-
-
-newtype Game p = Game {position :: p}
-
-
--- The typeclass Position provides a very abstract view of
--- positional games.
-class Position p where
-  choices :: p -> [p]     -- available branches at position p
-  winner :: p -> Winner   -- Nothing on non-leaf nodes
-  terminal :: p -> Bool   -- Can a move be made? (For instance if the board is full,
-                                                  the position is terminal)
-
-opponent :: Player -> Player
-opponent First = Second
-opponent Second = First
-
-
-playGame :: (Position p, Monad m) =>
-  Game p -> Strategy m p -> Strategy m p -> m Winner
-playGame (Game pos) firstStrategy secondStrategy
-  | terminal pos = return $ winner pos
-  | otherwise = do
-      pos' <- firstStrategy pos
-      playGame (Game pos') secondStrategy firstStrategy
-      
-playTournament :: (Monad m, Position p) =>
-  Int -> Game p -> Strategy m p -> Strategy m p -> m [Winner]
-playTournament n game fststrat sndstrat = do
-  let g = playGame game fststrat sndstrat
-  ws <- sequence $ replicate n g
-  return ws
+test
 \end{code}
 
 \subsubsection{SetGame.hs}
@@ -84,73 +33,7 @@ A typeclass works well as a general interface, but we need to have a concrete da
 For many purposes, the following one works quite well. When it doesn't, a user of the library can always define his own data-type and use most of the functionality provided by the \texttt{PoGa} library, as long as the data-type is an instance of the \texttt{Position} typeclass, as described above.
 
 \begin{code}
-
--- A module to use when your game is conveniently
--- definable by sets.
-
-module GameTheory.PoGa.SetGame
-       (SetGame(..), makeMove, fromWinningSets)
-       where
-
-import Data.Set as Set
-import GameTheory.PoGa.Game
-
-data SetGame v = SetGame {board :: Set v,               -- all vertices of board
-                          turn :: Player,               -- who's turn is it?
-                          firstChoices :: Set v,        -- vertices that First occupy
-                          secondChoices :: Set v,       -- vertices that Second occupy
-                          firstWin :: Set v -> Bool,    -- is First winner?
-                          secondWin :: Set v -> Bool}   -- is Second winner?
-                 
-                 
-instance Show v => Show (SetGame v) where
-  show sg = show $ board sg
-
--- All unoccupied vertices
-availableVertices :: Ord v => SetGame v -> Set v
-availableVertices sg =  
-  ((board sg) \\ (firstChoices sg)) \\ (secondChoices sg)
-
--- Current player makes move corresponding to the given vertex
-makeMove :: Ord v => SetGame v -> v -> SetGame v
-makeMove sg vtx = 
-  case turn sg of
-    First -> sg{firstChoices = Set.insert vtx (firstChoices sg),
-                turn = Second}
-    Second -> sg{secondChoices = Set.insert vtx (secondChoices sg),
-                 turn = First}
-
--- construct a game given a board and winning sets
-fromWinningSets :: (Ord v) =>
-  Set.Set v -> Set.Set (Set.Set v) -> Set.Set (Set.Set v) -> SetGame v
-fromWinningSets board wssFirst wssSecond = 
-  SetGame {board = board,
-           turn = First,
-           firstChoices = Set.empty,
-           secondChoices = Set.empty,
-           firstWin = win wssFirst,
-           secondWin = win wssSecond}
-  where
-  -- Make a win function from a set of winning sets
-  win :: (Ord v) => Set.Set (Set.Set v) -> Set.Set v -> Bool
-  win wss s =
-    or [ws `Set.isSubsetOf` s | ws <- Set.toList wss]
-
-
--- All possible moves that can be made for the given game.
-instance Ord v => Position (SetGame v) where
-  choices sg = 
-    Set.toList $ Set.mapMonotonic (makeMove sg) (availableVertices sg)
-  winner sg =
-    case (firstWin sg $ firstChoices sg,
-          secondWin sg $ secondChoices sg) of
-      (True, False) -> Only First
-      (False, True) -> Only Second
-      (False, False) -> Neither
-      (True, True) -> Both
-  terminal sg =
-    (Set.null $ availableVertices sg) || (winner sg /= Neither)
-
+test
 \end{code}
 
 \subsubsection {Strategies.hs}
@@ -168,193 +51,6 @@ It is provided in the module named \texttt{GraphicalGame}, and the required user
 Since it is not an important part of this paper, that entire module is left out of this section for space reasons.
 However, the interested reader can download them from the repository (TODO: insert repository address here).
 
-
-
-
 \begin{code}
-
-
-odule GameTheory.PoGa.Strategy
-       (Strategy,
-        perfectStrategyFirst,
-        perfectStrategySecond,
-        randomStrategy,
-        mctsStrategyFirst,
-        mctsStrategySecond,
-        MCTSNode (..))
-       where
-
-
-import Data.Function (on)
-import GameTheory.PoGa.Game as Game
-import qualified Data.Set as Set
-import Data.List (find, sortBy, maximumBy, minimumBy)
-import qualified Control.Monad.Random as Random
-
-type Strategy m p = p -> m p
-
--- ~~~~~~~~~~ Exports ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-perfectStrategyFirst :: (Monad m, Position p) => p -> m p
-perfectStrategyFirst pos = return $ perfectStrategy First pos
-perfectStrategySecond :: (Monad m, Position p) => p -> m p
-perfectStrategySecond pos = return $ perfectStrategy Second pos
-
--- smaple uniformly from all choices
-randomStrategy :: (Random.MonadRandom m, Position p) => p -> m p
-randomStrategy pos = Random.fromList [(c,1) | c <- choices pos]
-
-
--- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-prunedMaximumBy :: (a -> a -> Ordering) -> (a -> Bool) -> [a] -> a
-prunedMaximumBy compare isMax xs = 
-  case find isMax xs of
-    Just x -> x
-    Nothing -> maximumBy compare xs
-
-
-alternatingStrategy :: Position p =>
-  (Winner -> Winner -> Ordering) -> Player -> p -> Winner
-alternatingStrategy compareWinners player pos
-  | terminal pos = winner pos
-  | otherwise =
-      let ws = map (alternatingStrategy (flip compareWinners) (opponent player))
-                   (choices pos) in
-      prunedMaximumBy compareWinners ((==) (Only player)) ws
-    
-
--- first is 'maxi' since Only First is greatest, in compareWinners
-perfectStrategy:: Position p => Player -> p -> p
-perfectStrategy player pos = 
-  let cs = choices pos
-      ws = map (alternatingStrategy (flip compareWinners) (opponent player)) cs
-      wcs = zip ws cs in
-  snd $ prunedMaximumBy (compareWinners `on` fst) ((==) (Only player) . fst) wcs
-  where
-    winnerValue w
-      | w == (Only player) = 1
-      | w == (Only $ opponent player) = -1
-      | otherwise = 0
-    compareWinners w w' = compare (winnerValue w) (winnerValue w') 
-
-
-
-
--- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--- ~ Monte Carlo Tree Search (MCTS) strategy and supporting infrastructure
--- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-type Score = Double
-data MCTSNode p = Unexplored p | Explored p Int Score [MCTSNode p]
-
-
-instance Position p => Position (MCTSNode p) where
-  terminal (Unexplored pos) = terminal pos
-  terminal (Explored pos _ _ _) = terminal pos
-  choices (Unexplored pos) = map Unexplored (choices pos)
-  choices (Explored _ _ _ children) = children
-  winner (Unexplored pos) = winner pos
-  winner (Explored pos _ _ _) = winner pos
-
-compareChildren node a@(Explored _ _ _ _) b@(Explored _ _ _ _) =
-  compare (reconScore node a) (reconScore node b)
-  where
-  cExp :: Double  
-  cExp = 1.0 / (sqrt 2.0) -- amount of exploration
-  reconScore :: (Position p) => MCTSNode p -> MCTSNode p -> Score
-  reconScore parent@(Explored _ vcp sp _) child@(Explored _ vcc sc _) =
-    ( sc / (fromIntegral vcc) ) +
-    cExp * sqrt (  2.0*(log $ fromIntegral vcp) / (fromIntegral vcc)  )
-compareChildren _ (Unexplored _) (Unexplored _) = EQ
-compareChildren _ (Explored _ _ _ _) (Unexplored _) = LT
-compareChildren _ (Unexplored _) (Explored _ _ _ _) = GT 
-
-
--- This function is only defined for non-terminal nodes
-popBestChild :: Position p => MCTSNode p -> (MCTSNode p, [MCTSNode p])
-popBestChild node@(Explored pos visitCount score children) = 
-  popMaximumBy (compareChildren node) children
-popBestChild (Unexplored _) = error "popBestChild: un-explored node given"
-
-
-
-mctsStrategy :: (Position p, Random.MonadRandom m) =>
-  (p -> Score) -> Int -> MCTSNode p -> m (MCTSNode p)
-mctsStrategy leafValue 0 node = do
-  let (c, _) = popBestChild node
-  return c
-mctsStrategy leafValue numSteps node = do
-  (_, node') <- explore leafValue node
-  mctsStrategy leafValue (numSteps-1) node'
-
-
-
-explore :: (Position p, Random.MonadRandom m) =>
-  (p -> Score) -> MCTSNode p -> m (Score, MCTSNode p)
-explore leafValue (Unexplored pos) = do
-  s <- recon leafValue pos
-  return $ (-s, Explored pos 1 s (map Unexplored $ choices pos))
-explore leafValue node@(Explored pos visitCount score children)
-  | terminal node = do
-      let s = leafValue pos
-      return $ (-s, Explored pos (visitCount+1) s [])
-  | otherwise = do
-      let (c, cs) = popBestChild node
-      (s, c') <- explore leafValue c
-      return $ (-s, Explored pos (visitCount+1) (score+s) (c':cs))
-
-recon :: (Random.MonadRandom m, Position p) => (p -> Score) -> p -> m Score
-recon leafValue pos
-  | terminal pos = return $ leafValue pos
-  | otherwise = do
-      c <- Random.fromList [(c,1) | c <- choices pos]
-      s <- recon leafValue c
-      return $ -s
-
--- helper function: takes a non-empty list and
--- extracts it's maximum
-popMaximumBy :: (a -> a -> Ordering) -> [a] -> (a, [a])
-popMaximumBy _ [] = error "popMaximumBy: empty list"
-popMaximumBy _ [x] = (x, [])
-popMaximumBy cmp (x:xs) = 
-  let (m, xs') = popMaximumBy cmp xs in
-  if cmp m x == LT then (x, m:xs') else (m, x:xs')
-
-
-
-
-
-valueFirst :: Position p => p -> Score
-valueFirst pos =
-  case winner pos of
-    Neither -> 0.0
-    Both -> 0.0
-    Only First -> -1.0
-    Only Second -> 1.0
-
-valueSecond :: Position p =>  p -> Score
-valueSecond = negate . valueFirst
-
-
-mctsStrategyFirst :: (Position p, Random.MonadRandom m) =>
-  Int -> MCTSNode p ->  m (MCTSNode p) 
-mctsStrategyFirst = mctsStrategy valueFirst
-mctsStrategySecond :: (Position p, Random.MonadRandom m) =>
-  Int -> MCTSNode p ->  m (MCTSNode p)
-mctsStrategySecond = mctsStrategy valueSecond
-
-
-
-
--- ~~~~~ Tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-test_popMaximumBy :: Ord a => a -> [a] -> Bool
-test_popMaximumBy x xs =
-  let (m, xs') = popMaximumBy compare (x:xs) in
-  length (x:xs) == length (m:xs') && m == maximumBy compare (x:xs)
-
-
+test
 \end{code}
