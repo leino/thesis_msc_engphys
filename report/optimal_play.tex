@@ -1,6 +1,6 @@
 \subsection{Introduction}
 
-In this section, we will introduce an algorithm called the minimax algorithm which can play any positional game (and more general games) in an optimal manner.
+In this section, we will introduce an algorithm called the minimax algorithm, which can play any positional game (and more general games) in an optimal manner.
 The natural structure on which algorithmic play takes place is the game tree, as described in section~\ref{subsec:gametree}.
 A playing algorithm can then be seen as a search algorithm on the game tree.
 
@@ -75,7 +75,7 @@ If both players play optimally, then the nodes in the play path will all have th
 From the above results, we have the following nice re-characterization of definition~\ref{def:positionclasses}.
 
 \begin{theorem}
-The winner for a given node is the same as the winner of the leaf node (end position) which results when both players play optimally.
+The winner for a given node is the same as the winner of a leaf node (end position) which results when both players play optimally.
 \end{theorem}
 To get something a bit more operational, we define an ordering on the set of colors:
 
@@ -90,6 +90,7 @@ Thus, to find the winner of a position in which it's First's time to move, we ta
 To find the winner of a position in which it's Seconts time to move, we take the minimum.
 This leads to the following recursive definition for the winner of a node, which can be used to play optimally:
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[frame=single, caption={Winner function (no pruning)}, label={codelisting:winner-nopruning}]
   winner position =
     | terminal position      =
@@ -99,8 +100,9 @@ This leads to the following recursive definition for the winner of a node, which
     | otherwise              =
         minimum $ map winner $ choices position
 \end{lstlisting}
+\end{minipage}
 The above is a taste of Haskell code.
-The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in equation~\ref{eq:winnerordering}.
+The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in inequality~\ref{eq:winnerordering}.
 Since we know the rules of the game, the functions \texttt{turn}, \texttt{choices} and \texttt{terminal} are assumed to be given.
 (In turn, they tell who's turn it is, what his choices are and whether the position is terminal, given any position of the game.)
 
@@ -141,12 +143,15 @@ The implementation for \texttt{prunedMaximum} is similar:
       _ -> Only First
 \end{lstlisting}
 Now we can rewrite our pruned minimax algorithm so that it is very similar to listing~\ref{codelisting:winner-nopruning}:
+
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[frame=single, caption={Winner function (with pruning)}, label={codelisting:winner-pruning}]
   winner position
     | terminal position       = terminalWinner position
     | turn position == First  = prunedMaximum $ map winner $ choices play
     | otherwise               = prunedMinimum $ map winner $ choices play
 \end{lstlisting}
+\end{minipage}
 Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.
 
 In table~\ref{tab:ex_alphabeta}, we can recognize the game tree example from table~\ref{tab:ex_gametree}, with some parts taken out; the gray squares represent positions that do not need to be considered by minimax, thanks to alpha-beta pruning.
