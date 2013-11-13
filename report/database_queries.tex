@@ -1,4 +1,4 @@
-This section covers a number of interesting queries that one could make into the database from one of the experiments described above.
+This section covers a number of interesting queries that one could make into the database resulting from the experiment described in section~\ref{sec:experiment1}.
 
 It is assumed that you have SQLite 3 installed.
 To begin making queries into the database \texttt{mydatabase.db} (in the current working directory), you would issue the shell command:
@@ -21,11 +21,11 @@ sqlite> .tables
 experiments                 results_Perfect_vs_Perfect
 hypergraphs                 results_UCT_vs_Perfect  
 \end{code}
-These are the tables in \texttt{twothree.db}. The \texttt{hypergraphs} table contains the games we want to play, along with some meta information about the games. (See next command for details.)
-The table \texttt{results\_Perfect\_vs\_Perfect} contains the outcome for a each game when perfect First plays against perfect Second. (The perfect strategies are implemented using minimax, as covered in section \ref{sec:minimax}.)
+These are the tables in \texttt{twothree.db}. The \texttt{hypergraphs} table contains the games we want to play, along with some meta-information about the games. (See next command for details.)
+The table \texttt{results\_Perfect\_vs\_Perfect} contains the outcome for a each game when perfect First plays against perfect Second. (The perfect strategy is implemented using minimax, as covered in section \ref{sec:minimax}.)
 The table \texttt{results\_UCT\_vs\_Perfect} contains a number of sample outcomes when UCT (section \ref{sec:uct}) plays as First against a perfect opponent as Second.
 
-To get more precise information about what's contained in the above tables, issue the following command:
+To get more precise information about what's contained in the above tables, we issue the following command:
 
 \begin{minipage}{\linewidth}
 \begin{code}
@@ -249,7 +249,7 @@ sqlite> SELECT DISTINCT numvertices, numedges, COUNT (hypergraph)
 \\
 \end{tabular}
 
-The attentive reader will note the number of hypergraphs listed in the above table adds up to 2215838 -- the number of hypergraphs in the database:
+The attentive reader will note that the number of hypergraphs listed in the above table adds up to 2215838 -- the number of hypergraphs in the database:
 \begin{code}
 sqlite> SELECT COUNT (*) FROM hypergraphs;
 2215838
@@ -271,7 +271,7 @@ sqlite> SELECT SUM(num_first_wins), SUM(num_second_wins),
 208304245|10629080|2472675|22
 213217957|5808092|2379951|27
 \end{code}
-Or, approximately and in normalized form:
+Or, in normalized form and rounded:
 \begin{code}
 0.07 | 0.93 | 0.00 | 2
 0.43 | 0.55 | 0.02 | 7

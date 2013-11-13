@@ -8,7 +8,7 @@ We would also want to know at what number, or even if, it becomes virtually perf
 We can measure the performance of UCT, for a given game, by playing with UCT at $n$ iterations as First versus perfect as Second.
 Since the outcome is random, we'll want to repeat this many times, and record how many times UCT wins, looses and ties.
 
-We also want to classify the game being played as a first player win, second player win or neither player wins.
+We also want to classify the game being played as first player win, second player win or neither player win.
 As discussed in section \ref{sec:minimax}, this means running perfect vs perfect for the game and recording the outcome.
 
 
@@ -17,11 +17,11 @@ As discussed in section \ref{sec:minimax}, this means running perfect vs perfect
 The number of positional games grows rapidly with the number of vertices (or positions).
 If we want to study interesting games of higher number of vertices, we are going to need to focus on particular classes.
 
-In the experiment outlined below, we will focus on games which have hyperedges (winning sets) with either two or three vertices.
+In the experiment outlined below, we will focus on games which have hyperedges (winning sets) containing either two or three vertices.
 In order to limit the number of vertices in a hyperedge, we can use the arguments \texttt{-dm:n} and \texttt{-Dm:n} with \texttt{genbg}.
-The argument \texttt{-dm:n} gives a lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
-Recall that the first class of vertices correspond to the vertices of the hyper-graph, and the second class refers to the hyperedges, as described in section \ref{sec:nautycommandline}.
-Similarly, the argument \texttt{-Dm:n} gives upper bounds on the maximum degrees for the two classes.
+The argument \texttt{-dm:n} gives lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
+Recall that the first class of vertices corresponds to the vertices of the hyper-graph, and the second class corresponds to the hyperedges, as described in section \ref{sec:nautycommandline}.
+Similarly, the argument \texttt{-Dm:n} specifies upper bounds on the maximum degrees for the two classes.
 By corollary \ref{cor:hypergraph_bipartite_bijection}, we can list the class of hyper-graphs with 4 vertices and 2 hyperedges containing either 2 or 3 vertices, and where each vertex is in at least one hyperedge, by running:
 
 \begin{code}
@@ -91,4 +91,4 @@ Each of these tournaments consist of 100 games, since the outcome of a game is r
 
 We also classify the games as first, second or neither player win, by playing two optimal players against each other and recording the result.
 
-This all ends up in a database, which is discussed more in detail in chapter \ref{sec:database_queries}.
+This all ends up in a database, which is discussed in more detail in chapter \ref{sec:database_queries}.
