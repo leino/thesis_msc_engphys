@@ -91,7 +91,7 @@ This is just a random search from the selected node, until we hit a leaf node.
 As can be seen from table \ref{tab:mcts_iteration_before}, there are two possible outcomes: either the seventh node on the fourth row, or the eight node on the fifth row.
 Suppose that the outcome is the latter.
 This node is a win for First.
-We should now perform the backup step. We start with the score $1$, and alternate signs until we come back up to the selected node. Which get's initialized with $N=1$ and $Q=(-1)^2 = 1$.
+We should now perform the backup step. We start with the score $1$, and alternate signs until we come back up to the selected node. Which gets initialized with $N=1$ and $Q=(-1)^2 = 1$.
 The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go.
 The complete result after the backup step is shown in table \ref{fig:mcts_iteration_after}.
 \begin{center}
@@ -131,7 +131,7 @@ recon position
 It reads as follows: in case the given position is terminal, then we can return the \texttt{value} of that position. Otherwise we select a random child, apply \texttt{recon} to it, and get a score, \texttt{s}, back.
 Note that $\texttt{s}$ represents the score from the point of view of the opponent of the player in turn, since \texttt{recon} was applied to a child of \texttt{position}. Therefore we must negate the score before we return it.
 
-Next, we'll look at the \texttt{explore} funtion, which is the core of the algorithm. The return value of the function is a tuple of a score together with the explored node. Just like \texttt{recon}, the score it returns is relative to the player who's turn it is in the given node. Apart from the node to explore, it also takes \texttt{cExp}, which is just the $c$ parameter from expression~\ref{eq:uctnodevalue}.
+Next, we'll look at the \texttt{explore} function, which is the core of the algorithm. The return value of the function is a tuple of a score together with the explored node. Just like \texttt{recon}, the score it returns is relative to the player who's turn it is in the given node. Apart from the node to explore, it also takes \texttt{cExp}, which is just the $c$ parameter from expression~\ref{eq:uctnodevalue}.
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[frame=single]
