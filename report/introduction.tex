@@ -1,0 +1,47 @@
+\subsection{What is a combinatorial game?}
+
+Game theory in general is a large field.
+To give an idea about what kinds of games people have studied, here are two orthogonal categorizations.
+
+Firstly there is the \emph {chance versus skill} aspect. There are games of pure chance and no skill, games of some chance and some skill, and games of pure skill.
+Combinatorial games are games of pure skill and no chance, and Poker is a game of some chance and some skill.
+
+Secondly, there are games of \emph{complete information} and games of \emph{incomplete information}.
+Poker is a game of incomplete information, and combonatorial games are games of complete information.
+
+We will be concerned only with combinatorial games played by two players.
+
+\subsubsection{Examples of combinatorial games}
+
+The game of \emph{Nim} is a good example of a combinatorial game.
+Nim is a game for two players, and can be played using nothing more than a bunch of beans (or other small objects).
+The game is played by arranging the beans in a number of heaps.
+The players take turns performing moves. A move is made by selecting a heap, and then taking a number of beans from that heap only. The winner is the last person to take a bean.
+
+Another very popular combinatorial game is \emph{checkers}. (Also known as \emph{draughts}.)
+Checkers is played by two players on a checkerboard of some size, say 8-by-8 or 12-by-12 squares.
+Each player starts out with pieces of a given color in a certain pattern on his side of the board.
+The players then take turns performing alternate moves on his own pieces.
+A move consists in selecting a piece of ones own color, and moving it to an adjacent location.
+If the opponent has a piece in such a location, it may be captured by jumping over it to the next adjacent location in the same direction, in which case it is removed from the board. If a move captured an opponent piece, it may be extended in case it can capture more of the opponents pieces in the same way, in a subsequent move. A piece may also become a so-called ``king'', in which case it can move in more ways.
+
+\subsection{Advances in combinatorial game theory}
+
+For a given combinatorial game, it is quite easy to convince oneself that it would be possible, in principle, to exhaustively enumerate every single possible play of that game.
+In a few of those plays, one player may act ideally in all situations, and in even fewer, both players will act ideally in all situations.
+
+However, playing by investigating all possible plays will quickly introduce a player to the concept of \emph{combinatorial chaos} -- the number of possible ways of playing the game, though finite, can be enormous.
+Therefore it is natural to wonder if one can find an algorithm, with reasonable computational complexity, to play a given game perfectly.
+
+Several results along these lines are presented in \citep{demaine_hearn08}. For instance: on page 10 we learn that checkers has been determined to be a draw if both players play perfectly, but that playing perfectly is a hard computational problem. (PSPACE-hard.)
+
+\subsubsection{Nim-like games and Sprauge-Grundy theory}
+
+It should be mentioned that, in spite of combinatorial chaos, some elegant results have been found for a certain class of games -- so-called ``Nim-like'' games.
+
+TODO: write about these results
+
+\subsubsection{Important books}
+
+TODO: reference ''Winning ways, by Conway''
+TODO: reference ``Beck -- Tic-Tac-Toe theory''
