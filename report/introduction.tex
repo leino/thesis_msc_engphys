@@ -25,6 +25,8 @@ The players then take turns performing alternate moves on his own pieces.
 A move consists in selecting a piece of ones own color, and moving it to an adjacent location.
 If the opponent has a piece in such a location, it may be captured by jumping over it to the next adjacent location in the same direction, in which case it is removed from the board. If a move captured an opponent piece, it may be extended in case it can capture more of the opponents pieces in the same way, in a subsequent move. A piece may also become a so-called ``king'', in which case it can move in more ways.
 
+A good introduction to combinatorial game theory is \citep{winning_ways}.
+
 \subsection{Advances in combinatorial game theory}
 
 For a given combinatorial game, it is quite easy to convince oneself that it would be possible, in principle, to exhaustively enumerate every single possible play of that game.
@@ -37,11 +39,11 @@ Several results along these lines are presented in \citep{demaine_hearn08}. For 
 
 \subsubsection{Nim-like games and Sprauge-Grundy theory}
 
-It should be mentioned that, in spite of combinatorial chaos, some elegant results have been found for a certain class of games -- so-called ``Nim-like'' games.
+It should be mentioned that, in spite of combinatorial chaos, some very nice results have been found for a certain class of games -- so-called ``Nim-like'' games.
+In the 1930's, Sprague and Grundy both independently showed that \emph{impartial games} are equivalent to Nim.
+An impartial game, roughly, is a game where the players can both make the same moves, i.e. where the allowable moves at any moment only depends on what configuration the game is in, and not on who's turn it is to move.
+This is a big discovery because Nim can be considered a solved game -- at any moment in a game of Nim, it is possible to quickly say which player would win in perfect play.
 
-TODO: write about these results
+\subsubsection{Probabilistic approach to game theory}
 
-\subsubsection{Important books}
-
-TODO: reference ''Winning ways, by Conway''
-TODO: reference ``Beck -- Tic-Tac-Toe theory''
+An approach to tackling combinatorial chaos by means of probabilistic methods is presented in \citep{beck08}.
