@@ -21,7 +21,7 @@ The players take turns performing moves. A move is made by selecting a heap, and
 Another very popular combinatorial game is \emph{checkers}. (Also known as \emph{draughts}.)
 Checkers is played by two players on a checkerboard of some size, say 8-by-8 or 12-by-12 squares.
 Each player starts out with pieces of a given color in a certain pattern on his side of the board.
-The players then take turns performing alternate moves on his own pieces.
+The players then take turns performing moves on their own pieces.
 A move consists in selecting a piece of ones own color, and moving it to an adjacent location.
 If the opponent has a piece in such a location, it may be captured by jumping over it to the next adjacent location in the same direction, in which case it is removed from the board. If a move captured an opponent piece, it may be extended in case it can capture more of the opponents pieces in the same way, in a subsequent move. A piece may also become a so-called ``king'', in which case it can move in more ways.
 
@@ -33,7 +33,7 @@ For a given combinatorial game, it is quite easy to convince oneself that it wou
 In a few of those plays, one player may act ideally in all situations, and in even fewer, both players will act ideally in all situations.
 
 However, playing by investigating all possible plays will quickly introduce a player to the concept of \emph{combinatorial chaos} -- the number of possible ways of playing the game, though finite, can be enormous.
-Therefore it is natural to wonder if one can find an algorithm, with reasonable computational complexity, to play a given game perfectly.
+Therefore it is natural to wonder if one can find an algorithm with reasonable computational complexity, to play a given game perfectly.
 
 Several results along these lines are presented in \citep{demaine_hearn08}. For instance: on page 10 we learn that checkers has been determined to be a draw if both players play perfectly, but that playing perfectly is a hard computational problem. (PSPACE-hard.)
 
@@ -46,4 +46,4 @@ This is a big discovery because Nim can be considered a solved game -- at any mo
 
 \subsubsection{Probabilistic approach to game theory}
 
-An approach to tackling combinatorial chaos by means of probabilistic methods is presented in \citep{beck08}.
+An interesting approach to tackling combinatorial chaos by means of probabilistic methods is presented in \citep{beck08}.
