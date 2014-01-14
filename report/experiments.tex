@@ -86,10 +86,10 @@ We are dealing with the set of all hypergraphs with hyperedges of size either tw
 
 That ends up being about 2.2 million hypergraphs. 2,215,838, to be exact.
 
-For each of those hypergraphs, we run 6 tournaments of UCT versus perfect (minimax): UCT with 2,7,12,17,22 and 27 iterations, as first, versus perfect as second.
-Each of these tournaments consist of 100 games, since the outcome of a game is random. Within a given tournament, we record the number of first wins, second wins and the number of ties.
+For each of those hypergraphs, we run 6 tournaments of UCT versus perfect (minimax): UCT with 2,7,12,17,22 and 27 iterations, as First, versus perfect as Second.
+Each of these tournaments consist of 100 games, since the outcome of a game is random. Within a given tournament, we record the number of First wins, Second wins and the number of ties.
 
-We also classify the games as first, second or neither player win, by playing two optimal players against each other and recording the result.
+We also classify the games as First, Second or Neither player win, by playing two optimal players against each other and recording the result.
 
 This all ends up in a database, which is discussed in more detail in chapter \ref{sec:database_queries}.
 
@@ -99,7 +99,7 @@ The various data gathered are viewed in several different ways in the next secti
 
 For instance, in section \ref{sec:results_at_large} we look at the number of wins at a given number of iterations of for MCTS as First versus a perfect opponent as Second. Since there are many more First-win games than Neither-win games, we look at this table separately for those two classes of games. The trend is that in First-win games, MCTS is quite weak at very low numbers of iterations, but then climbs quite rapidly toward approximately 0.96 win rate at 27 iterations. The trend in Neither-win games is different in the way that, even at extremely low numbers of iterations, we get 0.87 win rate. The rate then proceeds to climb steadily to 0.99 at 27 iterations.
 
-Examples of a different way to split the results up is given in \ref{sec:more_detailed_results}.
+Examples of a different way to split the results up is given in section \ref{sec:more_detailed_results}.
 There, the games are classified based on their number of 2-edges and 3-edges. For each such category, we study the win-rates across the number of iterations of MCTS as First versus perfect as Second.
 In the first table, we quickly notice that in almost all of the cases, increasing numbers of iterations means an increasing win-rate for MCTS. There are exceptions to this in some categories (such as for 12 2-edges and 0 3-edges), but even in those cases the performance of MCTS is not bad.
-This section also shows that there are different aspects to MCTS's performance. For instance, in the case of 0 2-edges and 7 3-edges, MCTS only managed to get up to a win-rate of 0.6 at most. But on the other hand, in the same category and same number of iterations, the win-rate of the perfect opponent is only 0.1, meaning that the games ended up with no winner at a rate of 0.4. This can be contrasted with, for example, the category of 2 2-edges and 10 3-edges, where on the one hand the win-rate of MCTS goes up to 0.89 at most, but at the same time, the win-rate of second is quite high at 0.7.
+This section also shows that there are different aspects to MCTS's performance. For instance, in the case of 0 2-edges and 7 3-edges, MCTS only managed to get up to a win-rate of 0.6 at most. But on the other hand, in the same category and same number of iterations, the win-rate of the perfect opponent is only 0.1, meaning that the games ended up with no winner at a rate of 0.4. This can be contrasted with, for example, the category of 2 2-edges and 10 3-edges, where on the one hand the win-rate of MCTS goes up to 0.89 at most, but at the same time, the win-rate of Second is quite high at 0.7.
