@@ -6,6 +6,12 @@ In this section, we give an overview of the overall structure of the code and th
 Some parts of the \texttt{PoGa} library, such as the implementations of the games Tic-Tac-Toe and Hex, are not relevant and are thus not brought up here.
 The same goes for the entire \texttt{Graphics} submodule, which implements support for a human player for the cases of Tic-Tac-Toe and Hex.
 
+The full code is available in a Git repository at:
+
+\texttt{https://aleino@bitbucket.org/aleino/thesis.git}
+
+Note that the code may have been updated since it was used to generate the results you can read in this thesis. Therefore, the exact version used has been tagged in the repository as \texttt{final\_code}.
+
 \subsection {Positional game library}
 
 In this section, we introduce the \texttt{PoGa} library.
@@ -154,9 +160,7 @@ As mentioned, strategies take a position to a monadic position, where the monad 
 
 A strategy representing a human player would require some kind of user interface, which is not provided here.
 It is provided in the module named \texttt{GraphicalGame}, and the required user interfaces are specified for the cases of arbitrarily sized Tic-Tac-Toe and Hex games.
-
-Since it is not an important part of this paper, that entire module is left out of this section for space reasons.
-However, the interested reader can download them from the repository (TODO: insert repository address here).
+Since it is not an important for our purposes here, that entire module is left out of this section for space reasons.
 
 Below follows, \texttt{Perfect.hs}, the submodule containing the algorithm for perfect play, i.e. the minimax algorithm with alpha-beta pruning.
 
@@ -321,8 +325,6 @@ compareChildren cExp node a b =
     (Just _, Nothing) -> LT
     (Nothing, Just _) -> GT
 
--- TODO: rewrite as map best child
--- Also need MCTS nodes to store children in a list
 popBestChild :: (MCTSNode p, Game.Position p) => Double -> p -> (p, [p])
 popBestChild cExp node
   | explored node = popMaximumBy (compareChildren cExp node) (Game.choices node)
