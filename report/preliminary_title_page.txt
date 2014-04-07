@@ -1,0 +1,9 @@
+name:           Anders Leino
+email:          anders.leino@gmail.com
+english title:  Exact and Monte-Carlo algorithms for combinatorial games
+swedish title:  Exakta och Monte-Carlo algoritmer för kombinatoriska spel
+subject:        Mathematics
+handledare:     Klas Markström
+examinator:     Leif Persson
+uppdragsgivare: Institutionen för matematik, Umeå Universitet
+date:           2014-04-07
