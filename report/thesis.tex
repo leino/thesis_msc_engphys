@@ -61,9 +61,7 @@
 \title{Exact and Monte-Carlo algorithms for combinatorial games}
 \date{February 24, 2014}
 \author{Anders Leino}
-
 \maketitle
-
 \begin{abstract}
 This thesis concerns combinatorial games and algorithms that can be used to play them.
 Basic definitions and results about combinatorial games are covered, and an implementation of the minimax algorithm with alpha-beta pruning is presented.
@@ -72,9 +70,19 @@ Then, a framework for testing the behavior of UCT as first player, at various nu
 Finally, we present the results obtained by applying this framework to the 2.2 million smallest non-trivial positional games having winning sets of size either 2 or 3.
 It is seen that on almost all different classifications of the games studied, UCT converges quickly to near-perfect play.
 \end{abstract}
-
+\pagebreak
+\renewcommand{\abstractname}{Exakta och Monte-Carlo algoritmer för kombinatoriska spel}
+\begin{abstract}
+Denna rapport angår kombinatoriska spel och algoritmer som kan användas för att spela dessa.
+Grundläggande definitioner och resultat som angår kombinatoriska spel täcks, och en implementation av minimax-algoritmen med alpha-beta beskärning ges.
+Detta följs av en beskrivning samt en implementation av UCT varianten av MCTS (Monte-Carlo tree search).
+Sedan beskrivs ett ramverk för att testa beteendet för UCT som första spelare, vid olika antal iterationer ~(nämligen 2, 7, \dots 27), mot minimax som andra spelare.
+Till sist beskrivs resultaten vi funnit genom att använda detta ramverk för att spela de 2,2 miljoner minsta icke triviala positionella spelen med vinstmängder av storlek antingen 2 eller 3.
+Vi finner att, för nästan alla olika klassificeringar av spel vi studerar, så konvergerar UCT snabbt mot nära perfekt spel.
+\end{abstract}
+\pagebreak
 \tableofcontents
-
+\pagebreak
 \section{Introduction}
 \label{sec:introduction}
 \input{introduction.tex}
@@ -98,20 +106,20 @@ It is seen that on almost all different classifications of the games studied, UC
 \section{Experiments}
 \label{sec:experiments}
 \input{experiments.tex}
-
-\section{Appendix A: Database queries}
-\label{sec:database_queries}
-\input{database_queries.tex}
-
-\section{Appendix B: Code}
-\label{sec:code}
-\input{code.tex}
-
+\pagebreak
 % bibliography
 % \bibliographystyle{abbrv}
 \bibliographystyle{plainnat}
 \bibliography{simple}
 \input{bibliography.tex}
+\pagebreak
+\section{Appendix A: Database queries}
+\label{sec:database_queries}
+\input{database_queries.tex}
+\pagebreak
+\section{Appendix B: Code}
+\label{sec:code}
+\input{code.tex}
 
 \end{document}
 
