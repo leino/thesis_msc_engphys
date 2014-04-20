@@ -5,7 +5,7 @@ The plan is to try it out on many different games.
 In order to do that, we have to generate the games themselves.
 The goal of this chapter is to show how to do just that, given some constraints which we will cover later.
 
-Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is appropriate to talk about hyper-graphs in place of positional games.
+Since we will use a tool called Nauty to generate games, and since Nauty talks about graphs, it is appropriate to talk about hypergraphs in place of positional games.
 
 \begin{definition}
   A \emph{hypergraph} is a set of \emph{vertices}, $V$, together with a set of \emph{hyperedges} $E$, which are non-empty subsets of $V$.
@@ -25,6 +25,7 @@ We are particularly interested in the tools \texttt{genbg} and \texttt{showg}.
 A bipartite graph corresponds to a hypergraph in the following manner.
 Let us say that the two colors of the bipartite graph are red and blue. Then we can decide that the red vertices correspond exactly to the set of vertices in our hypergraph.
 We can make the blue vertices correspond to hyperedges by defining the hyperedge for a given blue vertex as those red vertices which are connected to it.
+This correspondence is indicated in table \ref{tab:bipartite_hypergraph_correspondence}, where a bipartite incidence graph (aka Levi graph) is displayed on the left hand side, and the corresponding hypergraph is displayed on the right hand side.
 
 
 \subsection{Choosing the command line switches}
@@ -298,7 +299,7 @@ Graph 4, order 5.
 \end{tabular}
 
 
-There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyperedge two times.
+There are still some issues. If we were to try to translate \texttt{Graph 1} to a hypergraph, we would get the same hyperedge twice.
 
 This issue is resolved with the command line switch \texttt{-z}, which ensures that no two vertices in the second class can have the same neighborhood.
 
@@ -317,7 +318,7 @@ Graph 1, order 5.
 
 \end{datalisting}
 So in the end we have only a single hypergraph in this class. It has two vertices, each with its own singleton hyperedge plus a hyperedge that contains both of the vertices.
-Table \ref{tab:bipartite_hypergraph_correspondence} shows how this bipartite graph and it's corresponding hypergraph are related.
+Table \ref{tab:bipartite_hypergraph_correspondence} shows how this bipartite graph and its corresponding hypergraph are related.
 \begin{center}
 \def\arraystretch{1.0}
 \begin{table}
@@ -326,7 +327,7 @@ Table \ref{tab:bipartite_hypergraph_correspondence} shows how this bipartite gra
   &
   \def\svgwidth{0.45\columnwidth} \input{hypergraph.pdf_tex}
 \end{tabular}
-\caption{The bipartite graph, and it's corresponding hypergraph.}
+\caption{An incidence graph and its corresponding hypergraph.}
 \label{tab:bipartite_hypergraph_correspondence}
 \end{table}
 \end{center}
@@ -363,7 +364,7 @@ Now, since $f$ is an isomorphism, $f$ indeed yields a bijection between $\mathca
 We have shown $G \cong G' \Rightarrow \varphi(G) \cong \varphi(G')$.
 To show the converse, suppose that we have a hypergraph isomorphism between $h: \varphi(G) \isomarrow \varphi(G')$.
 We define $f: G \rightarrow G'$ in two cases: $f \|_{V_1(G)} = h$ and $f \|_{V_2(G)} = \mathcal{N}^{-1} h \mathcal{N}$.
-We should check that the second expression is well defined. All vertices in $V_2(G)$ have distinct neighbourhoods, which is just another way of saying that $\mathcal{N}$ yields a bijection between vertices in $V_2(G)$ and their neighbourhoods, for all $G$. We also have that $h$ forms a bijection between the neighbourhoods of $V_2(G)$ and $V_2(G')$, by it's definition. These two facts are sufficcient to show that $f \|_{V_2(G)}$ is well defined.
+We should check that the second expression is well defined. All vertices in $V_2(G)$ have distinct neighbourhoods, which is just another way of saying that $\mathcal{N}$ yields a bijection between vertices in $V_2(G)$ and their neighbourhoods, for all $G$. We also have that $h$ forms a bijection between the neighbourhoods of $V_2(G)$ and $V_2(G')$, by its definition. These two facts are sufficcient to show that $f \|_{V_2(G)}$ is well defined.
 To show that $f$ is an isomorphism, we should also check that whenever $v_1 \sim v_2$ in $G$, we get $f(v_1) \sim f(v_2)$ in $G'$, and vice-versa.
 Suppose that $v_1 \sim v_2$ in $G$, where $v_1 \in V_1(G)$ and $v_2 \in V_2(G)$. It follows that $v_1 \in \mathcal{N}(v_2)$.
 Therefore $h(v_1) \in h \mathcal{N}( v_2 )$.
@@ -392,7 +393,7 @@ Let $\mathfrak{H}_{n,m}$ and the set of all non-isomorphic hypergraphs with $n$ 
 Then there is a bijection between $\mathfrak{B}_{n,m}$ and $\mathfrak{H}_{n,m}$.
 \end{corollary}
 
-We can also restrict on the size of the hyperedges and the number of hyperedges a given vertex can ocurr in.
+We can also restrict on the size of the hyperedges and the number of hyperedges a given vertex can occur in.
 
 \begin{corollary}
 Let $d,d',D,D'$ be integers.
