@@ -4,7 +4,7 @@ In this section, we will introduce an algorithm called the minimax algorithm, wh
 The natural structure on which algorithmic play takes place is the game tree, as described in section~\ref{subsec:gametree}.
 A playing algorithm can then be seen as a search algorithm on the game tree.
 
-The minimax algorithm in it's most naive implementation will search trough the entire game tree. This is not feasible for most games.
+The minimax algorithm in its most naive implementation will search trough the entire game tree. This is not feasible for most games.
 We therefore also describe a common optimization of the minimax algorithm, called alpha-beta pruning.
 
 
@@ -33,7 +33,7 @@ In terms of the game tree, what might it mean for any given position, not just a
 In the base case, i.e. we have a leaf node, the definition of winning node is clear from the rules of the particular game.
 If we are not on a leaf node, we break the definition up into two cases.
 
-\begin{definition}
+\begin{definition}[First player win node]
 \label{def:positionclasses}
 
 \begin{itemize}
@@ -42,7 +42,7 @@ If we are not on a leaf node, we break the definition up into two cases.
 
   \item Case 1: It is First's turn to move. In this case, the position is a First win if it has a child which is a First win, according to case 0 or case 2.
 
-  \item Case 2: It is Second's turn to move. In this case, the position is a First win if all of it's children are First win, according to case 0 or case 1.
+  \item Case 2: It is Second's turn to move. In this case, the position is a First win if all of its children are First win, according to case 0 or case 1.
 
 \end{itemize}
 
@@ -83,8 +83,11 @@ To get something a bit more operational, we define an ordering on the set of col
 \label{eq:winnerordering}
   \text{Second win} < \text{Neither win} < \text{First win}
 \end{equation}
-It is clear that First plays optimally if he at all times makes choices which are \emph{maximal} with respect to the above ordering.
+
+\begin{definition}[Optimal play]
+First is said to \emph{play optimally} if he at all times makes choices which are \emph{maximal} with respect to the above ordering.
 Similarly, Second plays optimally if he at all times makes choices which are \emph{minimal} with respect to the same ordering.
+\end{definition}
 
 Thus, to find the winner of a position in which it's First's time to move, we take the maximum of it's children, according to the above ordering.
 To find the winner of a position in which it's Second's time to move, we take the minimum.
