@@ -382,7 +382,7 @@ recon pos
       return $ -s
 
 -- helper function: takes a non-empty list and
--- extracts it's maximum
+-- extracts its maximum
 popMaximumBy :: (a -> a -> Ordering) -> [a] -> (a, [a])
 popMaximumBy _ [] = error "popMaximumBy: empty list"
 popMaximumBy _ [x] = (x, [])
