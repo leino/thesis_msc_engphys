@@ -17,11 +17,11 @@ It is assumed that we have a (reasonably efficient) function that lets us determ
 Here is a sketch of the steps that will make up our algorithm:
 
 \begin{itemize}
-\item \emph{Selection}: find a suitable expandable explored node, and select one of it's child nodes.
+\item \emph{Selection}: find a suitable expandable explored node by repeatedly applying a \emph{selection function}, and select one of its child nodes.
 \item \emph{Exploration}: run a simulation from the newly found child node and return a \emph{score}.
 \item \emph{Backpropagation}: use the score found in the previous step to update the visited tree in an appropriate way.
 \end{itemize}
-These steps are iterated a number of times in order to make a single move. Each iteration yields a more complete and refined knowledge of the game tree, thanks to the backpropagation step. In order to subsequently make a move, a sort of ``single level'' version of the selection step is carried out.
+These steps are iterated a number of times in order to make a single move. Each iteration yields a more complete and refined knowledge of the game tree, thanks to the backpropagation step. In order to subsequently make a move, a single application of the selection function is made.
 Note that there are variants of this algorithm which expand and explore multiple nodes instead of just one, but the principle is the same otherwise.
 Note also that this algorithm is far from complete. There are various appropriate ways of performing each of these steps, depending on the situation.
 The next section describes one of the possibilities: the UCT (Upper Confidence bounds for Trees) algorithm.
@@ -32,7 +32,6 @@ The next section describes one of the possibilities: the UCT (Upper Confidence b
 In this section, we fill in each of the steps outlined in the previous section, for the special case of the UCT algorithm.
 
 Each node $v$ in the explored part of the game tree has an attached score, which is just a real-valued number, say $S(v)$.
-
 
 \subsubsection{The selection step}
 \label{subsec:uct_selection_step}
@@ -52,17 +51,26 @@ The parameter $c$ determines the amount of exploration. We will choose $c = 1 / 
 This selection process continues until we find either an unexplored node or run into a node without children (i.e. a leaf node), in which case we return that leaf node.
 
 \subsubsection{The exploration step}
+\label{sec:exploration_step_explanation}
 
 When we have found a node using the selection step, we will explore that node, which will yield a score.
-If we are ``exploring'' a leaf node, the score will just be the value at the leaf node.
-Otherwise, we are exploring an unexplored non-leaf node, and then simply search randomly from that node until we run into a leaf node, which we know how to evaluate a score for.
-If the node has not previously been explored, it will finally be marked as explored, and it's visit count and score will be initialized as appropriate.
+If we are ``exploring'' a leaf node, the outcome is just First, Second or Neither, according to what outcome the leaf node represents.
+In case we are not exploring a leaf node, then we are exploring an unexplored non-leaf node, and then simply search randomly from that node until we run into a leaf node, which we know how to evaluate an outcome for.
+If the node has not previously been explored, it will finally be marked as explored, and its visit count and score will be initialized as appropriate.
+
+The result of the exploration step is a real-valued number -- a score.
+The score depends on who moves in order to arrive at the explored node, as well as what the outcome of the random search was.
+If First moves in order to arrive at the explored node, then a First, Second or Neither win outcome has a value of $1$, $-1$ or $0$, respectively. If Second moves to the explored node, these scores are negated.
 
 \subsubsection{The backup step}
+\label{sec:backup_step_explanation}
 
-When the exploration is done  we go back up the way we came, all the way to the root node.
-As we go, we update visit count, $N$, and accumulate the score, $Q$.
-We also make sure to alternate the sign of the score we use to accumulate as we go up the tree, since it represents the value for the player who's move it is at that node.
+As explained, the exploration step yields a score which is either $1$, $-1$ or $0$.
+In the backup step we go back up the way we came, all the way to the root node.
+As we go, we increment the visit count, $N$.
+We also update the cumulative score, $Q$, in the following way.
+Going up the tree, we bring with us the score corresponding to the outcome of the exploration step.
+However, in order to reflect the fact that the two players have opposite opinions of the outcome, we make sure to alternate its sign on each step. This alternated score is added to the cumulative score, $Q$.
 
 \subsection{An example}
 In this section, we give an example of the UCT algorithm described above.
@@ -83,16 +91,16 @@ We must first carry out the selection step. As can be seen from the figure, ther
 Let the choices on the second row of table \ref{tab:mcts_iteration_before} be $v_1$, $v_2$, $v_3$ and $v_4$, from left to right.
 Using expression \ref{eq:uctnodevalue} with $c = 1/\sqrt{2}$, we get $S(v_1) = \sqrt{\ln{5}} - 1$ for the first choice, and $S(v_2) = S(v_3) = S(v_4) = \sqrt{\ln{5}} + 1$ for the other three choices.
 So $v_2$, $v_3$ and $v_4$ all maximize $S$.
-Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} -- we simply select the first child, i.e. the fourth node from the left, on the third row.
+Suppose we choose to explore $v_2$. Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} -- we simply select the first child, i.e. the fourth node from the left, on the third row.
 This node is the result of the selection step.
 
 Now it is time to perform the exploration step.
 This is just a random search from the selected node, until we hit a leaf node.
 As can be seen from table \ref{tab:mcts_iteration_before}, there are two possible outcomes: either the seventh node on the fourth row, or the eight node on the fifth row.
 Suppose that the outcome is the latter.
-This node is a win for First.
-We should now perform the backup step. We start with the score $1$, and alternate signs until we come back up to the selected node. Which gets initialized with $N=1$ and $Q=(-1)^2 = 1$.
-The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go.
+This node is a win for First. Since we are exploring a node which First moves to, the numerical score of this outcome is $1$, as per the explanation in \ref{sec:exploration_step_explanation}.
+Thus, the backup step starts with the score $1$, and so the explored node gets initialized with $N=1$ and $Q=$.
+The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go, as described in \ref{sec:backup_step_explanation}.
 The complete result after the backup step is shown in table \ref{fig:mcts_iteration_after}.
 \begin{center}
 \def\arraystretch{5.5}
