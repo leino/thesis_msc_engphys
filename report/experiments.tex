@@ -22,7 +22,7 @@ In order to limit the number of vertices in a hyperedge, we can use the argument
 The argument \texttt{-dm:n} gives lower bounds, $m$ and $n$, for the minimum degrees of the first and second classes of vertices, respectively.
 Recall that the first class of vertices corresponds to the vertices of the hyper-graph, and the second class corresponds to the hyperedges, as described in section \ref{sec:nautycommandline}.
 Similarly, the argument \texttt{-Dm:n} specifies upper bounds on the maximum degrees for the two classes.
-By corollary \ref{cor:hypergraph_bipartite_bijection}, we can list the class of hyper-graphs with 4 vertices and 2 hyperedges containing either 2 or 3 vertices, and where each vertex is in at least one hyperedge, by running:
+By corollary \ref{cor:hypergraph_bipartite_bijection}, we can list the class of hypergraphs with 4 vertices and 2 hyperedges containing either 2 or 3 vertices, and where each vertex is in at least one hyperedge, by running:
 
 \begin{code}
   $ ./genbg -z 4 2 -d1:2 -D2:3 | ./showg
