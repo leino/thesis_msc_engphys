@@ -61,11 +61,11 @@ CREATE TABLE results_UCT_vs_Perfect
 );
 \end{code}
 \end{minipage}
-This command not only tells you the names, types and constraints of the collumns making up the table, but it does so by telling you the exact command that was issued to create the table.
+This command not only tells you the names, types and constraints of the columns making up the table, but it does so by telling you the exact command that was issued to create the table.
 The important information here is the names and types.
-We can see that \texttt{hypergraphs} has a collumn named \texttt{hypergraph}, which stores the hypergraph as a non-null \footnote{\texttt{NULL} is used to denote 'nothing', and is not appropriate here, which is why it is explicitly disallowed.} string (in the graph6 format). 
+We can see that \texttt{hypergraphs} has a column named \texttt{hypergraph}, which stores the hypergraph as a non-null \footnote{\texttt{NULL} is used to denote 'nothing', and is not appropriate here, which is why it is explicitly disallowed.} string (in the graph6 format). 
 The \texttt{hypergraphs} table also contains the number of vertices and edges as well as a more human-readable representation.
-Even though the last three collums of \texttt{hypergraphs} can easily be derived from the first collumn, they are nice to have there for convenience when making queries, as will be seen below.
+Even though the last three collums of \texttt{hypergraphs} can easily be derived from the first column, they are nice to have there for convenience when making queries, as will be seen below.
 
 
 \subsection{Overall database structure}
@@ -402,14 +402,14 @@ The output is as follows:
 \\
 \end{tabular}
 
-The first two collumns contain the number of vertices and edges, respectively. The following three collumns contains the number of times First, Second and Neither won in that category.
+The first two columns contain the number of vertices and edges, respectively. The following three collumns contains the number of times First, Second and Neither won in that category.
 
 \subsection{More detailed results}
 \label{sec:more_detailed_results}
 
 The following tables show percentages of First, Second and Neither wins, respectively, for a given number of 2-edges and 3-edges.
 (Recall that all edges are of size either 2 or 3, as described in section \ref{sec:experiment1}.)
-Note that the number of 3-edges increase along rows, and the number of 2-edges increase along collumns.
+Note that the number of 3-edges increase along rows, and the number of 2-edges increase along columns.
 The query is split up into First player win games (games where First wins if both players play perfectly), and Neither player win games (games where neither player wins if both play perfectly).
 Tables \ref{tab:detailed_results_first} and \ref{tab:detailed_results_neither} shows the query for First and Neither player win games, respectively.
 \newgeometry{left=1.0cm}
