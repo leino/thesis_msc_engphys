@@ -110,7 +110,7 @@ Since we know the rules of the game, the functions \texttt{turn}, \texttt{choice
 (In turn, they tell who's turn it is, what his choices are and whether the position is terminal, given any position of the game.)
 
 The code breaks the definition of \texttt{winner} up into three cases.
-In the first case, where the position is terminal, we trivially know the winner from the definition of the game, so \texttt{terminalWinner} is assumed to be given.
+In the first case, where the position is terminal, we know the winner from the definition of the game. This is what the \texttt{terminalWinner} function computes.
 In the second case, where the position is not terminal and it is First's turn to play, the winner is the maximum of \texttt{winner} mapped over the choices available from the given position.
 In the final case, we know that the node is not terminal and it is not First's turn to move. Thus it is Second's turn to move, and so the winner is the minimum of \texttt{winner} mapped over the choices available from the given position.
 
@@ -151,8 +151,8 @@ Now we can rewrite our pruned minimax algorithm so that it is very similar to li
 \begin{lstlisting}[frame=single, caption={Winner function (with pruning)}, label={codelisting:winner-pruning}]
   winner position
     | terminal position       = terminalWinner position
-    | turn position == First  = prunedMaximum $ map winner $ choices play
-    | otherwise               = prunedMinimum $ map winner $ choices play
+    | turn position == First  = prunedMaximum $ map winner $ choices position
+    | otherwise               = prunedMinimum $ map winner $ choices position
 \end{lstlisting}
 \end{minipage}
 Again, the winner function is the interesting part. If one has a winner function, it is easy to fill in the details required to derive a completely generic strategy.
