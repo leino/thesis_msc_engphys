@@ -128,10 +128,10 @@ We begin by looking at the \texttt{recon} function, which denotes the score \emp
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[frame=single]
 recon position
-  | Game.terminal position = return $ value pos
+  | terminal position = return $ value pos
   | otherwise = do
       c <- Random.fromList [(c,1)
-                           | c <- Game.choices position]
+                           | c <- choices position]
       s <- recon c
       return $ -s
 \end{lstlisting}
@@ -146,7 +146,7 @@ Next, we'll look at the \texttt{explore} function, which is the core of the algo
 explore cExp node = 
   case getMCTSData node of
     Nothing -> do
-      s <- if Game.terminal node
+      s <- if terminal node
            then return $ value node
            else recon node
       return ( s,
@@ -155,7 +155,7 @@ explore cExp node =
                              score = s} )
     Just (MCTSNodeData {visitCount = vc,
                         score = sc}) -> do
-      case Game.terminal node of
+      case terminal node of
         True -> do
           let s = value node
           return ( s,
