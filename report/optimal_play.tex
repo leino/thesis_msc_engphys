@@ -104,7 +104,7 @@ This leads to the following recursive definition for the winner of a node, which
         minimum $ map winner $ choices position
 \end{lstlisting}
 \end{minipage}
-The above is a taste of Haskell code.
+All code examples are written in the Haskell\footnote{Resources for learning Haskell can be found at \texttt{http://www.haskell.org/}. For a precise specification of the language, see \citep{haskell_report}, which is also available online at \texttt{http://www.haskell.org/onlinereport/haskell2010/}.} programming language.
 The \texttt{minimum} and \texttt{maximum} functions know about the ordering defined in inequality~\ref{eq:winnerordering}.
 Since we know the rules of the game, the functions \texttt{turn}, \texttt{choices} and \texttt{terminal} are assumed to be given.
 (In turn, they tell who's turn it is, what his choices are and whether the position is terminal, given any position of the game.)
