@@ -19,9 +19,9 @@ Here is a sketch of the steps that will make up our algorithm:
 \begin{itemize}
 \item \emph{Selection}: find a suitable expandable explored node by repeatedly applying a \emph{selection function}, and select one of its child nodes.
 \item \emph{Exploration}: run a simulation from the newly found child node and return a \emph{score}.
-\item \emph{Backpropagation}: use the score found in the previous step to update the visited tree in an appropriate way.
+\item \emph{Back propagation}: use the score found in the previous step to update the visited tree in an appropriate way.
 \end{itemize}
-These steps are iterated a number of times in order to make a single move. Each iteration yields a more complete and refined knowledge of the game tree, thanks to the backpropagation step. In order to subsequently make a move, a single application of the selection function is made.
+These steps are iterated a number of times in order to make a single move. Each iteration yields a more complete and refined knowledge of the game tree, thanks to the back propagation step. In order to subsequently make a move, a single application of the selection function is made.
 Note that there are variants of this algorithm which expand and explore multiple nodes instead of just one, but the principle is the same otherwise.
 Note also that this algorithm is far from complete. There are various appropriate ways of performing each of these steps, depending on the situation.
 The next section describes one of the possibilities: the UCT (Upper Confidence bounds for Trees) algorithm.
