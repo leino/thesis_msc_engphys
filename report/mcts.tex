@@ -54,7 +54,7 @@ This selection process continues until we find either an unexplored node or run 
 \label{sec:exploration_step_explanation}
 
 When we have found a node using the selection step, we will explore that node, which will yield a score.
-If we are ``exploring'' a leaf node, the outcome is just First, Second or Neither, according to what outcome the leaf node represents.
+If we are ``exploring'' a leaf node, the outcome is just First, Second or Neither win, according to what outcome the leaf node represents.
 In case we are not exploring a leaf node, then we are exploring an unexplored non-leaf node, and then simply search randomly from that node until we run into a leaf node, which we know how to evaluate an outcome for.
 If the node has not previously been explored, it will finally be marked as explored, and its visit count and score will be initialized as appropriate.
 
@@ -89,9 +89,9 @@ However, in order to get a non-trivial iteration, we assume that five iterations
 In table \ref{tab:mcts_iteration_before}, we have our starting point.
 We must first carry out the selection step. As can be seen from the figure, there are two cases: one with $N=1$ and $Q=-1$, and one with $N=1$ and $Q=1$.
 Let the choices on the second row of table \ref{tab:mcts_iteration_before} be $v_1$, $v_2$, $v_3$ and $v_4$, from left to right.
-Using expression \ref{eq:uctnodevalue} with $c = 1/\sqrt{2}$, we get $S(v_1) = \sqrt{\ln{5}} - 1$ for the first choice, and $S(v_2) = S(v_3) = S(v_4) = \sqrt{\ln{5}} + 1$ for the other three choices.
+Using expression \eqref{eq:uctnodevalue} with $c = 1/\sqrt{2}$, we get $S(v_1) = \sqrt{\ln{5}} - 1$ for the first choice, and $S(v_2) = S(v_3) = S(v_4) = \sqrt{\ln{5}} + 1$ for the other three choices.
 So $v_2$, $v_3$ and $v_4$ all maximize $S$.
-Suppose we choose to explore $v_2$. Since this node has no explored children, we do not need to calculate \ref{eq:uctnodevalue} -- we simply select the first child, i.e. the fourth node from the left, on the third row.
+Suppose we choose to explore $v_2$. Since this node has no explored children, we do not need to calculate \eqref{eq:uctnodevalue} -- we simply select the first child, i.e. the fourth node from the left, on the third row.
 This node is the result of the selection step.
 
 Now it is time to perform the exploration step.
@@ -99,8 +99,8 @@ This is just a random search from the selected node, until we hit a leaf node.
 As can be seen from table \ref{tab:mcts_iteration_before}, there are two possible outcomes: either the seventh node on the fourth row, or the eight node on the fifth row.
 Suppose that the outcome is the latter.
 This node is a win for First. Since we are exploring a node which First moves to, the numerical score of this outcome is $1$, as per the explanation in \ref{sec:exploration_step_explanation}.
-Thus, the backup step starts with the score $1$, and so the explored node gets initialized with $N=1$ and $Q=$.
-The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go, as described in \ref{sec:backup_step_explanation}.
+Thus, the backup step starts with the score $1$, and so the explored node gets initialized with $N=1$ and $Q=1$.
+The backup step is not done yet: we should continue all the way up to the root node, remembering to alternate the sign and adjust the accumulated scores and visit counts as we go, as described in section~\ref{sec:backup_step_explanation}.
 The complete result after the backup step is shown in table \ref{fig:mcts_iteration_after}.
 \begin{center}
 \def\arraystretch{5.5}
@@ -139,7 +139,7 @@ recon position
 It reads as follows: in case the given position is terminal, then we can return the \texttt{value} of that position. Otherwise we select a random child, apply \texttt{recon} to it, and get a score, \texttt{s}, back.
 Note that $\texttt{s}$ represents the score from the point of view of the opponent of the player in turn, since \texttt{recon} was applied to a child of \texttt{position}. Therefore we must negate the score before we return it.
 
-Next, we'll look at the \texttt{explore} function, which is the core of the algorithm. The return value of the function is a tuple of a score together with the explored node. Just like \texttt{recon}, the score it returns is relative to the player who's turn it is in the given node. Apart from the node to explore, it also takes \texttt{cExp}, which is just the $c$ parameter from expression~\ref{eq:uctnodevalue}.
+Next, we'll look at the \texttt{explore} function, which is the core of the algorithm. The return value of the function is a tuple of a score together with the explored node. Just like \texttt{recon}, the score it returns is relative to the player who's turn it is in the given node. Apart from the node to explore, it also takes \texttt{cExp}, which is just the $c$ parameter from expression~\eqref{eq:uctnodevalue}.
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[frame=single]
@@ -201,7 +201,7 @@ compareChildren cExp node a b =
     (Just _, Nothing) -> LT
     (Nothing, Just _) -> GT
 \end{lstlisting}
-The function splits into two cases. In the case where both children have been explored (i.e. have got MCTS data), we use expression~\ref{eq:uctnodevalue} to produce two numbers which us an ordering in the usual way. In case neither child have been explored, they are equal. In case the first has been explored but not the second, then the first is less than the second, and the final case is just the reverse of this.
+The function splits into two cases. In the case where both children have been explored (i.e. have got MCTS data), we use expression~\eqref{eq:uctnodevalue} to produce two numbers which us an ordering in the usual way. In case neither child have been explored, they are equal. In case the first has been explored but not the second, then the first is less than the second, and the final case is just the reverse of this.
 
 With the \texttt{explore} function and \texttt{compareChildren} in hand, we can easily write the final MCTS strategy. It needs two parameters: a number of iterations and a node to work on.
 
